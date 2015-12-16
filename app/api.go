@@ -2,34 +2,31 @@ package main
 
 import (
 	"database/sql"
-	"github.com/ant0ine/go-json-rest/rest"
+	"encoding/json"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"runtime"
 )
 
 func main() {
-	runtime.GOMAXPROCS(2)
-	api := rest.NewApi()
-	api.Use(rest.DefaultDevStack...)
-	router, err := rest.MakeRouter(
-		rest.Get("/", ApiHandler),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	api.SetApp(router)
-	log.Fatal(http.ListenAndServe(":8080", api.MakeHandler()))
+	r := httprouter.New()
+	r.GET("/", HomeHandler)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 type Product struct {
-	Amount string `json:"amount"`
+	Amount int    `json:"amount"`
 	Name   string `json:"name"`
 	Des    string `json:"des"`
 }
+type Response struct {
+	ResObj  []Product `json:"responseObject"`
+	ResCode string    `json:"responseCode"`
+	ResMsg  string    `json:"responseMessage"`
+}
 
-func ApiHandler(w rest.ResponseWriter, r *rest.Request) {
+func HomeHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	db, err := sql.Open("mysql", "root:sqdShengQianDai@tcp(121.43.110.32:3306)/sqd?autocommit=true")
 	if err != nil {
 		log.Fatalf("Open database error: %s\n", err)
@@ -45,15 +42,22 @@ func ApiHandler(w rest.ResponseWriter, r *rest.Request) {
 
 	var s []Product
 	p := &Product{}
+	p.Des = "hell哦"
+
 	for rows.Next() {
 		err := rows.Scan(&p.Name, &p.Amount)
-		p.Des = "hell哦"
 		s = append(s, *p)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
+	ret := Response{ResObj: s, ResCode: "success", ResMsg: "提交成功"}
+	Reply(w, r, ret)
+}
 
-	//	map[string]string{"Body": "Hello World!"}
-	w.WriteJson(s)
+func Reply(w http.ResponseWriter, r *http.Request, ret interface{}) {
+	//ret := Response{ResObj: s, ResCode: "success", ResMsg: "提交成功"}
+	js, _ := json.Marshal(&ret)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
