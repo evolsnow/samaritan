@@ -1,63 +1,60 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/codegangsta/negroni"
+	"github.com/garyburd/redigo/redis"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
+	"time"
 )
 
+var pool *redis.Pool
+
 func main() {
+	//	Rds, err := redis.Dial("tcp", "127.0.0.1:6379", 2)
+	pool = newPool("127.0.0.1:6379")
+
+	n := negroni.New(
+		negroni.NewRecovery(),
+		negroni.NewLogger(),
+		negroni.HandlerFunc(myMiddleware),
+	)
+
 	r := httprouter.New()
-	r.GET("/", HomeHandler)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	r.GET("/", ProductList)
+	r.GET("/test", Test)
+
+	n.UseHandler(r)
+	n.Run(":8080")
 }
 
-type Product struct {
-	Amount int    `json:"amount"`
-	Name   string `json:"name"`
-	Des    string `json:"des"`
-}
-type Response struct {
-	ResObj  []Product `json:"responseObject"`
-	ResCode string    `json:"responseCode"`
-	ResMsg  string    `json:"responseMessage"`
-}
+func myMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-func HomeHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	db, err := sql.Open("mysql", "root:sqdShengQianDai@tcp(121.43.110.32:3306)/sqd?autocommit=true")
-	if err != nil {
-		log.Fatalf("Open database error: %s\n", err)
+	if accept := r.Header.Get("Accept"); accept == "application/json" {
+		w.Header().Set("Content-Type", "application/json")
 	}
-	defer db.Close()
 
-	// Prepare statement for reading data
-	rows, err := db.Query("SELECT `name`, `funds_amount` FROM `product`")
-	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
-	}
-	defer rows.Close()
-
-	var s []Product
-	p := &Product{}
-	p.Des = "hell哦"
-
-	for rows.Next() {
-		err := rows.Scan(&p.Name, &p.Amount)
-		s = append(s, *p)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	ret := Response{ResObj: s, ResCode: "success", ResMsg: "提交成功"}
-	Reply(w, r, ret)
+	next(w, r)
 }
 
-func Reply(w http.ResponseWriter, r *http.Request, ret interface{}) {
-	//ret := Response{ResObj: s, ResCode: "success", ResMsg: "提交成功"}
-	js, _ := json.Marshal(&ret)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+func newPool(server string) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", server)
+			if err != nil {
+				return nil, err
+			}
+			//              if _, err := c.Do("AUTH", password); err != nil {
+			//                  c.Close()
+			//                  return nil, err
+			//              }
+			return c, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
+	}
 }
