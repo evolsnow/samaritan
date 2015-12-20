@@ -11,8 +11,7 @@ import (
 var pool *redis.Pool
 
 func main() {
-	//	Rds, err := redis.Dial("tcp", "127.0.0.1:6379", 2)
-	pool = newPool("127.0.0.1:6379")
+	pool = newPool("127.0.0.1:6379", 3)
 
 	n := negroni.New(
 		negroni.NewRecovery(),
@@ -37,7 +36,7 @@ func myMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	next(w, r)
 }
 
-func newPool(server string) *redis.Pool {
+func newPool(server string, db int) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
@@ -46,15 +45,15 @@ func newPool(server string) *redis.Pool {
 			if err != nil {
 				return nil, err
 			}
-			//              if _, err := c.Do("AUTH", password); err != nil {
-			//                  c.Close()
-			//                  return nil, err
-			//              }
+			if _, err := c.Do("SELECT", db); err != nil {
+				c.Close()
+				return nil, err
+			}
 			return c, err
 		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			return err
-		},
+		//		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+		//			_, err := c.Do("PING")
+		//			return err
+		//		},
 	}
 }

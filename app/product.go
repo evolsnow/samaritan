@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -59,6 +60,18 @@ type Response struct {
 }
 
 func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	conn := pool.Get()
+	defer conn.Close()
+	tmp, _ := redis.Bytes(conn.Do("GET", "productList"))
+	if tmp != nil {
+		//		log.Println("from cache")
+		//		if b, ok := tmp.([]byte); ok {
+		w.Write(tmp)
+		return
+		//log.Println("shouldn't appear")
+	} else {
+	}
+	//	}
 	db, err := sql.Open("mysql", "root:sqdShengQianDai@tcp(121.43.110.32:3306)/sqd?autocommit=true")
 	if err != nil {
 		log.Fatalf("Open database error: %s\n", err)
@@ -72,8 +85,8 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	defer rows.Close()
 
-	var s []Product
 	p := &Product{ZhiDing: 1, Day: 1, AllStatus: "1"}
+	var s []Product
 
 	for rows.Next() {
 		err := rows.Scan(&p.Id, &p.FundsAmount, &p.SalesAmount, &p.InterestYear, &p.MinPurchase, &p.InterestStart, &p.Name, &p.Period, &p.StatusInt)
@@ -86,10 +99,17 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		}
 	}
 	ret := Response{ResObj: s, ResCode: "success", ResMsg: "提交成功"}
-	reply(w, r, ret)
+	js, _ := json.Marshal(&ret)
+	go func() {
+		log.Println("set cache")
+		conn := pool.Get()
+		defer conn.Close()
+		conn.Do("SET", "productList", js)
+	}()
+	w.Write(js)
+	//	reply(w, r, ret)
 }
 
-func reply(w http.ResponseWriter, r *http.Request, ret interface{}) {
-	js, _ := json.Marshal(&ret)
-	w.Write(js)
-}
+//func reply(w http.ResponseWriter, r *http.Request, ret interface{}) {
+
+//}
