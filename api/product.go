@@ -72,7 +72,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	} else {
 	}
 	//	}
-	db, err := sql.Open("mysql", "root:sqdShengQianDai@tcp(121.43.110.32:3306)/sqd?autocommit=true")
+	db, err := sql.Open("mysql", "root:6:u2WkG=B:@tcp(139.196.13.186:3306)/sqd?autocommit=true")
 	if err != nil {
 		log.Fatalf("Open database error: %s\n", err)
 	}

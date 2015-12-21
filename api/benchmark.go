@@ -8,15 +8,15 @@ import (
 	"net/http"
 )
 
-type MyStruct struct {
-	Foo int `redis:"foo"`
-	Bar int `redis:"bar"`
-}
-
-type Album struct {
-	Title  string `redis:"title"`
-	Rating int    `redis:"rating"`
-}
+//type MyStruct struct {
+//	Foo int `redis:"foo"`
+//	Bar int `redis:"bar"`
+//}
+//
+//type Album struct {
+//	Title  string `redis:"title"`
+//	Rating int    `redis:"rating"`
+//}
 
 func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	conn := pool.Get()
@@ -37,7 +37,7 @@ func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	//		conn.Send("LPUSH", "albums", "3")
 	//		conn.Do("HMSET", "user", "foo", 10, "bar", 20)
 	//	ms := &MyStruct{}
-	ab := &Album{}
+	//ab := &Album{}
 	//
 	//	reply, err := redis.Values(conn.Do("HGETALL", "hi"))
 	//	if err != nil {
@@ -46,15 +46,23 @@ func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	//	redis.ScanStruct(reply, ms)
 	//	log.Println(*ms)
 
-	album, err := redis.Values(conn.Do("HGETALL", "album:1"))
+	//	album, err := redis.Values(conn.Do("HGETALL", "album:1"))
+	//	if err != nil {
+	//		// handle error
+	//		log.Println(err)
+	//	}
+
+	//	redis.ScanStruct(album, ab)
+	//	//log.Println(*ab)
+	//
+	//	ret, _ := json.Marshal(ab)
+	//	w.Write([]byte(ret))
+
+	username, err := redis.String(conn.Do("GETSET", "username", "evol"))
 	if err != nil {
-		// handle error
 		log.Println(err)
 	}
-
-	redis.ScanStruct(album, ab)
-	//log.Println(*ab)
-
-	ret, _ := json.Marshal(ab)
-	w.Write([]byte(ret))
+	f := map[string]string{"hello": username}
+	js, _ := json.Marshal(f)
+	w.Write([]byte(js))
 }
