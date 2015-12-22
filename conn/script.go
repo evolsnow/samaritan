@@ -4,7 +4,7 @@ import (
 	"github.com/evolsnow/gosqd/model"
 )
 
-func CreateProduct(p *model.Product) (interface{}, error) {
+func CreateProduct(p *model.RawProduct) (interface{}, error) {
 	conn := Pool.Get()
 	defer conn.Close()
 	return CreateProductScript.Do(conn, p.Name, p.CreateTime, p.ReviewTime, p.PublishTime, p.InterestStart, p.InterestEnd,

@@ -1,6 +1,6 @@
 package model
 
-type Product struct {
+type RawProduct struct {
 	Id              int
 	Name            string
 	CreateTime      string

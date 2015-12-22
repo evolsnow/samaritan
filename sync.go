@@ -27,7 +27,7 @@ func syncProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		panic(err.Error())
 	}
 	defer rows.Close()
-	p := &model.Product{}
+	p := &model.RawProduct{}
 	for rows.Next() {
 		err := rows.Scan(&p.Id, &p.Name, &p.CreateTime, &p.ReviewTime, &p.PublishTime, &p.InterestStart, &p.InterestEnd,
 			&p.Period, &p.FundsAmount, &p.MinPurchase, &p.SalseAmount, &p.InterestYear, &p.RepaymentType, &p.Category,

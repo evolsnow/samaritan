@@ -7,6 +7,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	//"fmt"
 )
 
 //type MyStruct struct {
@@ -65,5 +66,6 @@ func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	f := map[string]string{"hello": username}
 	js, _ := json.Marshal(f)
-	w.Write([]byte(js))
+
+	w.Write((js))
 }
