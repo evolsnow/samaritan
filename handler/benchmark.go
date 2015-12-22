@@ -1,7 +1,8 @@
-package main
+package handler
 
 import (
 	"encoding/json"
+	"github.com/evolsnow/gosqd/conn"
 	"github.com/garyburd/redigo/redis"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -19,8 +20,8 @@ import (
 //}
 
 func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	conn := pool.Get()
-	defer conn.Close()
+	c := conn.Pool.Get()
+	defer c.Close()
 	//	_, err := conn.Do("SET", "username", "evol")
 	//	if err != nil {
 	//	}
@@ -58,7 +59,7 @@ func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	//	ret, _ := json.Marshal(ab)
 	//	w.Write([]byte(ret))
 
-	username, err := redis.String(conn.Do("GETSET", "username", "evol"))
+	username, err := redis.String(c.Do("GETSET", "username", "evol"))
 	if err != nil {
 		log.Println(err)
 	}

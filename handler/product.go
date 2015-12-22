@@ -1,8 +1,9 @@
-package main
+package handler
 
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/evolsnow/gosqd/conn"
 	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
@@ -60,9 +61,9 @@ type Response struct {
 }
 
 func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	conn := pool.Get()
-	defer conn.Close()
-	tmp, _ := redis.Bytes(conn.Do("GET", "productList"))
+	c := conn.Pool.Get()
+	defer c.Close()
+	tmp, _ := redis.Bytes(c.Do("GET", "productList"))
 	if tmp != nil {
 		//		log.Println("from cache")
 		//		if b, ok := tmp.([]byte); ok {
@@ -102,9 +103,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	js, _ := json.Marshal(&ret)
 	go func() {
 		log.Println("set cache")
-		conn := pool.Get()
-		defer conn.Close()
-		conn.Do("SET", "productList", js)
+		c := conn.Pool.Get()
+		defer c.Close()
+		c.Do("SET", "productList", js)
 	}()
 	w.Write(js)
 	//	reply(w, r, ret)
