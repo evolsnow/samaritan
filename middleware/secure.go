@@ -1,19 +1,23 @@
 package middleware
 
 import (
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 )
 
 func BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		if accept := r.Header.Get("Accept"); accept == "application/json" {
-			log.Println("authenticated")
 			h(w, r, ps)
 			return
 		} else {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			e := map[string]string{"error": "authentication failed"}
+			msg, _ := json.Marshal(e)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(msg)
+			//			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
 	}
 }
