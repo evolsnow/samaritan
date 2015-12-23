@@ -13,6 +13,6 @@ func getRouter() *httprouter.Router {
 	r.GET("/", handler.ProductList)
 	r.GET("/test", handler.Test)
 	r.GET("/sync", syncProduct)
-	r.GET("/md", md.BasicAuth(handler.Hhhh))
+	r.POST("/md", md.BasicAuth(handler.Hhhh))
 	return r
 }
