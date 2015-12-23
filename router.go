@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/evolsnow/gosqd/handler"
+	md "github.com/evolsnow/gosqd/middleware"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -12,6 +13,6 @@ func getRouter() *httprouter.Router {
 	r.GET("/", handler.ProductList)
 	r.GET("/test", handler.Test)
 	r.GET("/sync", syncProduct)
-
+	r.GET("/md", md.BasicAuth(handler.Hhhh))
 	return r
 }
