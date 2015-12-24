@@ -11,9 +11,11 @@ var r = httprouter.New()
 func getRouter() *httprouter.Router {
 
 	r.GET("/", handler.ProductList)
-	r.GET("/test", handler.Test)
 	r.GET("/sync", syncProduct)
-	r.POST("/hi", mw.BasicAuth(handler.Hiii))
 
+	//test
+	r.GET("/test", handler.Test)
+	r.POST("/hi", mw.BasicAuth(handler.Hiii))
+	r.GET("/pm", handler.Pm)
 	return r
 }

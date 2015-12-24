@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -23,4 +24,11 @@ func Hiii(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 	generateResponse(w, r, rd)
 	//	fmt.Fprintf(w, rd.Inner.Name)
+}
+
+func Pm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	page := r.URL.Query().Get("page")
+	limit := r.URL.Query().Get("per_page")
+	fmt.Fprintf(w, page+limit)
+
 }

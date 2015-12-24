@@ -2,7 +2,6 @@ package conn
 
 import (
 	"github.com/garyburd/redigo/redis"
-	"log"
 	"time"
 )
 
@@ -10,10 +9,9 @@ var Pool *redis.Pool
 
 func init() {
 	Pool = newPool("127.0.0.1:6379", "123456", 3)
-	log.Println("reids-pool初始化完成")
 }
 
-func newPool(server, passwd string, db int) *redis.Pool {
+func newPool(server, password string, db int) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
@@ -22,7 +20,7 @@ func newPool(server, passwd string, db int) *redis.Pool {
 			if err != nil {
 				return nil, err
 			}
-			//			if _, err := c.Do("AUTH", passwd); err != nil {
+			//			if _, err := c.Do("AUTH", password); err != nil {
 			//				c.Close()
 			//				return nil, err
 			//			}
