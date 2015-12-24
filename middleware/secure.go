@@ -15,9 +15,8 @@ func BasicAuth(h httprouter.Handle) httprouter.Handle {
 			e := map[string]string{"error": "authentication failed"}
 			msg, _ := json.Marshal(e)
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(msg)
-			//			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
 	}
 }

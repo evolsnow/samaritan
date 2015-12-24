@@ -1,14 +1,19 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 type requestData struct {
-	Cardno     int
-	Methodname string
+	CardNo     int
+	MethodName string
+	Inner      nestedJson
+}
+
+type nestedJson struct {
+	Name string
+	Age  int
 }
 
 func Hiii(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -16,5 +21,6 @@ func Hiii(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if !parseRequest(w, r, rd) {
 		return
 	}
-	fmt.Fprintf(w, rd.Methodname)
+	generateResponse(w, r, rd)
+	//	fmt.Fprintf(w, rd.Inner.Name)
 }
