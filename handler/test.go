@@ -7,8 +7,8 @@ import (
 )
 
 type requestData struct {
-	CardNo     int
-	MethodName string
+	Jjj        int    `json:"cardNo,omitempty"`
+	MethodName string `json:"methodName"`
 	Inner      nestedJson
 }
 

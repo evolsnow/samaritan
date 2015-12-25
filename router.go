@@ -17,5 +17,6 @@ func getRouter() *httprouter.Router {
 	r.GET("/test", handler.Test)
 	r.POST("/hi", mw.BasicAuth(handler.Hiii))
 	r.GET("/pm", handler.Pm)
+	r.GET("/ab", handler.Ab)
 	return r
 }
