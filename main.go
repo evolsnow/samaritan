@@ -16,6 +16,7 @@ func main() {
 		log.Println("a vailid json config file must exist")
 		os.Exit(1)
 	}
+	//init redis pool
 	redisPort := strconv.Itoa(config.RedisPort)
 	conn.Pool = conn.NewPool(net.JoinHostPort(config.RedisAddr, redisPort), config.RedisPassword, config.RedisDb)
 
