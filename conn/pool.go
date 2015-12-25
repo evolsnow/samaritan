@@ -7,11 +7,11 @@ import (
 
 var Pool *redis.Pool
 
-func init() {
-	Pool = newPool("127.0.0.1:6379", "123456", 3)
-}
+//func init() {
+//	Pool = NewPool("127.0.0.1:6379", "123456", 3)
+//}
 
-func newPool(server, password string, db int) *redis.Pool {
+func NewPool(server, password string, db int) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
