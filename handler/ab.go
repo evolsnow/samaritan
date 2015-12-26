@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/evolsnow/gosqd/conn"
+	"github.com/evolsnow/httprouter"
 	"github.com/garyburd/redigo/redis"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 

@@ -2,7 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/julienschmidt/httprouter"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/evolsnow/httprouter"
+	"log"
 	"net/http"
 )
 
@@ -31,4 +33,17 @@ func Pm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	limit := r.URL.Query().Get("per_page")
 	fmt.Fprintf(w, page+limit)
 
+}
+
+func SetJwt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// Create the token
+	token := jwt.New(jwt.SigningMethodHS256)
+	// Set some claims
+	token.Claims["userId"] = "123"
+	// Sign and get the complete encoded token as a string
+	tokenString, err := token.SignedString([]byte("mySigningKey"))
+	if err != nil {
+		log.Println(err.Error())
+	}
+	fmt.Fprint(w, tokenString)
 }
