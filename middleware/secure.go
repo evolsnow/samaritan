@@ -7,10 +7,12 @@ import (
 	"net/http"
 )
 
+var SignKeyBytes = []byte("mySigningKey")
+
 func JwtAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
-			return []byte("mySigningKey"), nil
+			return SignKeyBytes, nil
 		})
 		if err == nil && token.Valid {
 			//save user_id in ps for sharing from middleware or handler
@@ -24,4 +26,13 @@ func JwtAuth(h httprouter.Handle) httprouter.Handle {
 			w.Write(msg)
 		}
 	}
+}
+
+func NewToken(id string) string {
+	token := jwt.New(jwt.SigningMethodHS256)
+	// Set some claims
+	token.Claims["userId"] = id
+	// Sign and get the complete encoded token as a string
+	tokenString, _ := token.SignedString(SignKeyBytes)
+	return tokenString
 }
