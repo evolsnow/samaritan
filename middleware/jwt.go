@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/evolsnow/gosqd/base"
 	"github.com/evolsnow/httprouter"
 	"net/http"
 )
@@ -15,15 +15,11 @@ func JwtAuth(h httprouter.Handle) httprouter.Handle {
 			return SignKeyBytes, nil
 		})
 		if err == nil && token.Valid {
-			//save user_id in ps for sharing from middleware or handler
+			//save user_id in ps for sharing between middleware or handlers
 			ps.Set("user_id", token.Claims["userId"].(string))
 			h(w, r, ps)
 		} else {
-			e := map[string]string{"error": "authentication failed"}
-			msg, _ := json.Marshal(e)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(msg)
+			base.SetError(w, err, http.StatusUnauthorized)
 		}
 	}
 }

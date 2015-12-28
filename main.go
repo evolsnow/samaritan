@@ -18,14 +18,14 @@ func main() {
 	}
 	//init redis pool
 	redisPort := strconv.Itoa(config.RedisPort)
-	conn.Pool = conn.NewPool(net.JoinHostPort(config.RedisAddr, redisPort), config.RedisPassword, config.RedisDb)
+	conn.Pool = conn.NewPool(net.JoinHostPort(config.RedisAddress, redisPort), config.RedisPassword, config.RedisDb)
 
 	n := negroni.New(
 		negroni.NewRecovery(),
 		negroni.NewLogger(),
 		negroni.HandlerFunc(mw.CTypeMiddleware),
 	)
-	r := getRouter()
+	r := newRouter()
 	n.UseHandler(r)
 	srvPort := strconv.Itoa(config.Port)
 	n.Run(net.JoinHostPort(config.Server, srvPort))

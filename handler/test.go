@@ -19,13 +19,12 @@ type nestedJson struct {
 	Age  int
 }
 
-func Hiii(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func Hi(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	rd := new(requestData)
 	if !parseRequest(w, r, rd) {
 		return
 	}
 	generateResponse(w, r, rd)
-	//	fmt.Fprintf(w, rd.Inner.Name)
 }
 
 func Pm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

@@ -8,14 +8,14 @@ import (
 
 var r = httprouter.New()
 
-func getRouter() *httprouter.Router {
+func newRouter() *httprouter.Router {
 
 	r.GET("/", handler.ProductList)
 	r.GET("/sync", syncProduct)
 
 	//test
 	r.GET("/test", handler.Test)
-	r.POST("/hi", mw.JwtAuth(handler.Hiii))
+	r.POST("/hi", mw.JwtAuth(handler.Hi))
 	r.GET("/set", handler.SetJwt)
 	r.GET("/pm", handler.Pm)
 	r.GET("/ab", handler.Ab)

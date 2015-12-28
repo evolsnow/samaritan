@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/evolsnow/gosqd/base"
 	"net/http"
 )
 
@@ -11,10 +12,7 @@ func parseRequest(w http.ResponseWriter, r *http.Request, ds interface{}) bool {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(ds)
 	if err != nil {
-		e := map[string]string{"error": err.Error()}
-		msg, _ := json.Marshal(e)
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(msg)
+		base.SetError(w, err, http.StatusBadRequest)
 		return false
 	}
 	return true
@@ -25,9 +23,6 @@ func generateResponse(w http.ResponseWriter, r *http.Request, ds interface{}) {
 	encoder := json.NewEncoder(w)
 	err := encoder.Encode(ds)
 	if err != nil {
-		e := map[string]string{"error": err.Error()}
-		msg, _ := json.Marshal(e)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(msg)
+		base.SetError(w, err, http.StatusInternalServerError)
 	}
 }
