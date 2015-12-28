@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/evolsnow/gosqd/base"
+	"github.com/evolsnow/samaritan/base"
 	"net/http"
 )
 

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/codegangsta/negroni"
-	"github.com/evolsnow/gosqd/conn"
-	mw "github.com/evolsnow/gosqd/middleware"
+	"github.com/evolsnow/samaritan/conn"
+	mw "github.com/evolsnow/samaritan/middleware"
 	"log"
 	"net"
 	"os"

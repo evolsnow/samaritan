@@ -3,8 +3,8 @@ package handler
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/evolsnow/gosqd/conn"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"log"

@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/evolsnow/gosqd/conn"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
 	"log"
 	"net/http"

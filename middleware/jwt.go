@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/evolsnow/gosqd/base"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/base"
 	"net/http"
 )
 

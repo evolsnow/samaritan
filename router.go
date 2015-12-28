@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/evolsnow/gosqd/handler"
-	mw "github.com/evolsnow/gosqd/middleware"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/handler"
+	mw "github.com/evolsnow/samaritan/middleware"
 )
 
 var r = httprouter.New()

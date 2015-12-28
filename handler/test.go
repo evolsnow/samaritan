@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	mw "github.com/evolsnow/gosqd/middleware"
 	"github.com/evolsnow/httprouter"
+	mw "github.com/evolsnow/samaritan/middleware"
 
 	"net/http"
 )

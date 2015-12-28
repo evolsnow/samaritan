@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	//	"fmt"
-	"github.com/evolsnow/gosqd/conn"
-	"github.com/evolsnow/gosqd/model"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"log"

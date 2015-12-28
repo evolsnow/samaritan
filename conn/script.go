@@ -1,7 +1,7 @@
 package conn
 
 import (
-	"github.com/evolsnow/gosqd/model"
+	"github.com/evolsnow/samaritan/model"
 )
 
 func CreateProduct(p *model.RawProduct) (interface{}, error) {
