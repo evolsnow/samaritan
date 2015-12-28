@@ -12,7 +12,7 @@ func parseRequest(w http.ResponseWriter, r *http.Request, ds interface{}) bool {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(ds)
 	if err != nil {
-		base.SetError(w, err, http.StatusBadRequest)
+		base.SetError(w, err.Error(), http.StatusBadRequest)
 		return false
 	}
 	return true
@@ -23,6 +23,6 @@ func generateResponse(w http.ResponseWriter, r *http.Request, ds interface{}) {
 	encoder := json.NewEncoder(w)
 	err := encoder.Encode(ds)
 	if err != nil {
-		base.SetError(w, err, http.StatusInternalServerError)
+		base.SetError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

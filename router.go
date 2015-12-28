@@ -15,7 +15,8 @@ func newRouter() *httprouter.Router {
 
 	//test
 	r.GET("/test", handler.Test)
-	r.POST("/hi", mw.JwtAuth(handler.Hi))
+	r.POST("/hi", mw.Auth(handler.Hi))
+	r.POST("/hin", handler.Hi)
 	r.GET("/set", handler.SetJwt)
 	r.GET("/pm", handler.Pm)
 	r.GET("/ab", handler.Ab)
