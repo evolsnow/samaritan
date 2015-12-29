@@ -4,9 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/evolsnow/samaritan/conn"
-	"strconv"
-	"strings"
 )
 
 const (
