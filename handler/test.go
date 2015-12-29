@@ -3,8 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/evolsnow/httprouter"
-	mw "github.com/evolsnow/samaritan/middleware"
-
+	"github.com/evolsnow/samaritan/base"
 	"net/http"
 )
 
@@ -35,6 +34,6 @@ func Pm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func SetJwt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tokenString := mw.NewToken("123")
+	tokenString := base.NewToken("123")
 	fmt.Fprint(w, tokenString)
 }

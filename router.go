@@ -6,9 +6,12 @@ import (
 	mw "github.com/evolsnow/samaritan/middleware"
 )
 
+const BaseURL = "/api/1.0"
+
 var r = httprouter.New()
 
 func newRouter() *httprouter.Router {
+	r.BaseURL = BaseURL
 
 	r.GET("/", handler.ProductList)
 	r.GET("/sync", syncProduct)

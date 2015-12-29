@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+//All redis actions
+
 func GetSignKey(id string) (key, lastVisit string) {
 	c := Pool.Get()
 	defer c.Close()
@@ -22,4 +24,22 @@ func UpdateSign(id, lv string) {
 	defer c.Close()
 	user := "vsuser:" + id
 	c.Do("HSET", user, "lastVisit", lv)
+}
+
+func GetPassword(id string) string {
+	c := Pool.Get()
+	defer c.Close()
+	user := "user:" + id
+	pwd, _ := redis.String(c.Do("HGET", user, "passwd"))
+	return pwd
+}
+
+func SetPassword(id, pwd string) {
+	c := Pool.Get()
+	defer c.Close()
+	user := "user:" + id
+	_, err := c.Do("HSET", user, "passwd", pwd)
+	if err != nil {
+		log.Println("Failed to save password for user:%s", id)
+	}
 }
