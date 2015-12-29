@@ -1,6 +1,8 @@
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func CTypeMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
