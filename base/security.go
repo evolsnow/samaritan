@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	JwtSignKey   = "36861f1530941263e6f61b43743074d8"
+	JwtKey       = "36861f1530941263e6f61b43743074d8"
 	PasswordSalt = "97096a41d7f2d22348ef9b64fbdfa87a"
 	TokenSalt    = "03e23aeb89f13ff4323e641a559db414"
 )
@@ -20,17 +20,17 @@ func NewToken(id string) string {
 	token.Claims["userId"] = id
 	token.Claims["salt"] = TokenSalt
 	// Sign and get the complete encoded token as a string
-	tokenString, _ := token.SignedString([]byte(JwtSignKey))
+	tokenString, _ := token.SignedString([]byte(JwtKey))
 	return tokenString
 }
 
 func ParseToken(r *http.Request, ps *httprouter.Params) (err error) {
 	token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JwtSignKey), nil
+		return []byte(JwtKey), nil
 	})
 	if err == nil && token.Valid {
 		userId := token.Claims["userId"].(string)
-		(*ps).Set("mwUserId", userId)
+		(*ps).Set("authId", userId)
 		return nil
 	} else {
 		return err

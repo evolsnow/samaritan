@@ -27,12 +27,12 @@ func newRouter() *httprouter.Router {
 
 	//test
 	r.GET("/test", handler.Test)
-	r.POST("/hil", mw.LoginRequired(handler.Hi))
 	r.POST("/hi", handler.Hi)
 	r.POST("/hia/:userId", mw.Auth(handler.Hi))
 	r.GET("/set", handler.SetJwt)
-	r.GET("/pm", mw.LoginRequired(handler.Pm))
+	r.GET("/pm", mw.Auth(handler.Pm))
 	r.GET("/ab", handler.Ab)
+
 	return r
 }
 

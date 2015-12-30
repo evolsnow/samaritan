@@ -30,7 +30,7 @@ func Pm(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//	page := r.URL.Query().Get("page")
 	//	limit := r.URL.Query().Get("per_page")
 	//	fmt.Fprintf(w, page+limit)
-	fmt.Println(ps.Get("userId"))
+	fmt.Println(ps.Get("authId"))
 
 }
 
