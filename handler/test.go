@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/conn"
 	"net/http"
 )
 
@@ -30,7 +31,17 @@ func Pm(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//	page := r.URL.Query().Get("page")
 	//	limit := r.URL.Query().Get("per_page")
 	//	fmt.Fprintf(w, page+limit)
-	fmt.Println(ps.Get("authId"))
+	fmt.Println(base.LRUCache.Get("test2"))
+	//fmt.Println(ps.Get("authId"))
+
+}
+
+func Pm2(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	//	page := r.URL.Query().Get("page")
+	//	limit := r.URL.Query().Get("per_page")
+	//	fmt.Fprintf(w, page+limit)
+	//fmt.Println(base.LRUCache.Get("test2"))
+	fmt.Println(conn.Get("test2"))
 
 }
 

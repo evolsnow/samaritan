@@ -30,7 +30,8 @@ func newRouter() *httprouter.Router {
 	r.POST("/hi", handler.Hi)
 	r.POST("/hia/:userId", mw.Auth(handler.Hi))
 	r.GET("/set", handler.SetJwt)
-	r.GET("/pm", mw.Auth(handler.Pm))
+	r.GET("/pm", handler.Pm)
+	r.GET("/pm2", handler.Pm2)
 	r.GET("/ab", handler.Ab)
 
 	return r

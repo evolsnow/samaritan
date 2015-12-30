@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/negroni"
+	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"log"
@@ -10,16 +11,26 @@ import (
 	"strconv"
 )
 
+const CacheSize = 100
+const CacheDB = 0
+
 func main() {
 	config, err := ParseConfig("config.json")
 	if err != nil {
 		log.Println("a vailid json config file must exist")
 		os.Exit(1)
 	}
-	//init redis pool
+	//init redis database pool
 	redisPort := strconv.Itoa(config.RedisPort)
-	conn.Pool = conn.NewPool(net.JoinHostPort(config.RedisAddress, redisPort), config.RedisPassword, config.RedisDb)
+	redisServer := net.JoinHostPort(config.RedisAddress, redisPort)
+	conn.Pool = conn.NewPool(redisServer, config.RedisPassword, config.RedisDB)
+	conn.CachePool = conn.NewPool(redisServer, config.RedisPassword, CacheDB)
 
+	//init LRU cache and simple redis cache
+	base.LRUCache = base.NewLRUCache(CacheSize)
+	base.Cache = base.NewCache()
+
+	//init server
 	n := negroni.New(
 		negroni.NewRecovery(),
 		negroni.NewLogger(),

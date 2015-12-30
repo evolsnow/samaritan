@@ -7,6 +7,8 @@ import (
 
 var Pool *redis.Pool
 
+var CachePool *redis.Pool
+
 //func init() {
 //	Pool = NewPool("127.0.0.1:6379", "123456", 3)
 //}

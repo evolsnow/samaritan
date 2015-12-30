@@ -11,7 +11,7 @@ type Config struct {
 	Port          int    `json:"port"`
 	RedisAddress  string `json:"redis_addr"`
 	RedisPort     int    `json:"redis_port"`
-	RedisDb       int    `json:"redis_db"`
+	RedisDB       int    `json:"redis_db"`
 	RedisPassword string `json:"redis_password"`
 }
 

@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/evolsnow/httprouter"
-	"net/http"
 )
 
 const (
@@ -24,8 +23,8 @@ func NewToken(id string) string {
 	return tokenString
 }
 
-func ParseToken(r *http.Request, ps *httprouter.Params) (err error) {
-	token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
+func ParseToken(ah string, ps *httprouter.Params) (err error) {
+	token, err := jwt.Parse(ah, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JwtKey), nil
 	})
 	if err == nil && token.Valid {

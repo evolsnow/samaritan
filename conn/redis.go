@@ -3,6 +3,7 @@ package conn
 import (
 	"github.com/garyburd/redigo/redis"
 	"log"
+	"time"
 )
 
 //All redis actions
@@ -42,4 +43,24 @@ func UpdatePassword(id, pwd string) {
 	if err != nil {
 		log.Println("Failed to update password for user:%s", id)
 	}
+}
+
+func Get(key string) string {
+	c := Pool.Get()
+	defer c.Close()
+	value, _ := redis.String(c.Do("GET", key))
+	return value
+}
+
+func CacheGet(key string) string {
+	c := CachePool.Get()
+	defer c.Close()
+	value, _ := redis.String(c.Do("GET", key))
+	return value
+}
+
+func CacheSet(key string, value interface{}, px time.Duration) {
+	c := CachePool.Get()
+	defer c.Close()
+	c.Do("SET", key, value, "PX", int64(px/time.Millisecond))
 }
