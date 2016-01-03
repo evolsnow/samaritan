@@ -37,3 +37,4 @@ var multiGetLua = `
    `
 
 var multiGetScript = redis.NewScript(0, multiGetLua)
+var test string
