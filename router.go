@@ -23,7 +23,7 @@ func newRouter() *httprouter.Router {
 	r.NotFound = NFound{}
 
 	r.GET("/", handler.ProductList)
-	r.GET("/sync", syncProduct)
+	//	r.GET("/sync", syncProduct)
 
 	//test
 	r.GET("/test", handler.Test)

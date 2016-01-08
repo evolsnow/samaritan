@@ -7,7 +7,6 @@ import (
 	mw "github.com/evolsnow/samaritan/middleware"
 	"log"
 	"net"
-	"os"
 	"strconv"
 )
 
@@ -17,12 +16,16 @@ const CacheDB = 0
 func main() {
 	config, err := ParseConfig("config.json")
 	if err != nil {
-		log.Println("a vailid json config file must exist")
-		os.Exit(1)
+		log.Fatal("a vailid json config file must exist")
 	}
+	if config.RedisDB == CacheDB {
+		log.Fatal("redis db can not be same as cache db: '0'")
+	}
+
 	//init redis database pool
 	redisPort := strconv.Itoa(config.RedisPort)
 	redisServer := net.JoinHostPort(config.RedisAddress, redisPort)
+
 	conn.Pool = conn.NewPool(redisServer, config.RedisPassword, config.RedisDB)
 	conn.CachePool = conn.NewPool(redisServer, config.RedisPassword, CacheDB)
 
