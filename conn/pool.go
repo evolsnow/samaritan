@@ -36,3 +36,17 @@ func NewPool(server, password string, db int) *redis.Pool {
 		},
 	}
 }
+
+func Ping(server, password string) bool {
+	c, err := redis.Dial("tcp", server)
+	if err != nil {
+		return false
+	}
+	if password != "" {
+		if _, err := c.Do("AUTH", password); err != nil {
+			c.Close()
+			return false
+		}
+	}
+	return true
+}

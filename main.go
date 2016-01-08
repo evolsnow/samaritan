@@ -25,7 +25,9 @@ func main() {
 	//init redis database pool
 	redisPort := strconv.Itoa(config.RedisPort)
 	redisServer := net.JoinHostPort(config.RedisAddress, redisPort)
-
+	if !conn.Ping(redisServer, config.RedisPassword) {
+		log.Fatal("connect to redis server failed")
+	}
 	conn.Pool = conn.NewPool(redisServer, config.RedisPassword, config.RedisDB)
 	conn.CachePool = conn.NewPool(redisServer, config.RedisPassword, CacheDB)
 
