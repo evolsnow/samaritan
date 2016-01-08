@@ -26,3 +26,15 @@ redis.call("HMSET", "product:"..product_id,
 return product_id
 `
 var CreateProductScript = redis.NewScript(19, createProductLua)
+
+var multiGetLua = `
+	local data = redis.call("SMEMBERS", "language")
+	local ret = {}
+  	for idx=1,#data do
+  		ret[idx] = redis.call("GET","l:"..data[idx])
+  	end
+  	return ret
+   `
+
+var multiGetScript = redis.NewScript(0, multiGetLua)
+var test string
