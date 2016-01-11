@@ -12,15 +12,15 @@ const BaseURL = "/api/1.0"
 
 var r = httprouter.New()
 
-type NAllowed struct{}
-type NFound struct{}
+type NotAllowed struct{}
+type NotFound struct{}
 
 func newRouter() *httprouter.Router {
 	//base url for all requests
 	r.BaseURL = BaseURL
 	//user-defined http error handler
-	r.MethodNotAllowed = NAllowed{}
-	r.NotFound = NFound{}
+	r.MethodNotAllowed = NotAllowed{}
+	r.NotFound = NotFound{}
 
 	r.GET("/", handler.ProductList)
 	//	r.GET("/sync", syncProduct)
@@ -38,11 +38,11 @@ func newRouter() *httprouter.Router {
 }
 
 // ServeHTTP makes the NAllowed implement the http.Handler interface.
-func (NAllowed) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (NotAllowed) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	base.SetError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 }
 
 // ServeHTTP makes the NFound implement the http.Handler interface.
-func (NFound) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (NotFound) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	base.SetError(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }

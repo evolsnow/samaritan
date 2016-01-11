@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Server        string `json:"server"`
 	Port          int    `json:"port"`
-	RedisAddress  string `json:"redis_addr"`
+	RedisAddress  string `json:"redis_address"`
 	RedisPort     int    `json:"redis_port"`
 	RedisDB       int    `json:"redis_db"`
 	RedisPassword string `json:"redis_password"`
