@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -108,16 +107,17 @@ func tlAI(info string) string {
 		log.Println(err.Error())
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	return string(body)
-	var reply tlReply
+
+	//	body, err := ioutil.ReadAll(resp.Body)
+	//	return string(body)
+	reply := new(tlReply)
 
 	decoder := json.NewDecoder(resp.Body)
 	decoder.Decode(reply)
-	return string(reply.text)
+	return strings.Replace(reply.Text, "<br>", "\n", -1)
 }
 
 type tlReply struct {
-	code int
-	text string
+	code int    `json:"code"`
+	Text string `json:"text"`
 }
