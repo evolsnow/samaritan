@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/codegangsta/negroni"
+	"github.com/evolsnow/negroni"
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	mw "github.com/evolsnow/samaritan/middleware"
@@ -10,10 +10,11 @@ import (
 	"strconv"
 )
 
-const CacheSize = 100
+const LRUCacheSize = 100
 const CacheDB = 0
 
 func main() {
+	go base.SaveAvatar("13295121932")
 	config, err := ParseConfig("config.json")
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
@@ -32,7 +33,7 @@ func main() {
 	conn.CachePool = conn.NewPool(redisServer, config.RedisPassword, CacheDB)
 
 	//init LRU cache and simple redis cache
-	base.LRUCache = base.NewLRUCache(CacheSize)
+	base.LRUCache = base.NewLRUCache(LRUCacheSize)
 	base.Cache = base.NewCache()
 
 	//init server
