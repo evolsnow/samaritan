@@ -41,7 +41,7 @@ func readMissionRcv(mid int, uids []int) ([]interface{}, error) {
 	defer c.Close()
 	replys := make([]interface{}, len(uids))
 	receiverSet := "mission:receivers" + strconv.Itoa(mid)
-	//todo luc
+	//todo lua smembers
 
 	return replys, nil
 }
