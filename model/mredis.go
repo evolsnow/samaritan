@@ -1,11 +1,11 @@
 package model
 
 import (
+	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
 	"log"
-	"time"
 	"strconv"
-"github.com/evolsnow/samaritan/conn"
+	"time"
 )
 
 //All model's redis actions
@@ -36,7 +36,7 @@ func readUser(id int) (reply []interface{}, err error) {
 	return
 }
 
-func readMissionRcv(mid int, uids []int) ([]interface{}, err error) {
+func readMissionRcv(mid int, uids []int) ([]interface{}, error) {
 	c := conn.Pool.Get()
 	defer c.Close()
 	replys := make([]interface{}, len(uids))
@@ -62,6 +62,6 @@ func updateMissionRcv(mid, uid int) (err error) {
 	return
 }
 
-func createMission(m *Mission){
+func createMission(m *Mission) {
 
 }
