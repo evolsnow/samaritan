@@ -2,11 +2,10 @@ package conn
 
 import (
 	"github.com/garyburd/redigo/redis"
-	"log"
 	"time"
 )
 
-//All redis actions
+//All extra redis actions
 //
 //func GetSignKey(id string) (key, lastVisit string) {
 //	c := Pool.Get()
@@ -26,24 +25,6 @@ import (
 //	user := "vsuser:" + id
 //	c.Do("HSET", user, "lastVisit", lv)
 //}
-
-func GetPassword(id string) string {
-	c := Pool.Get()
-	defer c.Close()
-	user := "user:" + id
-	pwd, _ := redis.String(c.Do("HGET", user, "passwd"))
-	return pwd
-}
-
-func UpdatePassword(id, pwd string) {
-	c := Pool.Get()
-	defer c.Close()
-	user := "user:" + id
-	_, err := c.Do("HSET", user, "passwd", pwd)
-	if err != nil {
-		log.Println("Failed to update password for user:%s", id)
-	}
-}
 
 func Get(key string) string {
 	c := Pool.Get()

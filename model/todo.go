@@ -1,13 +1,36 @@
 package model
 
+import (
+	"github.com/evolsnow/samaritan/conn"
+	"github.com/garyburd/redigo/redis"
+)
+
 type Todo struct {
 	Id        int
-	StartTime uint64  //start timestamp of this action
-	DeadLine  uint64  //end time
-	Desc      string  //description for the action
-	Owner     User    //whose
-	Status    int     //0:not begin, 1:ongoing, 2: overdue, 3:accomplished
-	Belong    Project //belong to which project
+	StartTime uint64 //start timestamp of this action
+	DeadLine  uint64 //end time
+	Desc      string //description for the action
+	OwnerId   int    //whose
+	Status    int    //0:not begin, 1:ongoing, 2: overdue, 3:accomplished
+	MissionId int    //belong to which mission
+}
+
+func (td *Todo) GetOwner() (owner *User) {
+	reply, err := readUser(td.OwnerId)
+	if err != nil {
+		return
+	}
+	redis.ScanStruct(reply, owner)
+	return
+}
+
+func (td *Todo) GetMission() (m *Mission) {
+	reply, err := readMission(td.MissionId)
+	if err != nil {
+		return
+	}
+	redis.ScanStruct(reply, m)
+	return
 }
 
 //TodoList
