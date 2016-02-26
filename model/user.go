@@ -1,6 +1,6 @@
 package model
 
-import "reflect"
+import "log"
 
 type User struct {
 	Id         int    `json:"id" redis:"id"`
@@ -16,9 +16,22 @@ type User struct {
 	StudentNum string `json:"stuNum" redis:"stuNum"` //1218404001...
 }
 
-func (u *User) Update(nu User) {
-	value := reflect.ValueOf(nu)
-	for i := 0; i < value.NumField(); i++ {
-		value.Field(i)
+//read user's password
+func (u *User) GetPassword() (pwd string) {
+	pwd, err := ReadPassword(u.Id)
+	if err != nil {
+		log.Println("Error get user's password:", err)
+		return ""
 	}
+	return
+}
+
+//save a new user
+func (u *User) Save() (err error) {
+	err = createUser(u)
+	if err != nil {
+		log.Println("Error save user:", err)
+		return
+	}
+	return
 }

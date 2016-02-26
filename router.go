@@ -18,12 +18,18 @@ type NotFound struct{}
 func newRouter() *httprouter.Router {
 	//base url for all requests
 	r.BaseURL = BaseURL
+
 	//user-defined http error handler
 	r.MethodNotAllowed = NotAllowed{}
 	r.NotFound = NotFound{}
 
-	r.GET("/", handler.ProductList)
-	//	r.GET("/sync", syncProduct)
+	//http get method
+
+	//http post method
+
+	//http put method
+
+	//http delete method
 
 	//test
 	r.GET("/test", handler.Test)

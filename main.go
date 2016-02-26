@@ -14,7 +14,7 @@ const LRUCacheSize = 100
 const CacheDB = 0
 
 func main() {
-	go base.SaveAvatar("13295121932")
+	go base.GenerateAvatar("13295121932")
 	config, err := ParseConfig("config.json")
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")

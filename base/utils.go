@@ -3,6 +3,7 @@ package base
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +21,7 @@ func getGravatarUrl(phone string) string {
 	return fmt.Sprintf("https://cn.gravatar.com/avatar/%s.jpg?d=retro&s=40", hashed)
 }
 
-func SaveAvatar(phone string) {
+func GenerateAvatar(phone string) {
 	resp, err := http.Get(getGravatarUrl(phone))
 	if err == nil {
 		defer resp.Body.Close()
@@ -31,4 +32,12 @@ func SaveAvatar(phone string) {
 		}
 		ioutil.WriteFile(fmt.Sprintf("%s%s.jpg", avatarPath, phone), data, 0644)
 	}
+}
+
+//set http status and reply error
+func SetError(w http.ResponseWriter, desc string, status int) {
+	e := map[string]interface{}{"code": status, "error": desc}
+	msg, _ := json.Marshal(e)
+	w.WriteHeader(status)
+	w.Write(msg)
 }
