@@ -43,7 +43,7 @@ func (u *User) CreateAvatar() {
 }
 
 //save a new user
-func (u *User) Save() int {
+func (u *User) Save() {
 	//return user id for jwt token use
-	return createUser(u)
+	u.Id = createUser(u)
 }
