@@ -99,7 +99,15 @@ func createUser(u *User) int {
 	return u.Id
 }
 
-func ReadPassword(uid int) (pwd string, err error) {
+func createUserAvatar(uid int, avatarUrl string) error {
+	c := conn.Pool.Get()
+	defer c.Close()
+	user := "user:" + strconv.Itoa(uid)
+	_, err := c.Do("HSET", user, UAvatar, avatarUrl)
+	return err
+}
+
+func readPassword(uid int) (pwd string, err error) {
 	c := conn.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(uid)

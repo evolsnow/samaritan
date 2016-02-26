@@ -1,13 +1,16 @@
 package model
 
-import "log"
+import (
+	"github.com/evolsnow/samaritan/base"
+	"log"
+)
 
 type User struct {
 	Id         int    `json:"id,omitempty" redis:"id"`
 	Alias      string `json:"alias,omitempty" redis:"alias"` //nick name
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`
-	Password   string `json:"passwd,omitempty" redis:"passwd"`
+	Password   string `json:"-" redis:"passwd"`
 	Avatar     string `json:"avatar,omitempty" redis:"avatar"` //avatar url
 	School     string `json:"school,omitempty" redis:"school"`
 	Department string `json:"depart,omitempty" redis:"depart"`
@@ -18,12 +21,25 @@ type User struct {
 
 //read user's password
 func (u *User) GetPassword() (pwd string) {
-	pwd, err := ReadPassword(u.Id)
+	pwd, err := readPassword(u.Id)
 	if err != nil {
 		log.Println("Error get user's password:", err)
 		return ""
 	}
 	return
+}
+
+//generate avatar url for user
+func (u *User) CreateAvatar() {
+	path, err := base.GenerateAvatar(u.Phone)
+	if err != nil {
+		log.Println("Error generate user's avatar:", err)
+	}
+	u.Avatar = path
+	err = createUserAvatar(u.Id, u.Avatar)
+	if err != nil {
+		log.Println("Error create user's avatar:", err)
+	}
 }
 
 //save a new user

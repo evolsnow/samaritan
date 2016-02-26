@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	avatarPath = "./avatar/"
+	avatarPath = "static/avatar/"
 )
 
 func getGravatarUrl(phone string) string {
@@ -21,17 +21,20 @@ func getGravatarUrl(phone string) string {
 	return fmt.Sprintf("https://cn.gravatar.com/avatar/%s.jpg?d=retro&s=40", hashed)
 }
 
-func GenerateAvatar(phone string) {
+func GenerateAvatar(phone string) (string, error) {
 	resp, err := http.Get(getGravatarUrl(phone))
 	if err == nil {
 		defer resp.Body.Close()
 		data, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			//use default avatar
-			return
+			return "", err
 		}
-		ioutil.WriteFile(fmt.Sprintf("%s%s.jpg", avatarPath, phone), data, 0644)
+		path := fmt.Sprintf("%s%s.jpg", avatarPath, phone)
+		go ioutil.WriteFile(path, data, 0644)
+		return path, nil
 	}
+	return "", err
 }
 
 //set http status and reply error

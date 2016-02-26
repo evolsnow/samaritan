@@ -21,6 +21,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Phone:    req.Phone,
 		Password: base.HashedPassword(req.Password),
 	}
+	go us.CreateAvatar()
 	//return jwt token
 	resp.Token = base.NewToken(us.Save())
 	makeResp(w, r, resp)
