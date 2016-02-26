@@ -24,10 +24,10 @@ type nestedJson struct {
 
 func Hi(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	rd := new(requestData)
-	if !parseRequest(w, r, rd) {
+	if !parseReq(w, r, rd) {
 		return
 	}
-	generateResponse(w, r, rd)
+	makeResp(w, r, rd)
 }
 
 func Pm(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -49,7 +49,7 @@ func Pm2(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func SetJwt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tokenString := base.NewToken("123")
+	tokenString := base.NewToken(123)
 	fmt.Fprint(w, tokenString)
 }
 func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

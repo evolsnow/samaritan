@@ -5,13 +5,13 @@ import (
 )
 
 type Todo struct {
-	Id           int    `json:"id,omitempty" redis:"id"`
-	StartTime    uint64 `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
-	Deadline     uint64 `json:"deadline,omitempty" redis:"dealine"`    //end time
-	Desc         string `json:"desc,omitempty" redis:"desc"`           //description for the action
-	OwnerId      int    `json:"ownerId,omitempty" redis:"ownerId"`     //whose
-	Accomplished bool   `json:"accomplished,omitempty" redis:"accomplished"`
-	MissionId    int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
+	Id        int    `json:"id,omitempty" redis:"id"`
+	StartTime uint64 `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
+	Deadline  uint64 `json:"deadline,omitempty" redis:"dealine"`    //end time
+	Desc      string `json:"desc,omitempty" redis:"desc"`           //description for the action
+	OwnerId   int    `json:"ownerId,omitempty" redis:"ownerId"`     //whose
+	Done      bool   `json:"done,omitempty" redis:"done"`
+	MissionId int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
 //get user from to-do's owner id
@@ -34,8 +34,8 @@ func (td *Todo) GetMission() (m *Mission) {
 	return
 }
 
-//update to-do accomplish status
-func (td *Todo) Done() (err error) {
+//update to-do done status
+func (td *Todo) Finish() (err error) {
 	err = updateTodoStatus(td.OwnerId, td.Id)
 	if err != nil {
 		log.Println("Error update to-do status:", err)

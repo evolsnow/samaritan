@@ -5,34 +5,45 @@ import (
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/mholt/binding"
-	"log"
 	"net/http"
+	"strconv"
 )
 
-func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	log.Println("calling func: NewTodo")
-	req := new(postTodoRequest)
+func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postUsReq)
 	errs := binding.Bind(r, req)
 	if errs != nil {
-		base.BadReqErrorHandle(w, errs.Error())
+		base.BadReqErrHandle(w, errs.Error())
 		return
 	}
+	resp := new(postUsResp)
+	us := model.User{
+		Phone:    req.Phone,
+		Password: base.HashedPassword(req.Password),
+	}
+	//return jwt token
+	resp.Token = base.NewToken(us.Save())
+	makeResp(w, r, resp)
+}
 
-	//if req.OwnerId != ps.Get("userId") {
-	//	base.ForbidErrorHandler(w)
-	//	return
-	//}
+func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postTdReq)
+	errs := binding.Bind(r, req)
+	if errs != nil {
+		base.BadReqErrHandle(w, errs.Error())
+		return
+	}
+	uid, _ := strconv.Atoi(ps.Get("userId"))
 	go func() {
 		td := model.Todo{
-			Desc:         req.Desc,
-			OwnerId:      req.OwnerId,
-			Deadline:     req.Deadline,
-			StartTime:    req.StartTime,
-			Accomplished: req.Accomplished,
-			MissionId:    req.MissionId,
+			OwnerId:   uid,
+			Desc:      req.Desc,
+			Deadline:  req.Deadline,
+			StartTime: req.StartTime,
+			Done:      req.Done,
+			MissionId: req.MissionId,
 		}
 		td.Save()
 	}()
-	resp := new(postTodoResponse)
-	generateResponse(w, r, resp)
+	makeBaseResp(w, r)
 }

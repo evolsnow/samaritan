@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/evolsnow/httprouter"
+	"strconv"
 )
 
 const (
@@ -13,7 +14,7 @@ const (
 	TokenSalt    = "03e23aeb89f13ff4323e641a559db414"
 )
 
-func NewToken(id string) string {
+func NewToken(id int) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Set some claims
 	token.Claims["userId"] = id
@@ -28,8 +29,8 @@ func ParseToken(ah string, ps *httprouter.Params) (err error) {
 		return []byte(JwtKey), nil
 	})
 	if err == nil && token.Valid {
-		userId := token.Claims["userId"].(string)
-		(*ps).Set("authId", userId)
+		userId := token.Claims["userId"].(int)
+		ps.Set("authId", strconv.Itoa(userId))
 		return nil
 	} else {
 		return err

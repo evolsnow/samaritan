@@ -27,11 +27,7 @@ func (u *User) GetPassword() (pwd string) {
 }
 
 //save a new user
-func (u *User) Save() (err error) {
-	err = createUser(u)
-	if err != nil {
-		log.Println("Error save user:", err)
-		return
-	}
-	return
+func (u *User) Save() int {
+	//return user id for jwt token use
+	return createUser(u)
 }

@@ -26,7 +26,8 @@ func newRouter() *httprouter.Router {
 	//http get method
 
 	//http post method
-	r.POST("/todo", hd.NewTodo)
+	r.POST("/users", hd.NewUser)
+	r.POST("/todos", hd.NewTodo)
 	//http put method
 
 	//http delete method

@@ -43,11 +43,11 @@ func SetError(w http.ResponseWriter, desc string, status int) {
 }
 
 //check http bad request error
-func BadReqErrorHandle(w http.ResponseWriter, desc string) {
+func BadReqErrHandle(w http.ResponseWriter, desc string) {
 	SetError(w, desc, http.StatusBadRequest)
 }
 
 //http 403 error
 func ForbidErrorHandler(w http.ResponseWriter) {
-	SetError(w, "Authorization error", http.StatusBadRequest)
+	SetError(w, "user match error", http.StatusForbidden)
 }
