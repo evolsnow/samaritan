@@ -2,48 +2,54 @@ package model
 
 import (
 	"github.com/garyburd/redigo/redis"
+	"log"
 )
 
 type Mission struct {
-	Id          int
-	StartTime   uint64 //start timestamp of this action
-	DeadLine    uint64 //end time
-	Desc        string //description for the action
-	Color       [3]int //RGB mode
-	PublisherId int    //who published the mission
-	ReceiversId []int  //user list who received the mission
+	Id          int    `json:"id" redis:"id"`
+	StartTime   uint64 `json:"startTime" redis:"startTime"`     //start timestamp of this action
+	DeadLine    uint64 `json:"deadLine" redis:"deadLine"`       //end time
+	Desc        string `json:"desc" redis:"desc"`               //description for the action
+	Color       [3]int `json:"color" redis:"-"`                 //RGB mode
+	PublisherId int    `json:"publisherId" redis:"publisherId"` //who published the mission
+	ReceiversId []int  `json:"receiversId" redis:"-"`           //user list who received the mission
 }
 
-func (m *Mission) GetPublisher() (owner *User) {
-	reply, err := readUser(m.PublisherId)
+func (m *Mission) GetPublisher() (publisher *User) {
+	publisher, err := readUser(m.PublisherId)
 	if err != nil {
-		return
+		log.Println("Error get publisher:", err)
+		return nil, nil
 	}
-	redis.ScanStruct(reply, owner)
 	return
 }
 
 func (m *Mission) AddReceiver(userId int) (err error) {
-	return updateMissionRcv(m.Id, userId)
+	err = createMissionRcv(m.Id, userId)
+	if err != nil {
+		log.Println("Error add receiver:", err)
+		return err
+	}
+	return
 }
 
 func (m *Mission) GetReceivers() (receivers []*User) {
 	if len(m.ReceiversId) == 0 {
 		return
 	}
-	replys, err := readMissionRcv(m.Id, m.ReceiversId)
+	receivers, err := readMissionRcv(m.Id)
 	if err != nil {
-		return
-	}
-	for i := range replys {
-		user := new(User)
-		redis.ScanStruct(replys[i], user)
-		receivers = append(receivers, user)
-
+		log.Println("Error get mission receivers:", err)
+		return nil
 	}
 	return
 }
 
 func (m *Mission) Save() (err error) {
-	return createMission(m)
+	err = createMission(m)
+	if err != nil {
+		log.Println("Error save mission:", err)
+		return err
+	}
+	return
 }
