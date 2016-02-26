@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/mholt/binding"
 	"io/ioutil"
 	"net/http"
 )
@@ -43,10 +42,12 @@ func SetError(w http.ResponseWriter, desc string, status int) {
 	w.Write(msg)
 }
 
-//check http error
-func ErrorHandle(w http.ResponseWriter, r *http.Request, errs binding.Errors) {
-	e := map[string]interface{}{"code": http.StatusBadRequest, "error": errs[0].Classification}
-	msg, _ := json.Marshal(e)
-	w.WriteHeader(http.StatusBadRequest)
-	w.Write(msg)
+//check http bad request error
+func BadReqErrorHandle(w http.ResponseWriter, desc string) {
+	SetError(w, desc, http.StatusBadRequest)
+}
+
+//http 403 error
+func ForbidErrorHandler(w http.ResponseWriter) {
+	SetError(w, "Authorization error", http.StatusBadRequest)
 }

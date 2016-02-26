@@ -5,13 +5,13 @@ import (
 )
 
 type Todo struct {
-	Id           int    `json:"id, omitempty" redis:"id"`
-	StartTime    uint64 `json:"startTime, omitempty" redis:"startTime"` //start timestamp of this action
-	Deadline     uint64 `json:"deadline, omitempty" redis:"dealine"`    //end time
-	Desc         string `json:"desc, omitempty" redis:"desc"`           //description for the action
-	OwnerId      int    `json:"ownerId, omitempty" redis:"ownerId"`     //whose
-	Accomplished bool   `json:"accomplished, omitempty" redis:"accomplished"`
-	MissionId    int    `json:"missionId, omitempty" redis:"missionId"` //belong to which mission
+	Id           int    `json:"id,omitempty" redis:"id"`
+	StartTime    uint64 `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
+	Deadline     uint64 `json:"deadline,omitempty" redis:"dealine"`    //end time
+	Desc         string `json:"desc,omitempty" redis:"desc"`           //description for the action
+	OwnerId      int    `json:"ownerId,omitempty" redis:"ownerId"`     //whose
+	Accomplished bool   `json:"accomplished,omitempty" redis:"accomplished"`
+	MissionId    int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
 //get user from to-do's owner id

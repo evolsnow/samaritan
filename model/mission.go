@@ -5,11 +5,11 @@ import (
 )
 
 type Mission struct {
-	Id          int    `json:"id, omitempty" redis:"id"`
-	StartTime   uint64 `json:"startTime, omitempty" redis:"startTime"`     //start timestamp of this action
-	Desc        string `json:"desc, omitempty" redis:"desc"`               //description for the action
-	PublisherId int    `json:"publisherId, omitempty" redis:"publisherId"` //who published the mission
-	ReceiversId []int  `json:"receiversId, omitempty" redis:"-"`           //user list who received the mission
+	Id          int    `json:"id,omitempty" redis:"id"`
+	StartTime   uint64 `json:"startTime,omitempty" redis:"startTime"`     //start timestamp of this action
+	Desc        string `json:"desc,omitempty" redis:"desc"`               //description for the action
+	PublisherId int    `json:"publisherId,omitempty" redis:"publisherId"` //who published the mission
+	ReceiversId []int  `json:"receiversId,omitempty" redis:"-"`           //user list who received the mission
 }
 
 func (m *Mission) GetPublisher() (publisher *User) {

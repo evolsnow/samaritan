@@ -45,10 +45,10 @@ const (
 
 //other useful index set key name
 const (
-	userBelongSet               = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
-	userTodoList                = "user:%d:todoList"     //user's all to-do, redis-type:List
-	userTodoNotAccomplishedList = "user:%d:todoStatus:0" //to-do status, redis-type:List
-	userTodoAccomplishedList    = "user:%d:todoStatus:1"
+	userBelongSet              = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
+	userTodoList               = "user:%d:todoList"     //user's all to-do, redis-type:List
+	userTodoNotAccomplishedSet = "user:%d:todoStatus:0" //to-do status, redis-type:Set
+	userTodoAccomplishedSet    = "user:%d:todoStatus:1"
 
 	userMissionJoinedSet    = "user:%d:missions:participate" //user's all missions redis-type:Set
 	userMissionPublishedSet = "user:%d:missions:publish"
@@ -131,7 +131,7 @@ func createTodo(td *Todo) error {
 					KEYS[1], KEYS[2], KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14])
 	redis.call("RPUSH", KEYS[15], tid)
-	redis.call("RPUSH", KEYS[16], tid)
+	redis.call("SADD", KEYS[16], tid)
 	`
 	//to-do model
 	td.Id, _ = redis.Int(c.Do("INCR", "autoIncrTodo"))
@@ -144,7 +144,7 @@ func createTodo(td *Todo) error {
 	k13, k14 := TodoMissionId, td.MissionId
 	//redis list
 	k15 := fmt.Sprintf(userTodoList, td.OwnerId)
-	k16 := fmt.Sprintf(userTodoNotAccomplishedList, td.OwnerId)
+	k16 := fmt.Sprintf(userTodoNotAccomplishedSet, td.OwnerId)
 
 	createTodoScript := redis.NewScript(16, createTodoLua)
 	_, err := createTodoScript.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16)
@@ -154,8 +154,8 @@ func createTodo(td *Todo) error {
 func updateTodoStatus(uid, tid int) error {
 	c := conn.Pool.Get()
 	defer c.Close()
-	accomplished := fmt.Sprintf(userTodoAccomplishedList, uid)
-	notAccomplished := fmt.Sprintf(userTodoNotAccomplishedList, uid)
+	accomplished := fmt.Sprintf(userTodoAccomplishedSet, uid)
+	notAccomplished := fmt.Sprintf(userTodoNotAccomplishedSet, uid)
 	_, err := c.Do("SMOVE", notAccomplished, accomplished, tid)
 	return err
 }

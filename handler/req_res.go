@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/model"
 	"github.com/mholt/binding"
 	"net/http"
 )
@@ -11,16 +10,16 @@ import (
 // base response for all requests
 type baseResp struct {
 	Code  int   `json:"code"`
-	Error error `json:"error, omitempty"`
+	Error error `json:"error,omitempty"`
 }
 
 type postTodoRequest struct {
-	StartTime    uint64 `json:"startTime, omitempty"`
-	Deadline     uint64 `json:"deadline"`
-	Desc         string `json:"desc"`
-	OwnerId      int    `json:"ownerId"`
-	Accomplished bool   `json:"accomplished, omitempty"`
-	MissionId    int    `json:"missionId, omitempty"`
+	StartTime    uint64
+	Deadline     uint64
+	Desc         string
+	OwnerId      int
+	Accomplished bool
+	MissionId    int
 }
 
 func (pt *postTodoRequest) FieldMap(req *http.Request) binding.FieldMap {
@@ -41,18 +40,6 @@ func (pt *postTodoRequest) FieldMap(req *http.Request) binding.FieldMap {
 		&pt.Accomplished: "accomplished",
 		&pt.MissionId:    "missionId",
 	}
-}
-
-func (pt *postTodoRequest) SaveTodo() (err error) {
-	td := model.Todo{
-		Desc:         pt.Desc,
-		OwnerId:      pt.OwnerId,
-		Deadline:     pt.Deadline,
-		StartTime:    pt.StartTime,
-		Accomplished: pt.Accomplished,
-		MissionId:    pt.MissionId,
-	}
-	return td.Save()
 }
 
 type postTodoResponse struct {
