@@ -1,25 +1,22 @@
 package model
 
 import (
-	"github.com/garyburd/redigo/redis"
 	"log"
 )
 
 type Mission struct {
-	Id          int    `json:"id" redis:"id"`
-	StartTime   uint64 `json:"startTime" redis:"startTime"`     //start timestamp of this action
-	DeadLine    uint64 `json:"deadLine" redis:"deadLine"`       //end time
-	Desc        string `json:"desc" redis:"desc"`               //description for the action
-	Color       [3]int `json:"color" redis:"-"`                 //RGB mode
-	PublisherId int    `json:"publisherId" redis:"publisherId"` //who published the mission
-	ReceiversId []int  `json:"receiversId" redis:"-"`           //user list who received the mission
+	Id          int    `json:"id, omitempty" redis:"id"`
+	StartTime   uint64 `json:"startTime, omitempty" redis:"startTime"`     //start timestamp of this action
+	Desc        string `json:"desc, omitempty" redis:"desc"`               //description for the action
+	PublisherId int    `json:"publisherId, omitempty" redis:"publisherId"` //who published the mission
+	ReceiversId []int  `json:"receiversId, omitempty" redis:"-"`           //user list who received the mission
 }
 
 func (m *Mission) GetPublisher() (publisher *User) {
 	publisher, err := readUser(m.PublisherId)
 	if err != nil {
 		log.Println("Error get publisher:", err)
-		return nil, nil
+		return nil
 	}
 	return
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/handler"
+	hd "github.com/evolsnow/samaritan/handler"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net/http"
 )
@@ -26,19 +26,19 @@ func newRouter() *httprouter.Router {
 	//http get method
 
 	//http post method
-
+	r.POST("/todo", hd.NewTodo)
 	//http put method
 
 	//http delete method
 
 	//test
-	r.GET("/test", handler.Test)
-	r.POST("/hi", handler.Hi)
-	r.POST("/hia/:userId", mw.Auth(handler.Hi))
-	r.GET("/set", handler.SetJwt)
-	r.GET("/pm", handler.Pm)
-	r.GET("/pm2", handler.Pm2)
-	r.GET("/ab", handler.Ab)
+	r.GET("/test", hd.Test)
+	r.POST("/hi", hd.Hi)
+	r.POST("/hia/:userId", mw.Auth(hd.Hi))
+	r.GET("/set", hd.SetJwt)
+	r.GET("/pm", hd.Pm)
+	r.GET("/pm2", hd.Pm2)
+	r.GET("/ab", hd.Ab)
 
 	return r
 }

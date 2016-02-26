@@ -26,7 +26,7 @@ const (
 const (
 	TodoId           = "id"
 	TodoStartTime    = "startTime"
-	TodoDeadLine     = "deadLine"
+	TodoDeadline     = "deadline"
 	TodoDesc         = "desc"
 	TodoOwnerId      = "ownerId"
 	TodoAccomplished = "accomplished"
@@ -37,42 +37,28 @@ const (
 const (
 	MissionId          = "id"
 	MissionStartTime   = "startTime"
-	MissionDeadLine    = "deadLine"
 	MissionDesc        = "desc"
 	MissionPublisherId = "publisherId"
 
-//Color saved as redis-list -> mission:{id}:color [00,00,00]
 //Receivers saved as redis-set -> mission:{id}:rcv (1,3,2)
 )
 
 //other useful index set key name
 const (
-	userBelongSet               = "%s:%s:%s:%s"          //just for further analysis-> school:department:grade:class
+	userBelongSet               = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
 	userTodoList                = "user:%d:todoList"     //user's all to-do, redis-type:List
 	userTodoNotAccomplishedList = "user:%d:todoStatus:0" //to-do status, redis-type:List
 	userTodoAccomplishedList    = "user:%d:todoStatus:1"
 
 	userMissionJoinedSet    = "user:%d:missions:participate" //user's all missions redis-type:Set
 	userMissionPublishedSet = "user:%d:missions:publish"
+	userMissionColorList    = "user:%d:mission:%d:color" //user defined mission color redis-type:List
 
-	missionColorList = "mission:%d:color" //mission's color redis-type:List
-	missionRcvSet    = "mission:%d:rcv"   //mission's receivers redis-type:Set
+	missionRcvSet = "mission:%d:rcv" //mission's receivers redis-type:Set
 )
 
 //redis actions of model User
-//const (
-//	UserId = "id"
-//	UserAlias = "alias"
-//	UserName = "name"
-//	UserPhone = "phone"
-//	UserPassword = "passwd"
-//	UserAvatar = "avatar"
-//	UserSchool = "school"
-//	UserDep = "depart"
-//	UserGrade = "grade"
-//	UserClass = "class"
-//	UserStuNum = "stuNum"
-//)
+
 func createUser(u *User) error {
 	c := conn.Pool.Get()
 	defer c.Close()
@@ -152,13 +138,13 @@ func createTodo(td *Todo) error {
 	k1, k2 := TodoId, td.Id
 	k3, k4 := TodoDesc, td.Desc
 	k5, k6 := TodoStartTime, td.StartTime
-	k7, k8 := TodoDeadLine, td.DeadLine
+	k7, k8 := TodoDeadline, td.Deadline
 	k9, k10 := TodoAccomplished, td.Accomplished
 	k11, k12 := TodoOwnerId, td.OwnerId
 	k13, k14 := TodoMissionId, td.MissionId
 	//redis list
-	k15 := fmt.Sprintf(userTodoList, td.Id)
-	k16 := fmt.Sprintf(userTodoNotAccomplishedList, td.Id)
+	k15 := fmt.Sprintf(userTodoList, td.OwnerId)
+	k16 := fmt.Sprintf(userTodoNotAccomplishedList, td.OwnerId)
 
 	createTodoScript := redis.NewScript(16, createTodoLua)
 	_, err := createTodoScript.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16)
@@ -185,26 +171,20 @@ func createMission(m *Mission) error {
 					   KEYS[7], KEYS[8],KEYS[9], KEYS[10])
 	redis.call("SADD", KEYS[11], mid)
 	redis.call("SADD", KEYS[12], mid)
-	redis.call("RPUSH", KEYS[13], KEYS[14])
-	redis.call("RPUSH", KEYS[13], KEYS[15])
-	redis.call("RPUSH", KEYS[13], KEYS[16])
 	`
 	//mission models
 	m.Id, _ = redis.Int(c.Do("INCR", "autoIncrMission"))
 	k1, k2 := MissionId, m.Id
 	k3, k4 := MissionStartTime, m.StartTime
-	k5, k6 := MissionDeadLine, m.DeadLine
+	//k5, k6 := MissionDeadline, m.Deadline
 	k7, k8 := MissionDesc, m.Desc
 	k9, k10 := MissionPublisherId, m.PublisherId
 	//redis set
 	k11 := fmt.Sprintf(userMissionJoinedSet, m.PublisherId)
 	k12 := fmt.Sprintf(userMissionPublishedSet, m.PublisherId)
-	//color
-	k13 := fmt.Sprintf(missionColorList, m.Id)
-	k14, k15, k16 := m.Color[0], m.Color[1], m.Color[2]
 
-	createMissionScript := redis.NewScript(16, createMissionLua)
-	_, err := createMissionScript.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16)
+	createMissionScript := redis.NewScript(10, createMissionLua)
+	_, err := createMissionScript.Do(c, k1, k2, k3, k4, k7, k8, k9, k10, k11, k12)
 	return err
 }
 
@@ -231,11 +211,15 @@ func readMissionRcv(mid int) (reply []*User, err error) {
 	return reply, err
 }
 
-func readMission(mid int) (reply []interface{}, err error) {
+func readMission(mid int) (m *Mission, err error) {
 	c := conn.Pool.Get()
 	defer c.Close()
 	mission := "mission:" + strconv.Itoa(mid)
-	reply, err = redis.Values(c.Do("HGETALL", mission))
+	ret, err := redis.Values(c.Do("HGETALL", mission))
+	if err != nil {
+		return
+	}
+	err = redis.ScanStruct(ret, m)
 	return
 }
 
