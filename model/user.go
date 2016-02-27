@@ -12,6 +12,7 @@ type User struct {
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`
 	Password   string `json:"-" redis:"passwd"`
+	Email      string `json:"email,omitempty" redis:"email"`
 	Avatar     string `json:"avatar,omitempty" redis:"avatar"` //avatar url
 	School     string `json:"school,omitempty" redis:"school"`
 	Department string `json:"depart,omitempty" redis:"depart"`

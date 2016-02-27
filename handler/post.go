@@ -19,6 +19,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	us := model.User{
 		Phone:    req.Phone,
 		Password: base.HashedPassword(req.Password),
+		Name:     req.Name,
 	}
 	go us.CreateAvatar()
 	//assign id to user

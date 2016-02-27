@@ -18,6 +18,7 @@ const (
 	UName     = "name"
 	UPhone    = "phone"
 	UPassword = "passwd"
+	UEmail    = "email"
 	UAvatar   = "avatar"
 	USchool   = "school"
 	UDep      = "depart"
@@ -28,15 +29,15 @@ const (
 
 //to-do thing redis key name
 const (
-	TId  = "id"
-	TPid = "pid"
-
-	TStartTime = "startTime"
-	TDeadline  = "deadline"
-	TDesc      = "desc"
-	TOwnerId   = "ownerId"
-	TDone      = "done"
-	TProjectId = "projectId"
+	TId         = "id"
+	TPid        = "pid"
+	TStartTime  = "startTime"
+	TDeadline   = "deadline"
+	TDesc       = "desc"
+	TOwnerId    = "ownerId"
+	TDone       = "done"
+	TFinishTime = "finishTime"
+	TProjectId  = "projectId"
 )
 
 //project redis key name
@@ -78,30 +79,32 @@ func createUser(u *User) {
 					KEYS[1], KEYS[2], KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14], KEYS[15], KEYS[16],
 					KEYS[17], KEYS[18], KEYS[19], KEYS[20], KEYS[21], KEYS[22],
-					KEYS[23], KEYS[24])
-			redis.call("SADD", KEYS[25], uid)
-			redis.call("SET", KEYS[26], uid)
+					KEYS[23], KEYS[24], KEYS[25], KEYS[26])
+			redis.call("SADD", KEYS[27], uid)
+			redis.call("SET", KEYS[28], uid)
 			`
-		//user model
-		k1, k2 := UId, u.Id
-		k3, k4 := UAlias, u.Alias
-		k5, k6 := UName, u.Name
-		k7, k8 := UPhone, u.Phone
-		k9, k10 := UPassword, u.Password
-		k11, k12 := UAvatar, u.Avatar
-		k13, k14 := USchool, u.School
-		k15, k16 := UDep, u.Department
-		k17, k18 := UGrade, u.Grade
-		k19, k20 := UClass, u.Class
-		k21, k22 := UStuNum, u.StudentNum
-		k23, k24 := UPid, u.Pid
-		//redis set
-		//todo not now (::0:)?
-		k25 := fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class)
-		k26 := ClientId + u.Name
-		script := redis.NewScript(26, lua)
-		_, err := script.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12,
-			k13, k14, k15, k16, k17, k18, k19, k20, k21, k22, k23, k24, k25, k26)
+		ka := []interface{}{
+			//user model
+			UId, u.Id,
+			UPid, u.Pid,
+			UAlias, u.Alias,
+			UName, u.Name,
+			UPhone, u.Phone,
+			UPassword, u.Password,
+			UEmail, u.Email,
+			UAvatar, u.Avatar,
+			USchool, u.School,
+			UDep, u.Department,
+			UGrade, u.Grade,
+			UClass, u.Class,
+			UStuNum, u.StudentNum,
+			//redis set
+			//todo not now (::0:)?
+			fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class),
+			ClientId + u.Pid,
+		}
+		script := redis.NewScript(len(ka), lua)
+		_, err := script.Do(c, ka...)
 		c.Close()
 		if err != nil {
 			log.Println("Error create user:", err)
@@ -152,29 +155,31 @@ func createTodo(td *Todo) {
 	td.Pid = base.HashedTodoId(td.Id)
 	go func() {
 		lua := `
-			local tid = redis.call("INCR", "autoIncrTodo")
+			local tid = KEYS[2]
 			redis.call("HMSET", "todo:"..tid,
 					KEYS[1], tid, KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14],
-					KEYS[15], KEYS[16])
-			redis.call("RPUSH", KEYS[17], tid)
-			redis.call("SADD", KEYS[18], tid)
+					KEYS[15], KEYS[16], KEYS[17], KEYS[18])
+			redis.call("RPUSH", KEYS[19], tid)
+			redis.call("SADD", KEYS[20], tid)
 			`
-		//to-do model
-		k1, k2 := TId, td.Id
-		k3, k4 := TDesc, td.Desc
-		k5, k6 := TStartTime, td.StartTime
-		k7, k8 := TDeadline, td.Deadline
-		k9, k10 := TDone, td.Done
-		k11, k12 := TOwnerId, td.OwnerId
-		k13, k14 := TProjectId, td.ProjectId
-		k15, k16 := TPid, td.Pid
-		//redis list
-		k17 := fmt.Sprintf(userTdList, td.OwnerId)
-		k18 := fmt.Sprintf(userTdNotDoneSet, td.OwnerId)
-
-		script := redis.NewScript(18, lua)
-		_, err := script.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16, k17, k18)
+		ka := []interface{}{
+			//to-do model
+			TId, td.Id,
+			TDesc, td.Desc,
+			TStartTime, td.StartTime,
+			TDeadline, td.Deadline,
+			TDone, td.Done,
+			TFinishTime, td.FinishTime,
+			TOwnerId, td.OwnerId,
+			TProjectId, td.ProjectId,
+			TPid, td.Pid,
+			//redis list
+			fmt.Sprintf(userTdList, td.OwnerId),
+			fmt.Sprintf(userTdNotDoneSet, td.OwnerId),
+		}
+		script := redis.NewScript(len(ka), lua)
+		_, err := script.Do(c, ka...)
 		if err != nil {
 			log.Println("Error create todo:", err)
 		}
@@ -205,19 +210,20 @@ func createProject(p *Project) {
 			redis.call("SADD", KEYS[13], pid)
 			redis.call("SADD", KEYS[14], pid)
 			`
-		//project models
-		k1, k2 := PId, p.Id
-		k3, k4 := PCreateTime, time.Now().Unix()
-		k5, k6 := PDesc, p.Desc
-		k7, k8 := PPublisherId, p.PublisherId
-		k9, k10 := PName, p.Name
-		k11, k12 := PPid, p.Pid
-		//redis set
-		k13 := fmt.Sprintf(userPjJoinedSet, p.PublisherId)
-		k14 := fmt.Sprintf(userPjPublishedSet, p.PublisherId)
-
-		script := redis.NewScript(14, lua)
-		_, err := script.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14)
+		ka := []interface{}{
+			//project models
+			PId, p.Id,
+			PCreateTime, time.Now().Unix(),
+			PDesc, p.Desc,
+			PPublisherId, p.PublisherId,
+			PName, p.Name,
+			PPid, p.Pid,
+			//redis set
+			fmt.Sprintf(userPjJoinedSet, p.PublisherId),
+			fmt.Sprintf(userPjPublishedSet, p.PublisherId),
+		}
+		script := redis.NewScript(len(ka), lua)
+		_, err := script.Do(c, ka...)
 		if err != nil {
 			log.Println("Error create project:", err)
 		}

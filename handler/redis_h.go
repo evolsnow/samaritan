@@ -19,6 +19,7 @@ const (
 const (
 	//clientId = "clientId:" //index for userId, clientId:John return john's userId
 	clientId       = model.ClientId
+	deviceToken    = "deviceToken:%d" //ios device token
 	privateChat    = "privateChat:"
 	publicChat     = "publicChat:"
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
@@ -29,6 +30,14 @@ func readUserId(user string) (uid int, err error) {
 	defer c.Close()
 	key := clientId + user
 	uid, err = redis.Int(c.Do("GET", key))
+	return
+}
+
+func readDeviceToken(uid int) (token string, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(deviceToken, uid)
+	token, err = redis.String(c.Do("GET", key))
 	return
 }
 
@@ -63,13 +72,15 @@ func createConversation(cv *Conversation) int {
 					KEYS[7], KEYS[8], KEYS[9], KEYS[10],)
 	rerurn cid
 	`
-	k1, k2 := CId, cv.Id
-	k3, k4 := CConvId, cv.ConversationId
-	k5, k6 := CMsg, cv.Msg
-	k7, k8 := CGroupName, cv.GroupName
-	k9, k10 := CFrom, cv.From
-	script := redis.NewScript(10, lua)
-	id, err := redis.Int(script.Do(c, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10))
+	ka := []interface{}{
+		CId, cv.Id,
+		CConvId, cv.ConversationId,
+		CMsg, cv.Msg,
+		CGroupName, cv.GroupName,
+		CFrom, cv.From,
+	}
+	script := redis.NewScript(len(ka), lua)
+	id, err := redis.Int(script.Do(c, ka...))
 	if err != nil {
 		log.Println("Error create offline conversation:", err)
 	}
