@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/evolsnow/binding"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/mholt/binding"
 	"net/http"
 )
 
