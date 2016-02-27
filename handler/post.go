@@ -12,11 +12,9 @@ import (
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postUsReq)
 	errs := binding.Bind(r, req)
-	if errs != nil {
-		base.BadReqErrHandle(w, errs.Error())
+	if errs.Handle(w) {
 		return
 	}
-	resp := new(postUsResp)
 	us := model.User{
 		Phone:    req.Phone,
 		Password: base.HashedPassword(req.Password),
@@ -25,6 +23,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//assign id to user
 	us.Save()
 	//return jwt token
+	resp := new(postUsResp)
 	resp.Token = base.NewToken(us.Id)
 	makeResp(w, r, resp)
 }
@@ -32,8 +31,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postTdReq)
 	errs := binding.Bind(r, req)
-	if errs != nil {
-		base.BadReqErrHandle(w, errs.Error())
+	if errs.Handle(w) {
 		return
 	}
 	uid, _ := strconv.Atoi(ps.Get("userId"))
