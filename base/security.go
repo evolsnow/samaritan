@@ -1,17 +1,19 @@
 package base
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/evolsnow/httprouter"
 	"strconv"
 )
 
 const (
-	JwtKey       = "36861f1530941263e6f61b43743074d8"
-	PasswordSalt = "97096a41d7f2d22348ef9b64fbdfa87a"
-	TokenSalt    = "03e23aeb89f13ff4323e641a559db414"
+	JwtKey          = "36861f1530941263e6f61b43743074d8"
+	PasswordSalt    = "97096a41d7f2d22348ef9b64fbdfa87a"
+	TokenSalt       = "03e23aeb89f13ff4323e641a559db414"
+	PrivateChatSalt = "e1b46b79232e42eb4656ee2c810a1d5b"
+	UserIdSalt      = "1d143777c383ec8f7c7b7e2a4879ce85"
+	TodoIdSalt      = "f7f32e72f01973acc96e5038113f67e4"
+	ProjectIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 )
 
 func NewToken(id int) string {
@@ -38,11 +40,26 @@ func ParseToken(ah string, ps *httprouter.Params) (err error) {
 }
 
 func HashedPassword(pwd string) string {
-	h := md5.New()
-	h.Write([]byte(pwd))
-	h.Write([]byte(PasswordSalt))
-	hashed := hex.EncodeToString(h.Sum(nil))
-	return hashed
+	return hashWithSalt(pwd, PasswordSalt)
+}
+
+func NewPrivateChatId(raw string) string {
+	return hashWithSalt(raw, PrivateChatSalt)
+}
+
+func HashedUserId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, UserIdSalt)
+}
+
+func HashedTodoId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, TodoIdSalt)
+}
+
+func HashedProjectId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, ProjectIdSalt)
 }
 
 //func validSign(XSign, userId string) string {

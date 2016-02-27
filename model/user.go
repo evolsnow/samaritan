@@ -6,7 +6,8 @@ import (
 )
 
 type User struct {
-	Id         int    `json:"id,omitempty" redis:"id"`
+	Id         int    `json:"-" redis:"id"` //private id
+	Pid        string `json:"id,omitempty" redis:"pid"`
 	Alias      string `json:"alias,omitempty" redis:"alias"` //nick name
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`
@@ -45,5 +46,5 @@ func (u *User) CreateAvatar() {
 //save a new user
 func (u *User) Save() {
 	//return user id for jwt token use
-	u.Id = createUser(u)
+	createUser(u)
 }

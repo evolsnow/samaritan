@@ -28,9 +28,15 @@ func newRouter() *httprouter.Router {
 	//http post method
 	r.POST("/users", hd.NewUser)
 	r.POST("/todos", hd.NewTodo)
+	r.POST("/projects", hd.NewProject)
+	r.POST("/privateChats", hd.NewPrivateChat)
+
 	//http put method
 
 	//http delete method
+
+	//webSocket
+	r.GET("/websocket/:deviceToken", hd.Socket)
 
 	//test
 	r.GET("/test", hd.Test)

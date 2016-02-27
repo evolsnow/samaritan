@@ -5,13 +5,14 @@ import (
 )
 
 type Todo struct {
-	Id        int    `json:"id,omitempty" redis:"id"`
-	StartTime uint64 `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
-	Deadline  uint64 `json:"deadline,omitempty" redis:"dealine"`    //end time
+	Id        int    `json:"-" redis:"id"` //private id
+	Pid       string `json:"id,omitempty" redis:"pid"`
+	StartTime int64  `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
+	Deadline  int64  `json:"deadline,omitempty" redis:"dealine"`    //end time
 	Desc      string `json:"desc,omitempty" redis:"desc"`           //description for the action
 	OwnerId   int    `json:"ownerId,omitempty" redis:"ownerId"`     //whose
 	Done      bool   `json:"done,omitempty" redis:"done"`
-	MissionId int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
+	ProjectId int    `json:"projId,omitempty" redis:"projId"` //belong to which mission
 }
 
 //get user from to-do's owner id
@@ -24,11 +25,11 @@ func (td *Todo) GetOwner() (owner *User) {
 	return
 }
 
-//get mission from to-do's mission id
-func (td *Todo) GetMission() (m *Mission) {
-	m, err := readMission(td.MissionId)
+//get project from to-do's project id
+func (td *Todo) GetProject() (m *Project) {
+	m, err := readProject(td.ProjectId)
 	if err != nil {
-		log.Println("Error get mission with todo:", err)
+		log.Println("Error get project with todo:", err)
 		return nil
 	}
 	return
@@ -45,11 +46,6 @@ func (td *Todo) Finish() (err error) {
 }
 
 //save a new to-do
-func (td *Todo) Save() (err error) {
-	err = createTodo(td)
-	if err != nil {
-		log.Println("Error save to-do:", err)
-		return
-	}
-	return
+func (td *Todo) Save() {
+	createTodo(td)
 }
