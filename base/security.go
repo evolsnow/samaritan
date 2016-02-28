@@ -14,6 +14,8 @@ const (
 	UserIdSalt      = "1d143777c383ec8f7c7b7e2a4879ce85"
 	TodoIdSalt      = "f7f32e72f01973acc96e5038113f67e4"
 	ProjectIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
+	MissionIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
+	CommentIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 )
 
 func NewToken(id int) string {
@@ -60,6 +62,16 @@ func HashedTodoId(id int) string {
 func HashedProjectId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, ProjectIdSalt)
+}
+
+func HashedMissionId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, MissionIdSalt)
+}
+
+func HashedCommentId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, CommentIdSalt)
 }
 
 //func validSign(XSign, userId string) string {

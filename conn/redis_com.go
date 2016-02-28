@@ -26,11 +26,11 @@ import (
 //	c.Do("HSET", user, "lastVisit", lv)
 //}
 
-func Get(key string) string {
+func Get(key string) (string, error) {
 	c := Pool.Get()
 	defer c.Close()
-	value, _ := redis.String(c.Do("GET", key))
-	return value
+	value, err := redis.String(c.Do("GET", key))
+	return value, err
 }
 
 func CacheGet(key string) string {

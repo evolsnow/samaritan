@@ -20,19 +20,11 @@ const (
 
 const (
 	//clientId = "clientId:" //index for userId, clientId:John return john's userId
-	clientId       = model.ClientId
+	//clientId       = model.UserId
 	deviceToken    = "deviceToken:%d" //ios device token
 	privateChat    = "p2pChat:"
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
 )
-
-func readUserId(user string) (uid int, err error) {
-	c := conn.Pool.Get()
-	defer c.Close()
-	key := clientId + user
-	uid, err = redis.Int(c.Do("GET", key))
-	return
-}
 
 func readDeviceToken(uid int) (token string, err error) {
 	c := conn.Pool.Get()

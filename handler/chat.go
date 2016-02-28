@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/anachronistic/apns"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -75,7 +76,7 @@ func establishSocketConn(w http.ResponseWriter, r *http.Request, uid int) {
 func handlerMsg(msg []byte) {
 	ct := new(Chat)
 	if err := json.Unmarshal(msg, ct); err == nil {
-		ct.SenderId, _ = readUserId(ct.From)
+		ct.SenderId = model.ReadUserId(ct.From)
 		ct.Response()
 	}
 }
@@ -84,7 +85,7 @@ func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
 	case InvitedToGroup, KickedFromGroup:
-		uid, _ := readUserId(ct.Target)
+		uid := model.ReadUserId(ct.Target)
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
 	//notify other members in this conversation

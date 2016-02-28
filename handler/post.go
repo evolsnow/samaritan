@@ -7,7 +7,6 @@ import (
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/model"
 	"net/http"
-	"strconv"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -37,7 +36,7 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if errs.Handle(w) {
 		return
 	}
-	uid, _ := strconv.Atoi(ps.Get("userId"))
+	uid := ps.GetInt("userId")
 	td := model.Todo{
 		OwnerId:      uid,
 		Desc:         req.Desc,
@@ -46,7 +45,7 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Place:        req.Place,
 		Repeat:       req.Repeat,
 		RepeatPeriod: req.RepeatPeriod,
-		ProjectId:    req.ProjectId,
+		MissionId:    req.ProjectId,
 	}
 	td.Save()
 	resp := new(postTdResp)
@@ -64,7 +63,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Desc: req.Desc,
 		Name: req.Name,
 	}
-	pj.PublisherId, _ = strconv.Atoi(ps.Get("userId"))
+	pj.CreatorId = ps.GetInt("userId")
 	//get pid
 	pj.Save()
 	resp := new(postPjResp)
@@ -78,8 +77,8 @@ func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	if errs.Handle(w) {
 		return
 	}
-	fd, _ := strconv.Atoi(ps.Get("userId"))
-	td, _ := readUserId(req.To)
+	fd := ps.GetInt("userId")
+	td := model.ReadUserId(req.To)
 	raw := ""
 	if fd < td {
 		raw = fmt.Sprintf("%d&%d", fd, td)

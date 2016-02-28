@@ -17,7 +17,7 @@ type Todo struct {
 	OwnerId    int    `json:"ownerId,omitempty" redis:"ownerId"` //whose
 	Done       bool   `json:"done,omitempty" redis:"done"`
 	FinishTime int64  `json:"finishTime,omitempty" redis:"finishTime"`
-	ProjectId  int    `json:"projId,omitempty" redis:"projId"` //belong to which mission
+	MissionId  int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
 //get user from to-do's owner id
@@ -31,10 +31,10 @@ func (td *Todo) GetOwner() (owner *User) {
 }
 
 //get project from to-do's project id
-func (td *Todo) GetProject() (m *Project) {
-	m, err := readProject(td.ProjectId)
+func (td *Todo) GetMission() (m *Mission) {
+	m, err := readMission(td.MissionId)
 	if err != nil {
-		log.Println("Error get project with todo:", err)
+		log.Println("Error get mission with todo:", err)
 		return nil
 	}
 	return

@@ -82,7 +82,7 @@ func (c *LCache) GetOrRedis(key string) (value interface{}) {
 		c.ll.MoveToFront(ele)
 		return ele.Value.(*entry).value
 	} else { // look up this key from redis
-		ele := conn.Get(key)
+		ele, _ := conn.Get(key)
 		if ele != "" {
 			go c.Add(key, ele)
 			return ele

@@ -40,17 +40,34 @@ const (
 	TOwnerId      = "ownerId"
 	TDone         = "done"
 	TFinishTime   = "finishTime"
-	TProjectId    = "projectId"
+	TMissionId    = "missionId"
+)
+
+//mission redis key name
+const (
+	MId          = "id"
+	MPid         = "pid"
+	MName        = "name"
+	MCreateTime  = "createTime"
+	MDesc        = "desc"
+	MPublisherId = "publisherId"
+	//comments
+	CId         = "id"
+	CPid        = "pid"
+	CWhen       = "when"
+	CCriticPid  = "criticPid"
+	CCriticName = "criticName"
 )
 
 //project redis key name
 const (
-	PId          = "id"
-	PPid         = "pid"
-	PName        = "name"
-	PCreateTime  = "createTime"
-	PDesc        = "desc"
-	PPublisherId = "publisherId"
+	PId         = "id"
+	PPid        = "pid"
+	PName       = "name"
+	PCreateTime = "createTime"
+	PDesc       = "desc"
+	PCreatorId  = "publisherId"
+	PPrivate    = "private"
 )
 
 //other useful index set key name
@@ -60,15 +77,43 @@ const (
 	userTdNotDoneSet = "user:%d:todoStatus:0" //to-do status, redis-type:Set
 	userTdDoneSet    = "user:%d:todoStatus:1"
 
-	userPjJoinedSet    = "user:%d:projects:participate" //user's all projects redis-type:Set
-	userPjPublishedSet = "user:%d:projects:publish"
-	userPjColorList    = "user:%d:project:%d:color" //user defined project color redis-type:List
+	userPjJoinedSet  = "user:%d:projects:participate" //user's all projects redis-type:Set
+	userPjCreatedSet = "user:%d:projects:create"
 
-	projectMembersSet = "project:%d:members" //project's receivers redis-type:Set
-	ClientId          = "clientId:"          //index for userId, ClientId:john's token return john's userId
-	GroupId           = "groupId:"           //index for groupId, GroupId:a return group a's Id
+	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
+	userMsPublishedSet = "user:%d:missions:publish"
+
+	userPjColorList = "user:%d:project:%d:color" //user defined project color redis-type:List
+
+	projectMembersSet = "project:%d:members" //project's members redis-type:Set
+
+	missionReceiversSet = "mission:%d:receivers" //mission's receivers redis-type:Set
+	missionCommentsList = "mission:%d:comments"  //mission's comments redis-type:List
+
+	UserId    = "userId:"    //index for userId, UserId:john's pid return john's userId
+	MissionId = "missionId:" //index for Mission Id, missionId:a's pid return mission a's Id
+	ProjectId = "project:"   //project:a's name return a's id
 
 )
+
+//visible func
+func ReadUserId(uPid string) (uid int) {
+	key := UserId + uPid
+	uid, _ = redis.Int(conn.Get(key))
+	return
+}
+
+func ReadMissionId(mPid string) (mid int) {
+	key := MissionId + mPid
+	mid, _ = redis.Int(conn.Get(key))
+	return
+}
+
+func ReadProjectId(pPid string) (pid int) {
+	key := ProjectId + pPid
+	pid, _ = redis.Int(conn.Get(key))
+	return
+}
 
 //redis actions of model User
 func createUser(u *User) {
@@ -105,7 +150,7 @@ func createUser(u *User) {
 			//redis set
 			//todo not now (::0:)?
 			fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class),
-			ClientId + u.Pid,
+			UserId + u.Pid,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -114,6 +159,18 @@ func createUser(u *User) {
 			log.Println("Error create user:", err)
 		}
 	}()
+}
+
+func readUser(id int) (u *User, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	user := "user:" + strconv.Itoa(id)
+	ret, err := redis.Values(c.Do("HGETALL", user))
+	if err != nil {
+		return
+	}
+	err = redis.ScanStruct(ret, u)
+	return
 }
 
 func createUserAvatar(uid int, avatarUrl string) error {
@@ -138,18 +195,6 @@ func updatePassword(id int, pwd string) error {
 	user := "user:" + strconv.Itoa(id)
 	_, err := c.Do("HSET", user, UPassword, pwd)
 	return err
-}
-
-func readUser(id int) (u *User, err error) {
-	c := conn.Pool.Get()
-	defer c.Close()
-	user := "user:" + strconv.Itoa(id)
-	ret, err := redis.Values(c.Do("HGETALL", user))
-	if err != nil {
-		return
-	}
-	err = redis.ScanStruct(ret, u)
-	return
 }
 
 //redis actions of model to-do
@@ -180,7 +225,7 @@ func createTodo(td *Todo) {
 			TDone, td.Done,
 			TFinishTime, td.FinishTime,
 			TOwnerId, td.OwnerId,
-			TProjectId, td.ProjectId,
+			TMissionId, td.MissionId,
 			TPid, td.Pid,
 			//redis list
 			fmt.Sprintf(userTdList, td.OwnerId),
@@ -204,6 +249,109 @@ func updateTodoStatus(uid, tid int) error {
 	return err
 }
 
+//redis actions of model mission
+func createMission(m *Mission) {
+	c := conn.Pool.Get()
+	m.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
+	m.Pid = base.HashedMissionId(m.Id)
+	go func() {
+		lua := `
+			local mid = KEYS[2]
+			redis.call("HMSET", "mission:"..mid,
+					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
+					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12])
+			redis.call("SADD", KEYS[13], mid)
+			redis.call("SET", KEYS[14], mid)
+			`
+		ka := []interface{}{
+			//mission models
+			MId, m.Id,
+			MPid, m.Pid,
+			MName, m.Name,
+			MCreateTime, time.Now().Unix(),
+			MDesc, m.Desc,
+			MPublisherId, m.PublisherId,
+			//redis set
+			fmt.Sprintf(userMsPublishedSet, m.PublisherId),
+			MissionId + m.Pid,
+		}
+		script := redis.NewScript(len(ka), lua)
+		_, err := script.Do(c, ka...)
+		if err != nil {
+			log.Println("Error create mission:", err)
+		}
+		c.Close()
+	}()
+}
+
+func createMissionComment(cm *Comment) {
+	c := conn.Pool.Get()
+	cm.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
+	cm.Pid = base.HashedCommentId(cm.Id)
+	go func() {
+		mid := ReadMissionId(cm.missionPid)
+		lua := `
+			local cmid = KEYS[2]
+			redis.call("HMSET", "comment:"..cmid,
+					   KEYS[1], cmid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
+					   KEYS[7], KEYS[8], KEYS[9], KEYS[10])
+			redis.call("RPUSH", KEYS[11], cmid)
+			`
+		ka := []interface{}{
+			//comment models
+			CId, cm.Id,
+			CPid, cm.Pid,
+			CWhen, cm.When,
+			CCriticPid, cm.CriticPid,
+			CCriticName, cm.CriticName,
+
+			//redis list
+			fmt.Sprintf(missionCommentsList, mid),
+		}
+		script := redis.NewScript(len(ka), lua)
+		_, err := script.Do(c, ka...)
+		if err != nil {
+			log.Println("Error create comment:", err)
+		}
+		c.Close()
+	}()
+}
+
+func readMission(mid int) (m *Mission, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	mission := "mission:" + strconv.Itoa(mid)
+	ret, err := redis.Values(c.Do("HGETALL", mission))
+	if err != nil {
+		return
+	}
+	err = redis.ScanStruct(ret, m)
+	return
+}
+
+func readMissionComments(mid int) (cms []*Comment, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionCommentsList, mid)
+	lua := `
+		local data = redis.call("LRANGE", KEYS[1], 0, -1)
+		local ret = {}
+  		for idx=1,#data do
+  			ret[idx] = redis.call("HGETALL","comment:"..data[idx])
+  		end
+  		return ret
+	`
+	script := redis.NewScript(1, lua)
+	rets, err := redis.Values(script.Do(c, key))
+	cms = make([]*Comment, len(rets))
+	for _, v := range rets {
+		cmt := new(Comment)
+		err = redis.ScanStruct(v.([]interface{}), cmt)
+		cms = append(cms, cmt)
+	}
+	return
+}
+
 //redis actions of model project
 func createProject(p *Project) {
 	c := conn.Pool.Get()
@@ -214,23 +362,25 @@ func createProject(p *Project) {
 			local pid = KEYS[2]
 			redis.call("HMSET", "project:"..pid,
 					   KEYS[1], pid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
-					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12])
-			redis.call("SADD", KEYS[13], pid)
-			redis.call("SADD", KEYS[14], pid)
-			redis.call("SET", KEYS[15], pid)
+					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12]
+					   KEYS[13], KYES[14])
+			redis.call("SADD", KEYS[15], pid)
+			redis.call("SADD", KEYS[16], pid)
+			redis.call("SET", KEYS[17], pid)
 			`
 		ka := []interface{}{
 			//project models
 			PId, p.Id,
+			PPid, p.Pid,
 			PCreateTime, time.Now().Unix(),
 			PDesc, p.Desc,
-			PPublisherId, p.PublisherId,
+			PCreatorId, p.CreatorId,
+			PPrivate, p.Private,
 			PName, p.Name,
-			PPid, p.Pid,
 			//redis set
-			fmt.Sprintf(userPjJoinedSet, p.PublisherId),
-			fmt.Sprintf(userPjPublishedSet, p.PublisherId),
-			GroupId + p.Name,
+			fmt.Sprintf(userPjJoinedSet, p.CreatorId),
+			fmt.Sprintf(userPjCreatedSet, p.CreatorId),
+			MissionId + p.Name,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -276,6 +426,14 @@ func readProject(pid int) (p *Project, err error) {
 	return
 }
 
+func readProjectMemIds(pid int) (ids []int, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(projectMembersSet, pid)
+	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
 func updateProjectMember(pid, uid, action int) (err error) {
 	c := conn.Pool.Get()
 	defer c.Close()
@@ -286,19 +444,5 @@ func updateProjectMember(pid, uid, action int) (err error) {
 	} else {
 		_, err = c.Do("SREM", memSet, uid)
 	}
-	return
-}
-
-func readMemIdsWithName(name string) (ids []int, err error) {
-	c := conn.Pool.Get()
-	defer c.Close()
-	idx := GroupId + name
-	// warning: one hard code here
-	lua := `
-	local pid = redis.call("GET", KEYS[1])
-	return redis.call("SMEMBERS", "project:"..pid..":members")
-	`
-	script := redis.NewScript(1, lua)
-	ids, err = redis.Ints(script.Do(c, idx))
 	return
 }
