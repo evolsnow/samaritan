@@ -29,7 +29,7 @@ func (m *Mission) GetReceiversId() []int {
 	}
 	ids, err := readMissionReceiversId(m.Id)
 	if err != nil {
-		log.Println("Error get project members with name", err)
+		log.Println("Error get mission receivers", err)
 		return nil
 	}
 	return ids
