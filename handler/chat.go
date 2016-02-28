@@ -17,15 +17,16 @@ const (
 	PeerToPeer = iota //private msg server <<-->> client
 	Discuss           //group chat server <<-->> client
 	//system call
-	UserJoined      // server -->> client
-	UserLeft        //server -->> client
-	InvitedToGroup  //server -->> client
-	KickedFromGroup //server -->> client
+	UserJoined        // server -->> client
+	UserLeft          //server -->> client
+	InvitedToMission  //server -->> client
+	KickedFromMission //server -->> client
+	// server -->> client
 )
 
 type Chat struct {
 	Id             int      `json:"-" redis:"id"`
-	ConversationId string   `json:"convId" redis:"convId"`
+	ConversationId string   `json:"convId,omitempty" redis:"convId"`
 	Type           int      `json:"type" redis:"type"`
 	Msg            string   `json:"msg,omitempty" redis:"msg"`
 	Target         string   `json:"target,omitempty" redis:"target"`       //joined or left user
@@ -84,7 +85,7 @@ func handlerMsg(msg []byte) {
 func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
-	case InvitedToGroup, KickedFromGroup:
+	case InvitedToMission, KickedFromMission:
 		uid := model.ReadUserId(ct.Target)
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
@@ -92,13 +93,14 @@ func (ct *Chat) Response() {
 	case PeerToPeer:
 		uid := model.ReadUserId(ct.To[0])
 		ct.ReceiversId = append(ct.ReceiversId, uid)
+
 	//notify other members in this conversation
 	case UserJoined, UserLeft, Discuss:
 		ids := readChatMembers(ct)
 		ct.ReceiversId = ids[:0]
 		for i, uid := range ids {
 			if uid == ct.SenderId {
-				ct.ReceiversId = append(ct.ReceiversId, ids[i:]...)
+				ct.ReceiversId = append(ct.ReceiversId, ids[i+1:]...)
 				break
 			} else {
 				ct.ReceiversId = append(ct.ReceiversId, uid)

@@ -13,7 +13,8 @@ type Todo struct {
 	Repeat       bool   `json:"repeat,omitempty" redis:"repeat"`
 	RepeatPeriod int64  `json:"repeatPeriod,omitempty" redis:"repeatPeriod"`
 	//Deadline     int64  `json:"deadline,omitempty" redis:"dealine"`    //end time
-	Desc       string `json:"desc,omitempty" redis:"desc"`       //description for the action
+	Desc       string `json:"desc,omitempty" redis:"desc"` //description for the action
+	Remark     string `json:"remark,omitempty" redis:"remark"`
 	OwnerId    int    `json:"ownerId,omitempty" redis:"ownerId"` //whose
 	Done       bool   `json:"done,omitempty" redis:"done"`
 	FinishTime int64  `json:"finishTime,omitempty" redis:"finishTime"`

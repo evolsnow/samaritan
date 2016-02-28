@@ -37,6 +37,7 @@ const (
 	TRepeat       = "repeat"
 	TRepeatPeriod = "repeatPeriod"
 	TDesc         = "desc"
+	TRemark       = "remark"
 	TOwnerId      = "ownerId"
 	TDone         = "done"
 	TFinishTime   = "finishTime"
@@ -209,14 +210,15 @@ func createTodo(td *Todo) {
 					KEYS[1], tid, KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14],
 					KEYS[15], KEYS[16], KEYS[17], KEYS[18], KEYS[19], KEYS[20],
-					KEYS[21], KEYS[22], KEYS[23], KEYS[24])
-			redis.call("RPUSH", KEYS[25], tid)
-			redis.call("SADD", KEYS[26], tid)
+					KEYS[21], KEYS[22], KEYS[23], KEYS[24], KEYS[25], KEYS[26])
+			redis.call("RPUSH", KEYS[27], tid)
+			redis.call("SADD", KEYS[28], tid)
 			`
 		ka := []interface{}{
 			//to-do model
 			TId, td.Id,
 			TDesc, td.Desc,
+			TRemark, td.Remark,
 			TStartTime, td.StartTime,
 			TTaskTime, td.TaskTime,
 			TPlace, td.Place,
