@@ -21,7 +21,6 @@ const (
 	UserLeft          //server -->> client
 	InvitedToMission  //server -->> client
 	KickedFromMission //server -->> client
-	// server -->> client
 )
 
 type Chat struct {

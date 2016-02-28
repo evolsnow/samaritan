@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
@@ -24,6 +25,7 @@ const (
 	deviceToken = "deviceToken:%d" //ios device token
 	//privateChat = "p2pChat:"
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
+	userToken      = "user:%d:token"
 )
 
 func readDeviceToken(uid int) (token string, err error) {
@@ -85,4 +87,11 @@ func updateOfflineMsg(uid, convId int) {
 	defer c.Close()
 	key := fmt.Sprintf(offlineMsgList, uid)
 	c.Do("RPUSH", key, convId)
+}
+
+func createToken(uid int, token string) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(userToken, uid)
+	c.Do("SET", key, token)
 }

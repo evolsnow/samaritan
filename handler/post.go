@@ -24,9 +24,11 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//assign id to user
 	us.Save()
 	//return jwt token
+	token := base.NewToken(us.Id)
 	resp := new(postUsResp)
-	resp.Token = base.NewToken(us.Id)
 	resp.Id = base.HashedUserId(us.Id)
+	resp.Token = token
+	go createToken(us.Id, token)
 	makeResp(w, r, resp)
 }
 
