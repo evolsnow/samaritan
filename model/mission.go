@@ -6,11 +6,11 @@ type Mission struct {
 	Id            int       `json:"-" redis:"id"`             //private id
 	Pid           string    `json:"id,omitempty" redis:"pid"` //public id
 	Name          string    `json:"name,omitempty" redis:"name"`
-	createTime    int64     `json:"createTime,omitempty" redis:"createTime"`   //create time timestamp of this mission
-	Desc          string    `json:"desc,omitempty" redis:"desc"`               //description for the project
-	PublisherId   int       `json:"publisherId,omitempty" redis:"publisherId"` //who published the mission
-	ReceiversId   []int     `json:"receiversId,omitempty" redis:"-"`           //user list who accepted the mission
-	Completion    float32   `json:"completion,omitempty" redis:"completion"`
+	createTime    int64     `json:"createTime,omitempty" redis:"createTime"`       //create time timestamp of this mission
+	Desc          string    `json:"desc,omitempty" redis:"desc"`                   //description for the project
+	PublisherId   int       `json:"publisherId,omitempty" redis:"publisherId"`     //who published the mission
+	ReceiversId   []int     `json:"receiversId,omitempty" redis:"-"`               //user list who accepted the mission
+	CompletionNum int       `json:"completionNum,omitempty" redis:"completionNum"` //completed number
 	CompletedTime int64     `json:"completedTime,omitempty" redis:"completedTime"`
 	Comments      []Comment `json:"comments,omitempty" redis:"-"`
 }

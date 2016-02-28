@@ -14,6 +14,7 @@ import (
 const (
 	UId       = "id"
 	UPid      = "pid"
+	USamId    = "samId"
 	UAlias    = "alias"
 	UName     = "name"
 	UPhone    = "phone"
@@ -46,12 +47,14 @@ const (
 
 //mission redis key name
 const (
-	MId          = "id"
-	MPid         = "pid"
-	MName        = "name"
-	MCreateTime  = "createTime"
-	MDesc        = "desc"
-	MPublisherId = "publisherId"
+	MId            = "id"
+	MPid           = "pid"
+	MName          = "name"
+	MCreateTime    = "createTime"
+	MDesc          = "desc"
+	MPublisherId   = "publisherId"
+	MCompletionNum = "completionNum"
+	MCompletedTime = "completedTime"
 	//comments
 	CId         = "id"
 	CPid        = "pid"
@@ -67,7 +70,7 @@ const (
 	PName       = "name"
 	PCreateTime = "createTime"
 	PDesc       = "desc"
-	PCreatorId  = "publisherId"
+	PCreatorId  = "creatorId"
 	PPrivate    = "private"
 )
 
@@ -129,14 +132,15 @@ func createUser(u *User) {
 					KEYS[1], KEYS[2], KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14], KEYS[15], KEYS[16],
 					KEYS[17], KEYS[18], KEYS[19], KEYS[20], KEYS[21], KEYS[22],
-					KEYS[23], KEYS[24], KEYS[25], KEYS[26])
-			redis.call("SADD", KEYS[27], uid)
-			redis.call("SET", KEYS[28], uid)
+					KEYS[23], KEYS[24], KEYS[25], KEYS[26], KEYS[27], KEYS[28])
+			redis.call("SADD", KEYS[29], uid)
+			redis.call("SET", KEYS[30], uid)
 			`
 		ka := []interface{}{
 			//user model
 			UId, u.Id,
 			UPid, u.Pid,
+			USamId, u.SamId,
 			UAlias, u.Alias,
 			UName, u.Name,
 			UPhone, u.Phone,
@@ -261,9 +265,10 @@ func createMission(m *Mission) {
 			local mid = KEYS[2]
 			redis.call("HMSET", "mission:"..mid,
 					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
-					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12])
-			redis.call("SADD", KEYS[13], mid)
-			redis.call("SET", KEYS[14], mid)
+					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
+					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
+			redis.call("SADD", KEYS[17], mid)
+			redis.call("SET", KEYS[18], mid)
 			`
 		ka := []interface{}{
 			//mission models
@@ -273,6 +278,8 @@ func createMission(m *Mission) {
 			MCreateTime, time.Now().Unix(),
 			MDesc, m.Desc,
 			MPublisherId, m.PublisherId,
+			MCompletionNum, m.CompletionNum,
+			MCompletedTime, m.CompletedTime,
 			//redis set
 			fmt.Sprintf(userMsPublishedSet, m.PublisherId),
 			MissionId + m.Pid,

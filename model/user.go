@@ -8,6 +8,7 @@ import (
 type User struct {
 	Id         int    `json:"-" redis:"id"` //private id
 	Pid        string `json:"id,omitempty" redis:"pid"`
+	SamId      string `json:"samId,omitempty" redis:"samId"` //unique id in samaritan
 	Alias      string `json:"alias,omitempty" redis:"alias"` //nick name
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`

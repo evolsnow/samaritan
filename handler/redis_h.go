@@ -25,6 +25,7 @@ const (
 	//privateChat = "p2pChat:"
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
 	userToken      = "user:%d:token"
+	samIdSet       = "allSamId"
 )
 
 func readDeviceToken(uid int) (token string, err error) {
@@ -33,6 +34,19 @@ func readDeviceToken(uid int) (token string, err error) {
 	key := fmt.Sprintf(deviceToken, uid)
 	token, err = redis.String(c.Do("GET", key))
 	return
+}
+
+func readIfSamIdExist(sid string) (exist bool) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	exist, _ = redis.Bool(c.Do("SISMEMBER", samIdSet, sid))
+	return
+}
+
+func updateSamIdSet(sid string) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	c.Do("SADD", samIdSet, sid)
 }
 
 //func createPrivateChatRecord(chatId string, ua, ub int) {
