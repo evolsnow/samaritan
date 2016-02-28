@@ -87,6 +87,6 @@ func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 	resp := new(postPrivateChatResp)
 	resp.PrivateChatId = base.NewPrivateChatId(raw)
-	go createPrivateConvRecord(resp.PrivateChatId, fd, td)
+	go createPrivateChatRecord(resp.PrivateChatId, fd, td)
 	makeResp(w, r, resp)
 }

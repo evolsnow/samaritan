@@ -12,14 +12,27 @@ import (
 	"time"
 )
 
-type Conversation struct {
+const (
+	PeerToPeer = iota //private msg server <<-->> client
+	Discuss           //group chat server <<-->> client
+	//system call
+	UserJoined      // server -->> client
+	UserLeft        //server -->> client
+	InvitedToGroup  //server -->> client
+	KickedFromGroup //server -->> client
+)
+
+type Chat struct {
 	Id             int      `json:"-" redis:"id"`
 	ConversationId string   `json:"convId" redis:"convId"`
-	Msg            string   `json:"msg" redis:"msg"`
-	GroupName      string   `json:"private" redis:"groupName"`
-	From           string   `json:"from" redis:"from"`
-	SenderId       int      `json:"-" redis:"-"`
+	Type           int      `json:"type" redis:"type"`
+	Msg            string   `json:"msg,omitempty" redis:"msg"`
+	Target         string   `json:"target,omitempty" redis:"target"` //joined or left user
+	GroupName      string   `json:"groupName,omitempty" redis:"groupName"`
+	From           string   `json:"from,omitempty" redis:"from"`
+	SenderId       int      `json:"-" redis:"-"` //server side use
 	To             []string `json:"to" redis:"to"`
+	ReceiversId    []int    `json:"-" redis:"-"` //server side use
 	Timestamp      int64    `json:"timestamp" redis:"timestamp"`
 }
 
@@ -54,56 +67,76 @@ func establishSocketConn(w http.ResponseWriter, r *http.Request, uid int) {
 			log.Println("read:", err)
 			break
 		}
-		log.Printf("recv: %s", message)
+		log.Printf("rect: %s", message)
 		go handlerMsg(message)
 	}
 }
 
 func handlerMsg(msg []byte) {
-	cv := new(Conversation)
-	if err := json.Unmarshal(msg, cv); err == nil {
-		cv.SenderId, _ = readUserId(cv.From)
-		cv.Execute()
+	ct := new(Chat)
+	if err := json.Unmarshal(msg, ct); err == nil {
+		ct.SenderId, _ = readUserId(ct.From)
+		ct.Response()
 	}
 }
 
-func (cv *Conversation) Execute() {
-	ids := readConvIds(cv)
-	reply := cv
-	reply.Timestamp = time.Now().Unix()
-	offlineIds := make([]int, len(ids), len(ids))
-	for _, uid := range ids {
-		if uid == cv.SenderId {
-			continue
+func (ct *Chat) Response() {
+	switch ct.Type {
+	//notify the special user
+	case InvitedToGroup, KickedFromGroup:
+		uid, _ := readUserId(ct.Target)
+		ct.ReceiversId = append(ct.ReceiversId, uid)
+
+	//notify other members in this conversation
+	case UserJoined, UserLeft, PeerToPeer, Discuss:
+		ids := readChatMembers(ct)
+		ct.ReceiversId = ids[:0]
+		for i, uid := range ids {
+			if uid == ct.SenderId {
+				ct.ReceiversId = append(ct.ReceiversId, ids[i:]...)
+				break
+			} else {
+				ct.ReceiversId = append(ct.ReceiversId, uid)
+			}
 		}
+	}
+	ct.send()
+}
+
+func (ct *Chat) send() {
+	ct.Timestamp = time.Now().Unix()
+	offlineIds := make([]int, len(ct.ReceiversId), len(ct.ReceiversId))
+	for _, uid := range ct.ReceiversId {
 		sc, ok := socketConnMap[uid]
 		if ok {
 			go func(*websocket.Conn, int) {
-				if err := sc.WriteJSON(reply); err != nil {
+				if err := sc.WriteJSON(ct); err != nil {
 					offlineIds = append(offlineIds, uid)
 				}
 			}(sc, uid)
 		} else {
-			go reply.Save(uid)
+			go ct.Save(uid)
 			offlineIds = append(offlineIds, uid)
 		}
 	}
-	applePush(offlineIds, reply)
-}
-
-func (cv *Conversation) Save(uid int) {
-	if cv.Id == 0 {
-		//not saved
-		cv.Id = createConversation(cv)
-	} else {
-		//offline msg saved
-		updateOfflineMsg(uid, cv.Id)
+	if ct.Type == PeerToPeer || ct.Type == Discuss {
+		applePush(offlineIds, ct)
 	}
 }
 
-func applePush(ids []int, cv *Conversation) {
+func (ct *Chat) Save(uid int) {
+	if ct.Id == 0 {
+		//not saved
+		ct.Id = createChat(ct)
+	} else {
+		//offline msg saved
+		updateOfflineMsg(uid, ct.Id)
+	}
+}
+
+func applePush(ids []int, ct *Chat) {
 	payload := apns.NewPayload()
-	payload.Alert = cv.Msg
+	payload.Alert = ct.Msg
 	payload.Sound = "default"
 	payload.Badge = 1
 	client := apns.NewClient("gateway.sandbox.push.apple.com:2195", "static/certs/cert.pem", "static/certs/key.pem")

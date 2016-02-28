@@ -62,7 +62,8 @@ const (
 	userPjColorList    = "user:%d:project:%d:color" //user defined project color redis-type:List
 
 	projectMembersSet = "project:%d:members" //project's receivers redis-type:Set
-	ClientId          = "clientId:"          //index for userId, clientId:John return john's userId
+	ClientId          = "clientId:"          //index for userId, ClientId:john's token return john's userId
+	GroupId           = "groupId:"           //index for groupId, GroupId:a return group a's Id
 
 )
 
@@ -209,6 +210,7 @@ func createProject(p *Project) {
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12])
 			redis.call("SADD", KEYS[13], pid)
 			redis.call("SADD", KEYS[14], pid)
+			redis.call("SET", KEYS[15], pid)
 			`
 		ka := []interface{}{
 			//project models
@@ -221,6 +223,7 @@ func createProject(p *Project) {
 			//redis set
 			fmt.Sprintf(userPjJoinedSet, p.PublisherId),
 			fmt.Sprintf(userPjPublishedSet, p.PublisherId),
+			GroupId + p.Name,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -276,5 +279,19 @@ func updateProjectMember(pid, uid, action int) (err error) {
 	} else {
 		_, err = c.Do("SREM", memSet, uid)
 	}
+	return
+}
+
+func readMemIdsWithName(name string) (ids []int, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	idx := GroupId + name
+	// warning: one hard code here
+	lua := `
+	local pid = redis.call("GET", KEYS[1])
+	return redis.call("SMEMBERS", "project:"..pid..":members")
+	`
+	script := redis.NewScript(1, lua)
+	ids, err = redis.Ints(script.Do(c, idx))
 	return
 }

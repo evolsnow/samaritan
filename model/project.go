@@ -53,6 +53,15 @@ func (p *Project) GetMembers() (participants []*User) {
 	return
 }
 
+func (p *Project) GetMembersId() []int {
+	ids, err := readMemIdsWithName(p.Name)
+	if err != nil {
+		log.Println("Error get project members with name", err)
+		return nil
+	}
+	return ids
+}
+
 func (p *Project) Save() {
 	createProject(p)
 }
