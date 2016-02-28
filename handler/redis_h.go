@@ -21,8 +21,8 @@ const (
 const (
 	//clientId = "clientId:" //index for userId, clientId:John return john's userId
 	//clientId       = model.UserId
-	deviceToken    = "deviceToken:%d" //ios device token
-	privateChat    = "p2pChat:"
+	deviceToken = "deviceToken:%d" //ios device token
+	//privateChat = "p2pChat:"
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
 )
 
@@ -34,27 +34,19 @@ func readDeviceToken(uid int) (token string, err error) {
 	return
 }
 
-func createPrivateChatRecord(chatId string, ua, ub int) {
-	c := conn.Pool.Get()
-	defer c.Close()
-	c.Send("SADD", privateChat+chatId, ua)
-	c.Send("SADD", privateChat+chatId, ub)
-	c.Flush()
-}
+//func createPrivateChatRecord(chatId string, ua, ub int) {
+//	c := conn.Pool.Get()
+//	defer c.Close()
+//	c.Send("SADD", privateChat+chatId, ua)
+//	c.Send("SADD", privateChat+chatId, ub)
+//	c.Flush()
+//}
 
 func readChatMembers(ct *Chat) (ids []int) {
-	c := conn.Pool.Get()
-	defer c.Close()
-	key := ""
-	if ct.Type == PeerToPeer {
-		key = privateChat + ct.ConversationId
-		ids, _ = redis.Ints(c.Do("SMEMBERS", key))
-	} else {
-		//read group members
-		p := new(model.Project)
-		p.Name = ct.GroupName
-		ids = p.GetMembersId()
-	}
+	//read mission members
+	m := new(model.Mission)
+	m.Pid = ct.GroupName
+	ids = m.GetReceiversId()
 	return
 }
 

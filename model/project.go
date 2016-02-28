@@ -58,7 +58,7 @@ func (p *Project) GetMembersId() []int {
 	if p.Id == 0 {
 		p.Id = ReadProjectId(p.Pid)
 	}
-	ids, err := readProjectMemIds(p.Id)
+	ids, err := readProjectMembersId(p.Id)
 	if err != nil {
 		log.Println("Error get project members with name", err)
 		return nil

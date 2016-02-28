@@ -352,6 +352,14 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
 	return
 }
 
+func readMissionReceiversId(mid int) (ids []int, err error) {
+	c := conn.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionReceiversSet, mid)
+	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
 //redis actions of model project
 func createProject(p *Project) {
 	c := conn.Pool.Get()
@@ -426,7 +434,7 @@ func readProject(pid int) (p *Project, err error) {
 	return
 }
 
-func readProjectMemIds(pid int) (ids []int, err error) {
+func readProjectMembersId(pid int) (ids []int, err error) {
 	c := conn.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(projectMembersSet, pid)

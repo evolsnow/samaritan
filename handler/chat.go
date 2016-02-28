@@ -28,8 +28,8 @@ type Chat struct {
 	ConversationId string   `json:"convId" redis:"convId"`
 	Type           int      `json:"type" redis:"type"`
 	Msg            string   `json:"msg,omitempty" redis:"msg"`
-	Target         string   `json:"target,omitempty" redis:"target"` //joined or left user
-	GroupName      string   `json:"groupName,omitempty" redis:"groupName"`
+	Target         string   `json:"target,omitempty" redis:"target"`       //joined or left user
+	GroupName      string   `json:"groupName,omitempty" redis:"groupName"` //as mission's name
 	From           string   `json:"from,omitempty" redis:"from"`
 	SenderId       int      `json:"-" redis:"-"` //server side use
 	To             []string `json:"to" redis:"to"`
@@ -88,8 +88,12 @@ func (ct *Chat) Response() {
 		uid := model.ReadUserId(ct.Target)
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
+	//notify one user
+	case PeerToPeer:
+		uid := model.ReadUserId(ct.To[0])
+		ct.ReceiversId = append(ct.ReceiversId, uid)
 	//notify other members in this conversation
-	case UserJoined, UserLeft, PeerToPeer, Discuss:
+	case UserJoined, UserLeft, Discuss:
 		ids := readChatMembers(ct)
 		ct.ReceiversId = ids[:0]
 		for i, uid := range ids {
