@@ -29,15 +29,18 @@ const (
 
 //to-do thing redis key name
 const (
-	TId         = "id"
-	TPid        = "pid"
-	TStartTime  = "startTime"
-	TDeadline   = "deadline"
-	TDesc       = "desc"
-	TOwnerId    = "ownerId"
-	TDone       = "done"
-	TFinishTime = "finishTime"
-	TProjectId  = "projectId"
+	TId           = "id"
+	TPid          = "pid"
+	TStartTime    = "startTime"
+	TTaskTime     = "taskTime"
+	TPlace        = "place"
+	TRepeat       = "repeat"
+	TRepeatPeriod = "repeatPeriod"
+	TDesc         = "desc"
+	TOwnerId      = "ownerId"
+	TDone         = "done"
+	TFinishTime   = "finishTime"
+	TProjectId    = "projectId"
 )
 
 //project redis key name
@@ -160,16 +163,20 @@ func createTodo(td *Todo) {
 			redis.call("HMSET", "todo:"..tid,
 					KEYS[1], tid, KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14],
-					KEYS[15], KEYS[16], KEYS[17], KEYS[18])
-			redis.call("RPUSH", KEYS[19], tid)
-			redis.call("SADD", KEYS[20], tid)
+					KEYS[15], KEYS[16], KEYS[17], KEYS[18], KEYS[19], KEYS[20],
+					KEYS[21], KEYS[22], KEYS[23], KEYS[24])
+			redis.call("RPUSH", KEYS[25], tid)
+			redis.call("SADD", KEYS[26], tid)
 			`
 		ka := []interface{}{
 			//to-do model
 			TId, td.Id,
 			TDesc, td.Desc,
 			TStartTime, td.StartTime,
-			TDeadline, td.Deadline,
+			TTaskTime, td.TaskTime,
+			TPlace, td.Place,
+			TRepeat, td.Repeat,
+			TRepeatPeriod, td.RepeatPeriod,
 			TDone, td.Done,
 			TFinishTime, td.FinishTime,
 			TOwnerId, td.OwnerId,
