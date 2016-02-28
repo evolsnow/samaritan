@@ -39,12 +39,14 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	uid, _ := strconv.Atoi(ps.Get("userId"))
 	td := model.Todo{
-		OwnerId:   uid,
-		Desc:      req.Desc,
-		Deadline:  req.Deadline,
-		StartTime: req.StartTime,
-		Done:      req.Done,
-		ProjectId: req.MissionId,
+		OwnerId:      uid,
+		Desc:         req.Desc,
+		StartTime:    req.StartTime,
+		TaskTime:     req.TaskTime,
+		Place:        req.Place,
+		Repeat:       req.Repeat,
+		RepeatPeriod: req.RepeatPeriod,
+		ProjectId:    req.ProjectId,
 	}
 	td.Save()
 	resp := new(postTdResp)
