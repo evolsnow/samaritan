@@ -1,12 +1,11 @@
 package main
 
 import (
+	"flag"
 	"github.com/evolsnow/negroni"
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	mw "github.com/evolsnow/samaritan/middleware"
-	//"log"
-	"flag"
 	"net"
 	"strconv"
 )
