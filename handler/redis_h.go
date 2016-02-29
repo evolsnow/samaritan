@@ -2,11 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
-	"log"
 )
+
+var log = base.Logger
 
 const (
 	CId        = "id"
@@ -90,7 +92,7 @@ func createChat(ct *Chat) int {
 	script := redis.NewScript(len(ka), lua)
 	id, err := redis.Int(script.Do(c, ka...))
 	if err != nil {
-		log.Println("Error create offline conversation:", err)
+		log.Error("Error create offline conversation:", err)
 	}
 	return id
 }

@@ -5,7 +5,8 @@ import (
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	mw "github.com/evolsnow/samaritan/middleware"
-	"log"
+	//"log"
+	"flag"
 	"net"
 	"strconv"
 )
@@ -13,15 +14,24 @@ import (
 const LRUCacheSize = 100
 const CacheDB = 0
 
+var log = base.Logger
+
 func main() {
-	config, err := ParseConfig("config.json")
+	var debug bool
+	var configFile string
+	flag.BoolVar(&debug, "d", false, "debug mode")
+	flag.StringVar(&configFile, "c", "config.json", "specify config file")
+	flag.Parse()
+	//set global log level
+	base.SetLogLevel(debug)
+	//parse config
+	config, err := ParseConfig(configFile)
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
 	}
 	if config.RedisDB == CacheDB {
 		log.Fatal("redis db can not be same as cache db: '0'")
 	}
-
 	//init redis database pool
 	redisPort := strconv.Itoa(config.RedisPort)
 	redisServer := net.JoinHostPort(config.RedisAddress, redisPort)

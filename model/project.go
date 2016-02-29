@@ -1,9 +1,5 @@
 package model
 
-import (
-	"log"
-)
-
 type Project struct {
 	Id         int    `json:"-" redis:"id"`             //private id
 	Pid        string `json:"id,omitempty" redis:"pid"` //public id
@@ -18,16 +14,17 @@ type Project struct {
 func (p *Project) GetCreator() (creator *User) {
 	creator, err := readUser(p.CreatorId)
 	if err != nil {
-		log.Println("Error get creator:", err)
+		log.Error("Error get creator:", err)
 		return nil
 	}
+	log.Debug("creator:", creator)
 	return
 }
 
 func (p *Project) AddMember(uid int) (err error) {
 	err = updateProjectMember(p.Id, uid, 1)
 	if err != nil {
-		log.Println("Error add Member:", err)
+		log.Error("Error add Member:", err)
 		return err
 	}
 	return
@@ -36,21 +33,22 @@ func (p *Project) AddMember(uid int) (err error) {
 func (p *Project) RemoveMember(uid int) (err error) {
 	err = updateProjectMember(p.Id, uid, -1)
 	if err != nil {
-		log.Println("Error remove Member:", err)
+		log.Error("Error remove Member:", err)
 		return err
 	}
 	return
 }
 
-func (p *Project) GetMembers() (participants []*User) {
+func (p *Project) GetMembers() (members []*User) {
 	if len(p.MembersId) == 0 {
 		return
 	}
-	participants, err := readProjectMembers(p.Id)
+	members, err := readProjectMembers(p.Id)
 	if err != nil {
-		log.Println("Error get project members:", err)
+		log.Error("Error get project members:", err)
 		return nil
 	}
+	log.Debug("proj members:", members)
 	return
 }
 
@@ -60,12 +58,14 @@ func (p *Project) GetMembersId() []int {
 	}
 	ids, err := readProjectMembersId(p.Id)
 	if err != nil {
-		log.Println("Error get project members", err)
+		log.Error("Error get project members", err)
 		return nil
 	}
+	log.Debug("proj members id:", ids)
 	return ids
 }
 
 func (p *Project) Save() {
+	log.Debug("create project:", p)
 	createProject(p)
 }

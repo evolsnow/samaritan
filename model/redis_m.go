@@ -5,10 +5,11 @@ import (
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
-	"log"
 	"strconv"
 	"time"
 )
+
+var log = base.Logger
 
 //user redis key name
 const (
@@ -161,7 +162,7 @@ func createUser(u *User) {
 		_, err := script.Do(c, ka...)
 		c.Close()
 		if err != nil {
-			log.Println("Error create user:", err)
+			log.Error("Error create user:", err)
 		}
 	}()
 }
@@ -240,7 +241,7 @@ func createTodo(td *Todo) {
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
 		if err != nil {
-			log.Println("Error create todo:", err)
+			log.Error("Error create todo:", err)
 		}
 		c.Close()
 	}()
@@ -268,7 +269,8 @@ func createMission(m *Mission) {
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
 					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
 			redis.call("SADD", KEYS[17], mid)
-			redis.call("SET", KEYS[18], mid)
+			redis.call("SADD", KEYS[18], mid)
+			redis.call("SET", KEYS[19], mid)
 			`
 		ka := []interface{}{
 			//mission models
@@ -282,12 +284,13 @@ func createMission(m *Mission) {
 			MCompletedTime, m.CompletedTime,
 			//redis set
 			fmt.Sprintf(userMsPublishedSet, m.PublisherId),
+			fmt.Sprintf(userMsAcceptedSet, m.PublisherId),
 			MissionId + m.Pid,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
 		if err != nil {
-			log.Println("Error create mission:", err)
+			log.Error("Error create mission:", err)
 		}
 		c.Close()
 	}()
@@ -320,7 +323,7 @@ func createMissionComment(cm *Comment) {
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
 		if err != nil {
-			log.Println("Error create comment:", err)
+			log.Error("Error create comment:", err)
 		}
 		c.Close()
 	}()
@@ -402,7 +405,7 @@ func createProject(p *Project) {
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
 		if err != nil {
-			log.Println("Error create project:", err)
+			log.Error("Error create project:", err)
 		}
 		c.Close()
 	}()

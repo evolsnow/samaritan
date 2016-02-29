@@ -15,6 +15,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if errs.Handle(w) {
 		return
 	}
+	log.Debug(req)
 	us := model.User{
 		Phone:    req.Phone,
 		Password: base.HashedPassword(req.Password),
@@ -29,6 +30,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp.Id = base.HashedUserId(us.Id)
 	resp.Token = token
 	go createToken(us.Id, token)
+	log.Debug(resp)
 	makeResp(w, r, resp)
 }
 

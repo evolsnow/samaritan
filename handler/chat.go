@@ -6,7 +6,6 @@ import (
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -55,20 +54,20 @@ func Socket(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func establishSocketConn(w http.ResponseWriter, r *http.Request, uid int) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("upgrade:", err)
+		log.Warn("upgrade:", err)
 		return
 	}
 	socketConnMap[uid] = c
-	log.Println("new socket conn:", uid)
+	log.Info("new socket conn:", uid)
 	defer c.Close()
 	defer delete(socketConnMap, uid)
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
-			log.Println("read:", err)
+			log.Warn("read:", err)
 			break
 		}
-		log.Printf("rect: %s", message)
+		log.Debug("rec: %s", message)
 		go handlerMsg(message)
 	}
 }
@@ -163,9 +162,9 @@ func applePush(ids []int, ct *Chat) {
 			defer wg.Done()
 			resp := client.Send(pn)
 			if resp.Error != nil {
-				log.Println("push notification error:", resp.Error)
+				log.Warn("push notification error:", resp.Error)
 			} else {
-				log.Println("successfully push:", pn.DeviceToken)
+				log.Debug("successfully push:", pn.DeviceToken)
 			}
 		}(pn)
 	}

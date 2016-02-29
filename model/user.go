@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/evolsnow/samaritan/base"
-	"log"
 )
 
 type User struct {
@@ -26,7 +25,7 @@ type User struct {
 func (u *User) GetPassword() (pwd string) {
 	pwd, err := readPassword(u.Id)
 	if err != nil {
-		log.Println("Error get user's password:", err)
+		log.Error("Error get user's password:", err)
 		return ""
 	}
 	return
@@ -36,23 +35,25 @@ func (u *User) GetPassword() (pwd string) {
 func (u *User) CreateAvatar() {
 	path, err := base.GenerateAvatar(u.Phone)
 	if err != nil {
-		log.Println("Error generate user's avatar:", err)
+		log.Error("Error generate user's avatar:", err)
 	}
 	u.Avatar = path
 	err = createUserAvatar(u.Id, u.Avatar)
 	if err != nil {
-		log.Println("Error create user's avatar:", err)
+		log.Error("Error create user's avatar:", err)
 	}
 }
 
 //full url of avatar img
 func (u *User) FullAvatarUrl() string {
 	prefix := "https://samaritan.tech:10000"
+	log.Debug(prefix + u.Avatar)
 	return prefix + u.Avatar
 }
 
 //save a new user
 func (u *User) Save() {
 	//return user id for jwt token use
+	log.Debug("create user:", u)
 	createUser(u)
 }

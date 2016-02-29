@@ -1,9 +1,5 @@
 package model
 
-import (
-	"log"
-)
-
 type Todo struct {
 	Id           int    `json:"-" redis:"id"` //private id
 	Pid          string `json:"id,omitempty" redis:"pid"`
@@ -25,9 +21,10 @@ type Todo struct {
 func (td *Todo) GetOwner() (owner *User) {
 	owner, err := readUser(td.OwnerId)
 	if err != nil {
-		log.Println("Error get user with todo:", err)
+		log.Error("Error get user with todo:", err)
 		return nil
 	}
+	log.Debug("get owner:", owner)
 	return
 }
 
@@ -35,9 +32,10 @@ func (td *Todo) GetOwner() (owner *User) {
 func (td *Todo) GetMission() (m *Mission) {
 	m, err := readMission(td.MissionId)
 	if err != nil {
-		log.Println("Error get mission with todo:", err)
+		log.Error("Error get mission with todo:", err)
 		return nil
 	}
+	log.Debug("get mission:", m)
 	return
 }
 
@@ -45,7 +43,7 @@ func (td *Todo) GetMission() (m *Mission) {
 func (td *Todo) Finish() (err error) {
 	err = updateTodoStatus(td.OwnerId, td.Id)
 	if err != nil {
-		log.Println("Error update to-do status:", err)
+		log.Error("Error update to-do status:", err)
 		return
 	}
 	return
@@ -53,5 +51,6 @@ func (td *Todo) Finish() (err error) {
 
 //save a new to-do
 func (td *Todo) Save() {
+	log.Debug("create todo:", td)
 	createTodo(td)
 }

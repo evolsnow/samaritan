@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var log = base.Logger
+
 func Auth(h httprouter.Handle) httprouter.Handle {
 	//jwt
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -17,6 +19,7 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 				// Try to get from LRU cache
 				if ele, hit := base.LRUCache.Get(ah[7:]); hit {
 					ps.Set("authId", ele.(string))
+					log.Debug("got token from LRU")
 					goto Success
 				} else {
 					//If failed, parse token and add token to cache

@@ -1,7 +1,5 @@
 package model
 
-import "log"
-
 type Mission struct {
 	Id            int       `json:"-" redis:"id"`             //private id
 	Pid           string    `json:"id,omitempty" redis:"pid"` //public id
@@ -29,12 +27,14 @@ func (m *Mission) GetReceiversId() []int {
 	}
 	ids, err := readMissionReceiversId(m.Id)
 	if err != nil {
-		log.Println("Error get mission receivers", err)
+		log.Error("Error get mission receivers", err)
 		return nil
 	}
+	log.Debug("receivers id:", ids)
 	return ids
 }
 
 func (cm *Comment) Save() {
+	log.Debug("create comment:", cm)
 	createMissionComment(cm)
 }
