@@ -7,7 +7,6 @@ import (
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
-	"log"
 	"net/http"
 )
 
