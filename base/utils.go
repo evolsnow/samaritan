@@ -45,14 +45,6 @@ func SetError(w http.ResponseWriter, desc string, status int) {
 	w.Write(msg)
 }
 
-func hashWithSalt(raw, salt string) string {
-	h := md5.New()
-	h.Write([]byte(raw))
-	h.Write([]byte(salt))
-	hashed := hex.EncodeToString(h.Sum(nil))
-	return hashed
-}
-
 //check http bad request error
 func BadReqErrHandle(w http.ResponseWriter, desc string) {
 	SetError(w, desc, http.StatusBadRequest)

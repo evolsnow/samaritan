@@ -1,14 +1,17 @@
 package base
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/evolsnow/httprouter"
+	"golang.org/x/crypto/scrypt"
 	"strconv"
 )
 
 const (
 	JwtKey          = "36861f1530941263e6f61b43743074d8"
-	PasswordSalt    = "97096a41d7f2d22348ef9b64fbdfa87a"
 	TokenSalt       = "03e23aeb89f13ff4323e641a559db414"
 	PrivateChatSalt = "e1b46b79232e42eb4656ee2c810a1d5b"
 	UserIdSalt      = "1d143777c383ec8f7c7b7e2a4879ce85"
@@ -41,8 +44,11 @@ func ParseToken(ah string, ps *httprouter.Params) (err error) {
 	}
 }
 
-func HashedPassword(pwd string) string {
-	return hashWithSalt(pwd, PasswordSalt)
+//high level secret,use 'scrypt' instead of hash+salt
+func EncryptedPassword(pwd string) string {
+	salt := fmt.Sprintf("%s@samaritan.tech", pwd)
+	dk, _ := scrypt.Key([]byte(pwd), []byte(salt), 16384, 8, 1, 32)
+	return string(dk)
 }
 
 func NewPrivateChatId(raw string) string {
@@ -72,6 +78,14 @@ func HashedMissionId(id int) string {
 func HashedCommentId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, CommentIdSalt)
+}
+
+func hashWithSalt(raw, salt string) string {
+	h := md5.New()
+	h.Write([]byte(raw))
+	h.Write([]byte(salt))
+	hashed := hex.EncodeToString(h.Sum(nil))
+	return hashed
 }
 
 //func validSign(XSign, userId string) string {
