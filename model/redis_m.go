@@ -77,26 +77,28 @@ const (
 
 //other useful index set key name
 const (
-	userGroup        = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
-	userTdList       = "user:%d:todoList"     //user's all to-do, redis-type:List
-	userTdNotDoneSet = "user:%d:todoStatus:0" //to-do status, redis-type:Set
-	userTdDoneSet    = "user:%d:todoStatus:1"
-
-	userPjJoinedSet  = "user:%d:projects:participate" //user's all projects redis-type:Set
-	userPjCreatedSet = "user:%d:projects:create"
-
+	//user
+	userGroup          = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
+	userTdList         = "user:%d:todoList"     //user's all to-do, redis-type:List
+	userTdNotDoneSet   = "user:%d:todoStatus:0" //to-do status, redis-type:Set
+	userTdDoneSet      = "user:%d:todoStatus:1"
+	userPjJoinedSet    = "user:%d:projects:participate" //user's all projects redis-type:Set
+	userPjCreatedSet   = "user:%d:projects:create"
 	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
 	userMsPublishedSet = "user:%d:missions:publish"
+	userPjColorList    = "user:%d:project:%d:color" //user defined project color redis-type:List
 
-	userPjColorList = "user:%d:project:%d:color" //user defined project color redis-type:List
-
+	//to-do
 	todoPictureList = "todo:%d:pictures" //to-do's pictures redis-type:List
 
-	projectMembersSet = "project:%d:members" //project's members redis-type:Set
-
+	//mission
 	missionReceiversSet = "mission:%d:receivers" //mission's receivers redis-type:Set
 	missionCommentsList = "mission:%d:comments"  //mission's comments redis-type:List
 
+	//project
+	projectMembersSet = "project:%d:members" //project's members redis-type:Set
+
+	//additional
 	UserId    = "userId:"    //index for userId, UserId:john's pid return john's userId
 	MissionId = "missionId:" //index for Mission Id, missionId:a's pid return mission a's Id
 	ProjectId = "project:"   //project:a's name return a's id
