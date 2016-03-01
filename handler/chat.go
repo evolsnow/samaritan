@@ -2,13 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/anachronistic/apns"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -140,14 +139,7 @@ func (ct *Chat) Save(uid int) {
 }
 
 func applePush(ids []int, ct *Chat) {
-	payload := apns.NewPayload()
-	payload.Alert = ct.Msg
-	payload.Sound = "default"
-	payload.Badge = 1
-	client := apns.NewClient("gateway.sandbox.push.apple.com:2195", "static/certs/cert.pem", "static/certs/key.pem")
-
-	var wg sync.WaitGroup
-	wg.Add(len(ids))
+	deviceList := make([]string, len(ids), len(ids))
 	for _, uid := range ids {
 		token, ok := deviceMap[uid]
 		if !ok {
@@ -155,18 +147,7 @@ func applePush(ids []int, ct *Chat) {
 			token, _ = readDeviceToken(uid)
 			deviceMap[uid] = token
 		}
-		pn := apns.NewPushNotification()
-		pn.DeviceToken = token
-		pn.AddPayload(payload)
-		go func(*apns.PushNotification) {
-			defer wg.Done()
-			resp := client.Send(pn)
-			if resp.Error != nil {
-				log.Warn("push notification error:", resp.Error)
-			} else {
-				log.Debug("successfully push:", pn.DeviceToken)
-			}
-		}(pn)
+		deviceList = append(deviceList, token)
 	}
-	wg.Wait()
+	base.IOSPush(deviceList, ct.Msg)
 }
