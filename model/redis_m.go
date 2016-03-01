@@ -90,6 +90,8 @@ const (
 
 	userPjColorList = "user:%d:project:%d:color" //user defined project color redis-type:List
 
+	todoPictureList = "todo:%d:pictures" //to-do's pictures redis-type:List
+
 	projectMembersSet = "project:%d:members" //project's members redis-type:Set
 
 	missionReceiversSet = "mission:%d:receivers" //mission's receivers redis-type:Set
