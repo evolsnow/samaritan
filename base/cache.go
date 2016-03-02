@@ -29,3 +29,8 @@ func (c *SimpleCache) Set(key string, value interface{}, px time.Duration) {
 func (c *SimpleCache) Get(key string) (value string) {
 	return conn.CacheGet(key)
 }
+
+// Delete deletes a key immediately
+func (c *SimpleCache) Delete(key string) {
+	conn.CacheDelete(key)
+}

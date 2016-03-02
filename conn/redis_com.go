@@ -45,3 +45,9 @@ func CacheSet(key string, value interface{}, px time.Duration) {
 	defer c.Close()
 	c.Do("SET", key, value, "PX", int64(px/time.Millisecond))
 }
+
+func CacheDelete(key string) {
+	c := CachePool.Get()
+	defer c.Close()
+	c.Do("DEL", key)
+}

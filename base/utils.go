@@ -6,7 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 const (
@@ -43,6 +46,12 @@ func SetError(w http.ResponseWriter, desc string, status int) {
 	msg, _ := json.Marshal(e)
 	w.WriteHeader(status)
 	w.Write(msg)
+}
+
+func RandomCode() string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	code := 100000 + rand.Intn(900000)
+	return strconv.Itoa(code)
 }
 
 //check http bad request error

@@ -7,6 +7,9 @@ import (
 	"net/http"
 )
 
+//init cache
+var cache = base.Cache
+
 //base response for all requests
 type baseResp struct {
 	Code  int   `json:"code,omitempty"`
