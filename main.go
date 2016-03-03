@@ -17,14 +17,14 @@ var log = base.Logger
 
 func main() {
 	var debug bool
-	var configFile string
+	var conf string
 	flag.BoolVar(&debug, "d", false, "debug mode")
-	flag.StringVar(&configFile, "c", "config.json", "specify config file")
+	flag.StringVar(&conf, "c", "config.json", "specify config file")
 	flag.Parse()
 	//set global log level
 	base.SetLogLevel(debug)
 	//parse config
-	config, err := ParseConfig(configFile)
+	config, err := ParseConfig(conf)
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
 	}

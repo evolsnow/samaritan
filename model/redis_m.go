@@ -31,19 +31,18 @@ const (
 
 //to-do thing redis key name
 const (
-	TId           = "id"
-	TPid          = "pid"
-	TStartTime    = "startTime"
-	TTaskTime     = "taskTime"
-	TPlace        = "place"
-	TRepeat       = "repeat"
-	TRepeatPeriod = "repeatPeriod"
-	TDesc         = "desc"
-	TRemark       = "remark"
-	TOwnerId      = "ownerId"
-	TDone         = "done"
-	TFinishTime   = "finishTime"
-	TMissionId    = "missionId"
+	TId         = "id"
+	TPid        = "pid"
+	TStartTime  = "startTime"
+	TPlace      = "place"
+	TRepeat     = "repeat"
+	TRepeatMode = "repeatMode"
+	TDesc       = "desc"
+	TRemark     = "remark"
+	TOwnerId    = "ownerId"
+	TDone       = "done"
+	TFinishTime = "finishTime"
+	TMissionId  = "missionId"
 )
 
 //mission redis key name
@@ -229,10 +228,9 @@ func createTodo(td *Todo) {
 			TDesc, td.Desc,
 			TRemark, td.Remark,
 			TStartTime, td.StartTime,
-			TTaskTime, td.TaskTime,
 			TPlace, td.Place,
 			TRepeat, td.Repeat,
-			TRepeatPeriod, td.RepeatPeriod,
+			TRepeatMode, td.RepeatMode,
 			TDone, td.Done,
 			TFinishTime, td.FinishTime,
 			TOwnerId, td.OwnerId,

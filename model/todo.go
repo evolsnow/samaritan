@@ -1,21 +1,19 @@
 package model
 
 type Todo struct {
-	Id           int      `json:"-" redis:"id"` //private id
-	Pid          string   `json:"id,omitempty" redis:"pid"`
-	StartTime    int64    `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
-	TaskTime     int64    `json:"taskTime,omitempty" redis:"taskTime"`
-	Place        string   `json:"place,omitempty" redis:"place"`
-	Pictures     []string `json:"pictures,omitempty" redis:"-"`
-	Repeat       bool     `json:"repeat,omitempty" redis:"repeat"`
-	RepeatPeriod int64    `json:"repeatPeriod,omitempty" redis:"repeatPeriod"`
-	//Deadline     int64  `json:"deadline,omitempty" redis:"dealine"`    //end time
-	Desc       string `json:"desc,omitempty" redis:"desc"` //description for the action
-	Remark     string `json:"remark,omitempty" redis:"remark"`
-	OwnerId    int    `json:"ownerId,omitempty" redis:"ownerId"` //whose
-	Done       bool   `json:"done,omitempty" redis:"done"`
-	FinishTime int64  `json:"finishTime,omitempty" redis:"finishTime"`
-	MissionId  int    `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
+	Id         int      `json:"-" redis:"id"` //private id
+	Pid        string   `json:"id,omitempty" redis:"pid"`
+	StartTime  int64    `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
+	Place      string   `json:"place,omitempty" redis:"place"`
+	Pictures   []string `json:"pictures,omitempty" redis:"-"`
+	Repeat     bool     `json:"repeat,omitempty" redis:"repeat"`
+	RepeatMode int      `json:"repeatMode,omitempty" redis:"repeatMode"`
+	Desc       string   `json:"desc,omitempty" redis:"desc"` //description for the action
+	Remark     string   `json:"remark,omitempty" redis:"remark"`
+	OwnerId    int      `json:"ownerId,omitempty" redis:"ownerId"` //whose
+	Done       bool     `json:"done,omitempty" redis:"done"`
+	FinishTime int64    `json:"finishTime,omitempty" redis:"finishTime"`
+	MissionId  int      `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
 //get user from to-do's owner id
