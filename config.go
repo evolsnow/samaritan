@@ -13,6 +13,10 @@ type Config struct {
 	RedisPort     int    `json:"redis_port"`
 	RedisDB       int    `json:"redis_db"`
 	RedisPassword string `json:"redis_password"`
+	MysqlAddress  string `json:"mysql_address"`
+	MysqlPort     int    `json:"mysql_port"`
+	MysqlDB       string `json:"mysql_db"`
+	MysqlPassword string `json:"mysql_password"`
 }
 
 func ParseConfig(path string) (config *Config, err error) {

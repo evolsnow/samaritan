@@ -12,6 +12,7 @@ type Mission struct {
 	CompletedTime int64     `json:"completedTime,omitempty" redis:"completedTime"`
 	Comments      []Comment `json:"comments,omitempty" redis:"-"`
 }
+
 type Comment struct {
 	Id         int    `json:"-" redis:"id"`
 	Pid        string `json:"id,omitempty" redis:"pid"`

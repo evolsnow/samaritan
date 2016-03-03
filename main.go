@@ -23,23 +23,24 @@ func main() {
 	flag.Parse()
 	//set global log level
 	base.SetLogLevel(debug)
+
 	//parse config
-	config, err := ParseConfig(conf)
+	cfg, err := ParseConfig(conf)
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
 	}
-	if config.RedisDB == CacheDB {
+	if cfg.RedisDB == CacheDB {
 		log.Fatal("redis db can not be same as cache db: '0'")
 	}
-	//init redis database pool
-	redisPort := strconv.Itoa(config.RedisPort)
-	redisServer := net.JoinHostPort(config.RedisAddress, redisPort)
-	if !conn.Ping(redisServer, config.RedisPassword) {
-		log.Fatal("connect to redis server failed")
-	}
-	conn.Pool = conn.NewPool(redisServer, config.RedisPassword, config.RedisDB)
-	conn.CachePool = conn.NewPool(redisServer, config.RedisPassword, CacheDB)
 
+	//init redis  pool
+	redisPort := strconv.Itoa(cfg.RedisPort)
+	redisServer := net.JoinHostPort(cfg.RedisAddress, redisPort)
+	conn.Pool = conn.NewPool(redisServer, cfg.RedisPassword, cfg.RedisDB)
+	conn.CachePool = conn.NewPool(redisServer, cfg.RedisPassword, CacheDB)
+
+	//init mysql database
+	conn.DB = conn.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
 	//init LRU cache and simple redis cache
 	base.LRUCache = base.NewLRUCache(LRUCacheSize)
 	base.Cache = base.NewCache()
@@ -52,6 +53,6 @@ func main() {
 	)
 	r := newRouter()
 	n.UseHandler(r)
-	srvPort := strconv.Itoa(config.Port)
-	n.Run(net.JoinHostPort(config.Server, srvPort))
+	srvPort := strconv.Itoa(cfg.Port)
+	n.Run(net.JoinHostPort(cfg.Server, srvPort))
 }

@@ -22,13 +22,11 @@ func makeBaseResp(w http.ResponseWriter, r *http.Request) {
 
 //struct to post to-do request
 type postTdReq struct {
-	StartTime    int64
-	TaskTime     int64
-	Desc         string
-	Repeat       bool
-	RepeatPeriod int64
-	Place        string
-	ProjectId    int
+	StartTime int64
+	Desc      string
+	Repeat    bool
+	Place     string
+	ProjectId int
 }
 
 func (pt *postTdReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -37,18 +35,13 @@ func (pt *postTdReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "desc",
 			Required: true,
 		},
-		&pt.TaskTime: binding.Field{
-			Form:     "taskTime",
-			Required: true,
-		},
 		&pt.StartTime: binding.Field{
 			Form:     "startTime",
 			Required: true,
 		},
-		&pt.Place:        "place",
-		&pt.Repeat:       "repeat",
-		&pt.RepeatPeriod: "repeatPeriod",
-		&pt.ProjectId:    "projectId",
+		&pt.Place:     "place",
+		&pt.Repeat:    "repeat",
+		&pt.ProjectId: "projectId",
 	}
 }
 
