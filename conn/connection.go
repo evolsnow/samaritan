@@ -6,6 +6,8 @@ import (
 	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"net"
+	"strconv"
 	"time"
 )
 
@@ -39,11 +41,14 @@ func NewPool(server, password string, db int) *redis.Pool {
 	}
 }
 
-func NewDB(password, server string, port int, database string) *sql.DB {
-	db, err := sql.Open("mysql", fmt.Sprintf("root:%s:@tcp(%s:%d)/%s?autocommit=true", password, server, port, database))
-	if err != nil {
+func NewDB(password, host string, port int, database string) *sql.DB {
+	server := net.JoinHostPort(host, strconv.Itoa(port))
+	db, _ := sql.Open("mysql", fmt.Sprintf("remote:%s@tcp(%s)/%s?autocommit=true", password, server, database))
+	if err := db.Ping(); err != nil {
 		log.Fatal("failed to connect mysql:", err)
 		return nil
 	}
+	db.SetMaxOpenConns(200)
+	db.SetMaxIdleConns(100)
 	return db
 }

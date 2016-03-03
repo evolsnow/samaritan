@@ -6,6 +6,7 @@ import (
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 	"net/http"
 )
@@ -69,6 +70,7 @@ func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 //}
 
 func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	model.Test()
 	c := conn.Pool.Get()
 	defer c.Close()
 	//	_, err := conn.Do("SET", "username", "evol")
