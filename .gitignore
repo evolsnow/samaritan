@@ -2,4 +2,5 @@ test-results/
 tmp/
 .idea/
 output/
+config.json
 doc
