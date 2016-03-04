@@ -41,6 +41,7 @@ func main() {
 
 	//init mysql database
 	conn.DB = conn.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
+
 	//init LRU cache and simple redis cache
 	base.LRUCache = base.NewLRUCache(LRUCacheSize)
 	base.Cache = base.NewCache()
