@@ -8,10 +8,11 @@ type User struct {
 	Id         int    `json:"-" redis:"id"` //private id
 	Pid        string `json:"id,omitempty" redis:"pid"`
 	SamId      string `json:"samId,omitempty" redis:"samId"` //unique id in samaritan
+	createTime int64  `json:"createTime,omitempty" redis:"createTime"`
 	Alias      string `json:"alias,omitempty" redis:"alias"` //nick name
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`
-	Password   string `json:"-" redis:"passwd"`
+	Password   string `json:"passwd" redis:"passwd"`
 	Email      string `json:"email,omitempty" redis:"email"`
 	Avatar     string `json:"avatar,omitempty" redis:"avatar"` //avatar url
 	School     string `json:"school,omitempty" redis:"school"`
