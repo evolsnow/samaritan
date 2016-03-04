@@ -6,12 +6,14 @@ import (
 )
 
 func init() {
-	for {
-		if conn.DB != nil {
-			db = conn.DB
-			break
+	go func() {
+		for {
+			if conn.DB != nil {
+				db = conn.DB
+				break
+			}
 		}
-	}
+	}()
 }
 
 var db *sql.DB
