@@ -37,3 +37,14 @@ func Test() {
 		log.Fatal(err)
 	}
 }
+
+func CreateUser(u *User) {
+	stmt, err := db.Prepare("INSERT INTO user(redis_id, pid, sam_id, alias, name, phone, password, email, avatar, school, depart, grade, class, studentNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = stmt.Exec(u.Id, u.Pid, u.SamId, u.Alias, u.Name, u.Phone, u.Password, u.Email, u.Avatar, u.School, u.Department, u.Grade, u.Class, u.StudentNum)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
