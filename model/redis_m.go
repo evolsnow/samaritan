@@ -12,26 +12,28 @@ import (
 
 //user redis key name
 const (
-	UId       = "id"
-	UPid      = "pid"
-	USamId    = "samId"
-	UAlias    = "alias"
-	UName     = "name"
-	UPhone    = "phone"
-	UPassword = "passwd"
-	UEmail    = "email"
-	UAvatar   = "avatar"
-	USchool   = "school"
-	UDep      = "depart"
-	UGrade    = "grade"
-	UClass    = "class"
-	UStuNum   = "stuNum"
+	UId         = "id"
+	UPid        = "pid"
+	USamId      = "samId"
+	UCreateTime = "createTime"
+	UAlias      = "alias"
+	UName       = "name"
+	UPhone      = "phone"
+	UPassword   = "passwd"
+	UEmail      = "email"
+	UAvatar     = "avatar"
+	USchool     = "school"
+	UDep        = "depart"
+	UGrade      = "grade"
+	UClass      = "class"
+	UStuNum     = "stuNum"
 )
 
 //to-do thing redis key name
 const (
 	TId         = "id"
 	TPid        = "pid"
+	TCreateTime = "createTime"
 	TStartTime  = "startTime"
 	TPlace      = "place"
 	TRepeat     = "repeat"
@@ -135,15 +137,17 @@ func createUser(u *User) {
 					KEYS[1], KEYS[2], KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
 					KEYS[9], KEYS[10], KEYS[11], KEYS[12], KEYS[13], KEYS[14], KEYS[15], KEYS[16],
 					KEYS[17], KEYS[18], KEYS[19], KEYS[20], KEYS[21], KEYS[22],
-					KEYS[23], KEYS[24], KEYS[25], KEYS[26], KEYS[27], KEYS[28])
-			redis.call("SADD", KEYS[29], uid)
-			redis.call("SET", KEYS[30], uid)
+					KEYS[23], KEYS[24], KEYS[25], KEYS[26], KEYS[27], KEYS[28],
+					KEYS[29], KEYS[30])
+			redis.call("SADD", KEYS[31], uid)
+			redis.call("SET", KEYS[32], uid)
 			`
 		ka := []interface{}{
 			//user model
 			UId, u.Id,
 			UPid, u.Pid,
 			USamId, u.SamId,
+			UCreateTime, u.createTime,
 			UAlias, u.Alias,
 			UName, u.Name,
 			UPhone, u.Phone,
@@ -226,6 +230,7 @@ func createTodo(td *Todo) {
 			TId, td.Id,
 			TDesc, td.Desc,
 			TRemark, td.Remark,
+			TCreateTime, td.createTime,
 			TStartTime, td.StartTime,
 			TPlace, td.Place,
 			TRepeat, td.Repeat,

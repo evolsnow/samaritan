@@ -3,10 +3,10 @@ package model
 import "github.com/evolsnow/samaritan/base/log"
 
 type Mission struct {
-	Id            int       `json:"-" redis:"id"`             //private id
-	Pid           string    `json:"id,omitempty" redis:"pid"` //public id
+	Id            int       `json:"-" redis:"id"`                            //private id
+	Pid           string    `json:"id,omitempty" redis:"pid"`                //public id
+	createTime    int64     `json:"createTime,omitempty" redis:"createTime"` //create time timestamp of this mission
 	Name          string    `json:"name,omitempty" redis:"name"`
-	createTime    int64     `json:"createTime,omitempty" redis:"createTime"`       //create time timestamp of this mission
 	Desc          string    `json:"desc,omitempty" redis:"desc"`                   //description for the project
 	PublisherId   int       `json:"publisherId,omitempty" redis:"publisherId"`     //who published the mission
 	ReceiversId   []int     `json:"receiversId,omitempty" redis:"-"`               //user list who accepted the mission

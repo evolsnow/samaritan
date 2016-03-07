@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"github.com/evolsnow/samaritan/base/log"
 	"github.com/evolsnow/samaritan/conn"
+	"time"
 )
 
 func init() {
 	go func() {
 		for {
+			//leave time for init db
+			time.Sleep(time.Second / 2)
 			if conn.DB != nil {
 				db = conn.DB
 				break
