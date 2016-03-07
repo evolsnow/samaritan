@@ -1,8 +1,8 @@
-package base
+package rpc
 
 import (
-	"github.com/evolsnow/samaritan/base/log"
-	pb "github.com/evolsnow/samaritan/rpc/protos"
+	"github.com/evolsnow/samaritan/common/log"
+	pb "github.com/evolsnow/samaritan/rpcServer/protos"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

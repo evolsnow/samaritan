@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/evolsnow/negroni"
-	"github.com/evolsnow/samaritan/base/log"
-	"github.com/evolsnow/samaritan/caches"
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/caches"
+	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/log"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net"
 	"strconv"

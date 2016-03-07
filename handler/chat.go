@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"github.com/evolsnow/httprouter"
-	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/base/log"
+	"github.com/evolsnow/samaritan/common/log"
+	"github.com/evolsnow/samaritan/common/rpc"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -150,5 +150,5 @@ func applePush(ids []int, ct *Chat) {
 		}
 		deviceList = append(deviceList, token)
 	}
-	base.IOSPush(deviceList, ct.Msg)
+	rpc.IOSPush(deviceList, ct.Msg)
 }

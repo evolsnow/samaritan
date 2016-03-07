@@ -1,7 +1,7 @@
 package caches
 
 import (
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/conn"
 	"time"
 )
 

@@ -2,8 +2,8 @@ package model
 
 import (
 	"database/sql"
-	"github.com/evolsnow/samaritan/base/log"
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/log"
 	"time"
 )
 

@@ -16,7 +16,7 @@ package caches
 
 import (
 	"container/list"
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/conn"
 )
 
 var LRUCache *LCache

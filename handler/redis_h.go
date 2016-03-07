@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"github.com/evolsnow/samaritan/base/log"
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 )

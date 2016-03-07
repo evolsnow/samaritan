@@ -3,7 +3,7 @@ package conn
 import (
 	"database/sql"
 	"fmt"
-	"github.com/evolsnow/samaritan/base/log"
+	"github.com/evolsnow/samaritan/common/log"
 	"github.com/garyburd/redigo/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"net"

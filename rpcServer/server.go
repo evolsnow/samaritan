@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/anachronistic/apns"
-	pb "github.com/evolsnow/samaritan/rpc/protos"
+	pb "github.com/evolsnow/samaritan/rpcServer/protos"
 	"golang.org/x/net/context"
 	"log"
 	"net/mail"

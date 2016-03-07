@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	pb "github.com/evolsnow/samaritan/rpc/protos"
+	pb "github.com/evolsnow/samaritan/rpcServer/protos"
 	"google.golang.org/grpc"
 	"log"
 	"net"

@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/caches"
-	"github.com/evolsnow/samaritan/conn"
+	"github.com/evolsnow/samaritan/common/caches"
+	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 	"net/http"
-
-	"github.com/evolsnow/samaritan/base/log"
 )
 
 type requestData struct {

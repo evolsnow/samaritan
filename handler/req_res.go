@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/caches"
+	"github.com/evolsnow/samaritan/common/caches"
 	"net/http"
 )
 
