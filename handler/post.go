@@ -5,8 +5,10 @@ import (
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
 	"github.com/evolsnow/samaritan/model"
 	"net/http"
+	"time"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -53,6 +55,7 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := new(postTdResp)
 	resp.Id = td.Pid
 	makeResp(w, r, resp)
+	cache.Set("foo", "bar", time.Minute)
 }
 
 func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

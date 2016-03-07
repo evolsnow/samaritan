@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/evolsnow/negroni"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
+	"github.com/evolsnow/samaritan/caches"
 	"github.com/evolsnow/samaritan/conn"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net"
@@ -13,8 +14,6 @@ import (
 const LRUCacheSize = 100
 const CacheDB = 0
 
-var log = base.Logger
-
 func main() {
 	var debug bool
 	var conf string
@@ -22,7 +21,7 @@ func main() {
 	flag.StringVar(&conf, "c", "config.json", "specify config file")
 	flag.Parse()
 	//set global log level
-	base.SetLogLevel(debug)
+	log.SetLogLevel(debug)
 
 	//parse config
 	cfg, err := ParseConfig(conf)
@@ -43,8 +42,8 @@ func main() {
 	conn.DB = conn.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
 
 	//init LRU cache and simple redis cache
-	base.LRUCache = base.NewLRUCache(LRUCacheSize)
-	base.Cache = base.NewCache()
+	caches.LRUCache = caches.NewLRUCache(LRUCacheSize)
+	caches.Cache = caches.NewCache()
 
 	//init server
 	n := negroni.New(

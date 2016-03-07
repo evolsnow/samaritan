@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
 	"net/http"

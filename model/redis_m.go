@@ -3,13 +3,12 @@ package model
 import (
 	"fmt"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/garyburd/redigo/redis"
 	"strconv"
 	"time"
 )
-
-var log = base.Logger
 
 //user redis key name
 const (

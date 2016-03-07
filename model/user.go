@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
 )
 
 type User struct {

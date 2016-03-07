@@ -1,13 +1,13 @@
 package base
 
 import (
+	"github.com/evolsnow/samaritan/base/log"
 	pb "github.com/evolsnow/samaritan/rpc/protos"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 var client pb.SamaritanClient
-var log = Logger
 
 func init() {
 	conn, err := grpc.Dial("127.0.0.1:10010", grpc.WithInsecure())

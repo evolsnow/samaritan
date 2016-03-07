@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-const BaseURL = "/api/1.0"
+//const BaseURL = "/api/1.0"
 
 var r = httprouter.New()
 
@@ -17,7 +17,7 @@ type NotFound struct{}
 
 func newRouter() *httprouter.Router {
 	//base url for all requests
-	r.BaseURL = BaseURL
+	//r.BaseURL = BaseURL
 
 	//user-defined http error handler
 	r.MethodNotAllowed = NotAllowed{}

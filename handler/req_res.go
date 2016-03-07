@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/caches"
 	"net/http"
 )
 
 //init cache
-var cache = base.Cache
+var cache = caches.Cache
 
 //base response for all requests
 type baseResp struct {

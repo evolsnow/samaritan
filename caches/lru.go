@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 // Implements an LRU cache.
-package base
+package caches
 
 import (
 	"container/list"

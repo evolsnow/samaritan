@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/caches"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 	"net/http"
+
+	"github.com/evolsnow/samaritan/base/log"
 )
 
 type requestData struct {
@@ -34,7 +37,7 @@ func Pm(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//	page := r.URL.Query().Get("page")
 	//	limit := r.URL.Query().Get("per_page")
 	//	fmt.Fprintf(w, page+limit)
-	fmt.Println(base.LRUCache.Get("test2"))
+	fmt.Println(caches.LRUCache.Get("test2"))
 	//fmt.Println(ps.Get("authId"))
 
 }

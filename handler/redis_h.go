@@ -2,13 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/base/log"
 	"github.com/evolsnow/samaritan/conn"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
 )
-
-var log = base.Logger
 
 const (
 	CId        = "id"

@@ -1,4 +1,4 @@
-package base
+package caches
 
 import (
 	"github.com/evolsnow/samaritan/conn"

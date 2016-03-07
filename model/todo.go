@@ -1,5 +1,7 @@
 package model
 
+import "github.com/evolsnow/samaritan/base/log"
+
 type Todo struct {
 	Id         int      `json:"-" redis:"id"` //private id
 	Pid        string   `json:"id,omitempty" redis:"pid"`
