@@ -7,7 +7,6 @@ import (
 	"github.com/evolsnow/samaritan/model"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"strconv"
 )
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
@@ -19,7 +18,7 @@ var deviceMap = make(map[int]string)
 
 //keep deviceToken and connection
 func Socket(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	uid, _ := strconv.Atoi(ps.Get("userId"))
+	uid := ps.GetInt("userId")
 	deviceToken := ps.ByName("deviceToken")
 	deviceMap[uid] = deviceToken
 	establishSocketConn(w, r, uid)

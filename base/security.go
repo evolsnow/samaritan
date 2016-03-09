@@ -36,8 +36,8 @@ func ParseToken(ah string, ps *httprouter.Params) (err error) {
 		return []byte(JwtKey), nil
 	})
 	if err == nil && token.Valid {
-		userId := token.Claims["userId"].(int)
-		ps.Set("authId", strconv.Itoa(userId))
+		userId := token.Claims["userId"].(float64)
+		ps.Set("authId", strconv.Itoa(int(userId)))
 		return nil
 	} else {
 		return err
