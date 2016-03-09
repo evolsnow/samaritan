@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestParseConfig(t *testing.T) {
-	cfg, err := ParseConfig("config.json")
+	cfg, err := ParseConfig("config.json.example")
 	if err != nil {
 		t.Error("parse config.json errer:", err.Error())
 	}
