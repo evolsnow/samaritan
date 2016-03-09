@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/evolsnow/negroni"
-	"github.com/evolsnow/samaritan/common/caches"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	mw "github.com/evolsnow/samaritan/middleware"
@@ -11,7 +10,6 @@ import (
 	"strconv"
 )
 
-const LRUCacheSize = 100
 const CacheDB = 0
 
 func main() {
@@ -40,10 +38,6 @@ func main() {
 
 	//init mysql database
 	dbms.DB = dbms.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
-
-	//init LRU cache and simple redis cache
-	caches.LRUCache = caches.NewLRUCache(LRUCacheSize)
-	caches.Cache = caches.NewCache()
 
 	//init server
 	n := negroni.New(

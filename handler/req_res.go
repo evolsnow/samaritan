@@ -9,7 +9,7 @@ import (
 )
 
 //get cache
-var cache = caches.Cache
+var cache = caches.NewCache()
 
 //base response for all requests
 type baseResp struct {

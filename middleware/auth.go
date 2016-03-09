@@ -10,7 +10,7 @@ import (
 )
 
 func Auth(h httprouter.Handle) httprouter.Handle {
-	lru := caches.LRUCache
+	lru := caches.NewLRUCache(100)
 	//jwt
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		// Look for an Authorization header
