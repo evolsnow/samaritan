@@ -1,6 +1,8 @@
 package model
 
-import "github.com/evolsnow/samaritan/common/log"
+import (
+	"github.com/evolsnow/samaritan/common/log"
+)
 
 type Todo struct {
 	Id         int      `json:"-" redis:"id"` //private id

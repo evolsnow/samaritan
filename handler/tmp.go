@@ -6,7 +6,7 @@ import (
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
 	"github.com/evolsnow/samaritan/common/caches"
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"
 	"github.com/garyburd/redigo/redis"
@@ -46,7 +46,7 @@ func Pm2(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	//	limit := r.URL.Query().Get("per_page")
 	//	fmt.Fprintf(w, page+limit)
 	//fmt.Println(base.LRUCache.Get("test2"))
-	fmt.Println(conn.Get("test2"))
+	fmt.Println(dbms.Get("test2"))
 
 }
 
@@ -55,7 +55,7 @@ func SetJwt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprint(w, tokenString)
 }
 func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	ret, _ := redis.Bytes(c.Do("GET", ":1:product_list"))
 	w.Write(ret)
@@ -73,34 +73,34 @@ func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	model.Test()
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
-	//	_, err := conn.Do("SET", "username", "evol")
+	//	_, err := dbms.Do("SET", "username", "evol")
 	//	if err != nil {
 	//	}
-	//	username, _ := redis.String(conn.Do("GET", "username"))
+	//	username, _ := redis.String(dbms.Do("GET", "username"))
 	//	f := map[string]string{"hello": username}
 	//	js, _ := json.Marshal(f)
 
 	//
-	//		conn.Send("HMSET", "album:1", "title", "Red", "rating", 5)
-	//		conn.Send("HMSET", "album:2", "title", "Earthbound", "rating", 1)
-	//		conn.Send("HMSET", "album:3", "title", "Beat", "rating", 4)
-	//		conn.Send("LPUSH", "albums", "1")
-	//		conn.Send("LPUSH", "albums", "2")
-	//		conn.Send("LPUSH", "albums", "3")
-	//		conn.Do("HMSET", "user", "foo", 10, "bar", 20)
+	//		dbms.Send("HMSET", "album:1", "title", "Red", "rating", 5)
+	//		dbms.Send("HMSET", "album:2", "title", "Earthbound", "rating", 1)
+	//		dbms.Send("HMSET", "album:3", "title", "Beat", "rating", 4)
+	//		dbms.Send("LPUSH", "albums", "1")
+	//		dbms.Send("LPUSH", "albums", "2")
+	//		dbms.Send("LPUSH", "albums", "3")
+	//		dbms.Do("HMSET", "user", "foo", 10, "bar", 20)
 	//	ms := &MyStruct{}
 	//ab := &Album{}
 	//
-	//	reply, err := redis.Values(conn.Do("HGETALL", "hi"))
+	//	reply, err := redis.Values(dbms.Do("HGETALL", "hi"))
 	//	if err != nil {
 	//		log.Println("get error")
 	//	}
 	//	redis.ScanStruct(reply, ms)
 	//	log.Println(*ms)
 
-	//	album, err := redis.Values(conn.Do("HGETALL", "album:1"))
+	//	album, err := redis.Values(dbms.Do("HGETALL", "album:1"))
 	//	if err != nil {
 	//		// handle error
 	//		log.Println(err)

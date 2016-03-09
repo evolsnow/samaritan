@@ -19,7 +19,7 @@ type Comment struct {
 	Id         int    `json:"-" redis:"id"`
 	Pid        string `json:"id,omitempty" redis:"pid"`
 	When       int64  `json:"when,omitempty" redis:"when"`
-	missionPid string `json:"-" redis:"-"`
+	MissionPid string `json:"-" redis:"-"`
 	CriticPid  string `json:"uid,omitempty" redis:"criticPid"`
 	CriticName string `json:"uName,omitempty" redis:"criticName"`
 }

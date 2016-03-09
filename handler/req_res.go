@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-//init cache
+//get cache
 var cache = caches.Cache
 
 //base response for all requests

@@ -5,6 +5,7 @@ import (
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"
 	"net/http"
@@ -31,7 +32,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := new(postUsResp)
 	resp.Id = base.HashedUserId(us.Id)
 	resp.Token = token
-	go createToken(us.Id, token)
+	go dbms.CreateToken(us.Id, token)
 	log.Debug(resp)
 	makeResp(w, r, resp)
 }

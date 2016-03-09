@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 	"github.com/evolsnow/samaritan/base"
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/garyburd/redigo/redis"
 	"strconv"
@@ -74,6 +74,15 @@ const (
 	PCreatorId  = "creatorId"
 	PPrivate    = "private"
 )
+const (
+	ChId        = "id"
+	ChConvId    = "convId"
+	ChType      = "type"
+	ChTarget    = "target"
+	ChMsg       = "msg"
+	ChGroupName = "groupName"
+	ChFrom      = "from"
+)
 
 //other useful index set key name
 const (
@@ -98,6 +107,10 @@ const (
 	//project
 	projectMembersSet = "project:%d:members" //project's members redis-type:Set
 
+	//chat
+	deviceToken    = "deviceToken:%d"     //ios device token
+	offlineMsgList = "user:%d:offlineMsg" //redis type:list
+
 	//additional
 	UserId    = "userId:"    //index for userId, UserId:john's pid return john's userId
 	MissionId = "missionId:" //index for Mission Id, missionId:a's pid return mission a's Id
@@ -108,25 +121,25 @@ const (
 //visible func
 func ReadUserId(uPid string) (uid int) {
 	key := UserId + uPid
-	uid, _ = redis.Int(conn.Get(key))
+	uid, _ = redis.Int(dbms.Get(key))
 	return
 }
 
 func ReadMissionId(mPid string) (mid int) {
 	key := MissionId + mPid
-	mid, _ = redis.Int(conn.Get(key))
+	mid, _ = redis.Int(dbms.Get(key))
 	return
 }
 
 func ReadProjectId(pPid string) (pid int) {
 	key := ProjectId + pPid
-	pid, _ = redis.Int(conn.Get(key))
+	pid, _ = redis.Int(dbms.Get(key))
 	return
 }
 
 //redis actions of model User
 func createUser(u *User) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	u.Id, _ = redis.Int(c.Do("INCR", "autoIncrUser"))
 	u.Pid = base.HashedUserId(u.Id)
 	//return user's id asap
@@ -174,7 +187,7 @@ func createUser(u *User) {
 }
 
 func readUser(id int) (u *User, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(id)
 	ret, err := redis.Values(c.Do("HGETALL", user))
@@ -186,7 +199,7 @@ func readUser(id int) (u *User, err error) {
 }
 
 func createUserAvatar(uid int, avatarUrl string) error {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(uid)
 	_, err := c.Do("HSET", user, UAvatar, avatarUrl)
@@ -194,7 +207,7 @@ func createUserAvatar(uid int, avatarUrl string) error {
 }
 
 func readPassword(uid int) (pwd string, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(uid)
 	pwd, err = redis.String(c.Do("HGET", user, UPassword))
@@ -202,7 +215,7 @@ func readPassword(uid int) (pwd string, err error) {
 }
 
 func updatePassword(id int, pwd string) error {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(id)
 	_, err := c.Do("HSET", user, UPassword, pwd)
@@ -211,7 +224,7 @@ func updatePassword(id int, pwd string) error {
 
 //redis actions of model to-do
 func createTodo(td *Todo) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	td.Id, _ = redis.Int(c.Do("INCR", "autoIncrTodo"))
 	td.Pid = base.HashedTodoId(td.Id)
 	go func() {
@@ -254,7 +267,7 @@ func createTodo(td *Todo) {
 }
 
 func updateTodoStatus(uid, tid int) error {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	done := fmt.Sprintf(userTdDoneSet, uid)
 	notDone := fmt.Sprintf(userTdNotDoneSet, uid)
@@ -264,7 +277,7 @@ func updateTodoStatus(uid, tid int) error {
 
 //redis actions of model mission
 func createMission(m *Mission) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	m.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	m.Pid = base.HashedMissionId(m.Id)
 	go func() {
@@ -303,11 +316,11 @@ func createMission(m *Mission) {
 }
 
 func createMissionComment(cm *Comment) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	cm.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	cm.Pid = base.HashedCommentId(cm.Id)
 	go func() {
-		mid := ReadMissionId(cm.missionPid)
+		mid := ReadMissionId(cm.MissionPid)
 		lua := `
 			local cmid = KEYS[2]
 			redis.call("HMSET", "comment:"..cmid,
@@ -336,7 +349,7 @@ func createMissionComment(cm *Comment) {
 }
 
 func readMission(mid int) (m *Mission, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	mission := "mission:" + strconv.Itoa(mid)
 	ret, err := redis.Values(c.Do("HGETALL", mission))
@@ -348,7 +361,7 @@ func readMission(mid int) (m *Mission, err error) {
 }
 
 func readMissionComments(mid int) (cms []*Comment, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(missionCommentsList, mid)
 	lua := `
@@ -371,7 +384,7 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
 }
 
 func readMissionReceiversId(mid int) (ids []int, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(missionReceiversSet, mid)
 	ids, err = redis.Ints(c.Do("SMEMBERS", key))
@@ -380,7 +393,7 @@ func readMissionReceiversId(mid int) (ids []int, err error) {
 
 //redis actions of model project
 func createProject(p *Project) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	p.Id, _ = redis.Int(c.Do("INCR", "autoIncrProject"))
 	p.Pid = base.HashedProjectId(p.Id)
 	go func() {
@@ -418,7 +431,7 @@ func createProject(p *Project) {
 }
 
 func readProjectMembers(pid int) (reply []*User, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	rcvSet := fmt.Sprintf(projectMembersSet, pid)
 	lua := `
@@ -441,7 +454,7 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 }
 
 func readProject(pid int) (p *Project, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	project := "project:" + strconv.Itoa(pid)
 	ret, err := redis.Values(c.Do("HGETALL", project))
@@ -453,7 +466,7 @@ func readProject(pid int) (p *Project, err error) {
 }
 
 func readProjectMembersId(pid int) (ids []int, err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(projectMembersSet, pid)
 	ids, err = redis.Ints(c.Do("SMEMBERS", key))
@@ -461,7 +474,7 @@ func readProjectMembersId(pid int) (ids []int, err error) {
 }
 
 func updateProjectMember(pid, uid, action int) (err error) {
-	c := conn.Pool.Get()
+	c := dbms.Pool.Get()
 	defer c.Close()
 	memSet := fmt.Sprintf(projectMembersSet, pid)
 	if action > 0 {
@@ -471,4 +484,57 @@ func updateProjectMember(pid, uid, action int) (err error) {
 		_, err = c.Do("SREM", memSet, uid)
 	}
 	return
+}
+
+func createChat(ct *Chat) int {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	//todo expire the msg
+	lua := `
+	local cid = redis.call("INCR", "autoIncrChat")
+	redis.call("HMSET", "chat:"..cid,
+					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
+					KEYS[7], KEYS[8], KEYS[9], KEYS[10],
+					KEYS[11], KEYS[12], KEYS[13], KEYS[14])
+	rerurn cid
+	`
+	ka := []interface{}{
+		CId, ct.Id,
+		ChConvId, ct.ConversationId,
+		ChType, ct.Type,
+		ChTarget, ct.Target,
+		ChMsg, ct.Msg,
+
+		ChGroupName, ct.GroupName,
+		ChFrom, ct.From,
+	}
+	script := redis.NewScript(len(ka), lua)
+	id, err := redis.Int(script.Do(c, ka...))
+	if err != nil {
+		log.Error("Error create offline conversation:", err)
+	}
+	return id
+}
+
+func readChatMembers(ct *Chat) (ids []int) {
+	//read mission members
+	m := new(Mission)
+	m.Pid = ct.GroupName
+	ids = m.GetReceiversId()
+	return
+}
+
+func readDeviceToken(uid int) (token string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(deviceToken, uid)
+	token, err = redis.String(c.Do("GET", key))
+	return
+}
+
+func updateOfflineMsg(uid, convId int) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(offlineMsgList, uid)
+	c.Do("RPUSH", key, convId)
 }

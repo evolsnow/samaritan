@@ -4,7 +4,7 @@ import (
 	"flag"
 	"github.com/evolsnow/negroni"
 	"github.com/evolsnow/samaritan/common/caches"
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net"
@@ -35,11 +35,11 @@ func main() {
 	//init redis  pool
 	redisPort := strconv.Itoa(cfg.RedisPort)
 	redisServer := net.JoinHostPort(cfg.RedisAddress, redisPort)
-	conn.Pool = conn.NewPool(redisServer, cfg.RedisPassword, cfg.RedisDB)
-	conn.CachePool = conn.NewPool(redisServer, cfg.RedisPassword, CacheDB)
+	dbms.Pool = dbms.NewPool(redisServer, cfg.RedisPassword, cfg.RedisDB)
+	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisPassword, CacheDB)
 
 	//init mysql database
-	conn.DB = conn.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
+	dbms.DB = dbms.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
 
 	//init LRU cache and simple redis cache
 	caches.LRUCache = caches.NewLRUCache(LRUCacheSize)

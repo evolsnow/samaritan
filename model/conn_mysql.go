@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"time"
 )
@@ -12,8 +12,8 @@ func init() {
 		for {
 			//leave time for init db
 			time.Sleep(time.Second / 2)
-			if conn.DB != nil {
-				db = conn.DB
+			if dbms.DB != nil {
+				db = dbms.DB
 				break
 			}
 		}
@@ -21,6 +21,17 @@ func init() {
 }
 
 var db *sql.DB
+
+func CreateUser(u *User) {
+	stmt, err := db.Prepare("INSERT INTO user(redis_id, pid, sam_id, alias, name, phone, password, email, avatar, school, depart, grade, class, studentNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = stmt.Exec(u.Id, u.Pid, u.SamId, u.Alias, u.Name, u.Phone, u.Password, u.Email, u.Avatar, u.School, u.Department, u.Grade, u.Class, u.StudentNum)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func Test() {
 	var name string
@@ -37,17 +48,6 @@ func Test() {
 		log.Println(name)
 	}
 	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func CreateUser(u *User) {
-	stmt, err := db.Prepare("INSERT INTO user(redis_id, pid, sam_id, alias, name, phone, password, email, avatar, school, depart, grade, class, studentNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = stmt.Exec(u.Id, u.Pid, u.SamId, u.Alias, u.Name, u.Phone, u.Password, u.Email, u.Avatar, u.School, u.Department, u.Grade, u.Class, u.StudentNum)
 	if err != nil {
 		log.Fatal(err)
 	}

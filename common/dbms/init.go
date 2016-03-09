@@ -1,4 +1,4 @@
-package conn
+package dbms
 
 import (
 	"database/sql"
@@ -14,8 +14,6 @@ import (
 var Pool *redis.Pool
 
 var CachePool *redis.Pool
-
-var DB *sql.DB
 
 func NewPool(server, password string, db int) *redis.Pool {
 	return &redis.Pool{
@@ -40,6 +38,8 @@ func NewPool(server, password string, db int) *redis.Pool {
 		},
 	}
 }
+
+var DB *sql.DB
 
 func NewDB(password, host string, port int, database string) *sql.DB {
 	server := net.JoinHostPort(host, strconv.Itoa(port))

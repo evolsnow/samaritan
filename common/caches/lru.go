@@ -16,7 +16,7 @@ package caches
 
 import (
 	"container/list"
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 )
 
 var LRUCache *LCache
@@ -81,8 +81,9 @@ func (c *LCache) GetOrRedis(key string) (value interface{}) {
 	if ele, hit := c.lruCache[key]; hit {
 		c.ll.MoveToFront(ele)
 		return ele.Value.(*entry).value
-	} else { // look up this key from redis
-		ele, _ := conn.Get(key)
+	} else {
+		// look up this key from redis
+		ele, _ := dbms.Get(key)
 		if ele != "" {
 			go c.Add(key, ele)
 			return ele

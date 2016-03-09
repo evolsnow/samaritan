@@ -1,30 +1,17 @@
-package conn
+package dbms
 
 import (
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
 
-//All extra redis actions
-//
-//func GetSignKey(id string) (key, lastVisit string) {
-//	c := Pool.Get()
-//	defer c.Close()
-//	user := "vsuser:" + id
-//	ret, err := redis.Strings(c.Do("HMGET", user, "appKey", "lastVisit"))
-//	if err != nil {
-//		log.Println("no user %s", user)
-//		return
-//	}
-//	return ret[0], ret[1]
-//}
-//
-//func UpdateSign(id, lv string) {
-//	c := Pool.Get()
-//	defer c.Close()
-//	user := "vsuser:" + id
-//	c.Do("HSET", user, "lastVisit", lv)
-//}
+const (
+	userToken = "user:%d:token"
+	samIdSet  = "allSamId"
+)
+
+// All extra redis actions
 
 func Get(key string) (string, error) {
 	c := Pool.Get()
@@ -50,4 +37,24 @@ func CacheDelete(key string) {
 	c := CachePool.Get()
 	defer c.Close()
 	c.Do("DEL", key)
+}
+
+func CreateToken(uid int, token string) {
+	c := Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(userToken, uid)
+	c.Do("SET", key, token)
+}
+
+func ReadIfSamIdExist(sid string) (exist bool) {
+	c := Pool.Get()
+	defer c.Close()
+	exist, _ = redis.Bool(c.Do("SISMEMBER", samIdSet, sid))
+	return
+}
+
+func UpdateSamIdSet(sid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("SADD", samIdSet, sid)
 }

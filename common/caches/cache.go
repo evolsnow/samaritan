@@ -1,7 +1,7 @@
 package caches
 
 import (
-	"github.com/evolsnow/samaritan/common/conn"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"time"
 )
 
@@ -22,15 +22,15 @@ func NewCache() *SimpleCache {
 
 // Add adds a value to the cache.
 func (c *SimpleCache) Set(key string, value interface{}, px time.Duration) {
-	conn.CacheSet(key, value, px)
+	dbms.CacheSet(key, value, px)
 }
 
 // Get looks up a key's value from the cache.
 func (c *SimpleCache) Get(key string) (value string) {
-	return conn.CacheGet(key)
+	return dbms.CacheGet(key)
 }
 
 // Delete deletes a key immediately
 func (c *SimpleCache) Delete(key string) {
-	conn.CacheDelete(key)
+	dbms.CacheDelete(key)
 }
