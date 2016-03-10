@@ -8,7 +8,7 @@ import (
 // Different from LRU cache, this normal cache is saved in redis
 // and shouldn't be deleted by the system automatically
 
-var Cache *SimpleCache
+//var Cache *SimpleCache
 
 type SimpleCache struct {
 	cache map[string]interface{}
