@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/evolsnow/httprouter"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/caches"
 	"github.com/evolsnow/samaritan/common/log"
 	"net/http"

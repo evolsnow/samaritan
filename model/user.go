@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/log"
 )
 

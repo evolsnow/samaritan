@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/httprouter"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"

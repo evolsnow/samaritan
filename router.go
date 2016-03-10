@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/evolsnow/httprouter"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	hd "github.com/evolsnow/samaritan/handler"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net/http"

@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/garyburd/redigo/redis"

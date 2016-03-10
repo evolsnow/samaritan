@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/evolsnow/httprouter"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/caches"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
@@ -75,43 +75,6 @@ func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	go model.Test()
 	c := dbms.Pool.Get()
 	defer c.Close()
-	//	_, err := dbms.Do("SET", "username", "evol")
-	//	if err != nil {
-	//	}
-	//	username, _ := redis.String(dbms.Do("GET", "username"))
-	//	f := map[string]string{"hello": username}
-	//	js, _ := json.Marshal(f)
-
-	//
-	//		dbms.Send("HMSET", "album:1", "title", "Red", "rating", 5)
-	//		dbms.Send("HMSET", "album:2", "title", "Earthbound", "rating", 1)
-	//		dbms.Send("HMSET", "album:3", "title", "Beat", "rating", 4)
-	//		dbms.Send("LPUSH", "albums", "1")
-	//		dbms.Send("LPUSH", "albums", "2")
-	//		dbms.Send("LPUSH", "albums", "3")
-	//		dbms.Do("HMSET", "user", "foo", 10, "bar", 20)
-	//	ms := &MyStruct{}
-	//ab := &Album{}
-	//
-	//	reply, err := redis.Values(dbms.Do("HGETALL", "hi"))
-	//	if err != nil {
-	//		log.Println("get error")
-	//	}
-	//	redis.ScanStruct(reply, ms)
-	//	log.Println(*ms)
-
-	//	album, err := redis.Values(dbms.Do("HGETALL", "album:1"))
-	//	if err != nil {
-	//		// handle error
-	//		log.Println(err)
-	//	}
-
-	//	redis.ScanStruct(album, ab)
-	//	//log.Println(*ab)
-	//
-	//	ret, _ := json.Marshal(ab)
-	//	w.Write([]byte(ret))
-
 	username, err := redis.String(c.Do("GETSET", "username", "evol"))
 	if err != nil {
 		log.Println(err)

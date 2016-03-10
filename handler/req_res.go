@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/evolsnow/binding"
-	"github.com/evolsnow/samaritan/base"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/caches"
 	"net/http"
 )
