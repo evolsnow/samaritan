@@ -1,29 +1,12 @@
 package model
 
 import (
-	"database/sql"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
-	"time"
 )
 
-func init() {
-	go func() {
-		for {
-			//leave time for init db
-			time.Sleep(time.Second / 2)
-			if dbms.DB != nil {
-				db = dbms.DB
-				break
-			}
-		}
-	}()
-}
-
-var db *sql.DB
-
 func CreateUser(u *User) {
-	stmt, err := db.Prepare("INSERT INTO user(redis_id, pid, sam_id, alias, name, phone, password, email, avatar, school, depart, grade, class, studentNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := dbms.DB.Prepare("INSERT INTO user(redis_id, pid, sam_id, alias, name, phone, password, email, avatar, school, depart, grade, class, studentNum) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +18,7 @@ func CreateUser(u *User) {
 
 func Test() {
 	var name string
-	rows, err := db.Query("select name from user where id = ?", 1)
+	rows, err := dbms.DB.Query("select name from user where id = ?", 1)
 	if err != nil {
 		log.Fatal(err)
 	}

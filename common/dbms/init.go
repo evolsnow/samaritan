@@ -45,7 +45,7 @@ func NewDB(password, host string, port int, database string) *sql.DB {
 	server := net.JoinHostPort(host, strconv.Itoa(port))
 	db, _ := sql.Open("mysql", fmt.Sprintf("remote:%s@tcp(%s)/%s?autocommit=true", password, server, database))
 	if err := db.Ping(); err != nil {
-		log.Fatal("failed to connect mysql:", err)
+		log.Error("failed to connect mysql:", err)
 		return nil
 	}
 	db.SetMaxOpenConns(200)
