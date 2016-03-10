@@ -18,20 +18,10 @@ func CreateUser(u *User) {
 
 func Test() {
 	var name string
-	rows, err := dbms.DB.Query("select name from user where id = ?", 1)
+	row := dbms.DB.QueryRow("select name from user where id = ?", 1)
+	err := row.Scan(&name)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&name)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(name)
-	}
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Println(name)
 }

@@ -72,7 +72,7 @@ func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 //}
 
 func Test(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	model.Test()
+	go model.Test()
 	c := dbms.Pool.Get()
 	defer c.Close()
 	//	_, err := dbms.Do("SET", "username", "evol")
