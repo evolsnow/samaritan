@@ -27,13 +27,13 @@
 ### 引用库说明
 golang的一大特点便是fork优秀的开源库再针对自己的项目进行优化使用，所以samaritan也是这么搭建而成的，真心感谢开源作者们。
 
--  [negroni](https://github.com/evolsnow/negroni): Martini作者停止维护Martini后着手的新的web中间件管理项目，fork之后加了HTTPS支持。
+-  [negroni](https://github.com/codegangsta/negroni): Martini作者停止维护Martini后着手的新的web中间件管理项目，fork之后加了HTTPS支持。
 
 - [binding](https://github.com/mholt/binding): HTTP请求内容与定义的结构体绑定中间件，规范请求参数，方便调试。fork后修改了错误内容的输出模式。
 
 - [jwt-go](https://github.com/dgrijalva/jwt-go): ['JSON Web Tokens'](http://self-issued.info/docs/draft-jones-json-web-token.html)中间件的golang实现，用户请求信息鉴权。
 
-- [httprouter](https://github.com/evolsnow/httprouter): 简洁高效的路由管理，fork后增加了上下文参数存取的功能，方便在中间件及handler间传递。
+- [httprouter](https://github.com/julienschmidt/httprouter): 简洁高效的路由管理，fork后增加了上下文参数存取的功能，方便在中间件及handler间传递。
 
 - [logrus](https://github.com/Sirupsen/logrus): 更方便的日志输出，按照等级输出在debug时很有必要。
 
