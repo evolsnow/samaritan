@@ -1,6 +1,7 @@
 package log
 
 import (
+	"encoding/json"
 	"github.com/Sirupsen/logrus"
 )
 
@@ -9,6 +10,7 @@ var Logger = logrus.New()
 func SetLogLevel(debug bool) {
 	if debug {
 		Logger.Level = logrus.DebugLevel
+		Logger.Debug("debug mode")
 	} else {
 		Logger.Level = logrus.InfoLevel
 	}
@@ -40,4 +42,24 @@ func Debug(args ...interface{}) {
 
 func Println(args ...interface{}) {
 	Logger.Println(args...)
+}
+
+// DebugJson pretty print the request and response
+// Should add no more than one description
+func DebugJson(args ...interface{}) {
+	if len(args) == 1 {
+		Logger.Debug("\n", marshalWithIndent(args[0]))
+	} else if len(args) == 2 {
+		Logger.Debug(args[0].(string)+"\n", marshalWithIndent(args[1]))
+	}
+
+}
+
+func marshalWithIndent(s interface{}) interface{} {
+	b, err := json.MarshalIndent(s, "", "    ")
+	if err != nil {
+		return s
+	} else {
+		return string(b)
+	}
 }

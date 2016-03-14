@@ -56,6 +56,6 @@ func (u *User) FullAvatarUrl() string {
 //save a new user
 func (u *User) Save() {
 	//return user id for jwt token use
-	log.Debug("create user:", u)
+	log.DebugJson("create user:", u)
 	createUser(u)
 }

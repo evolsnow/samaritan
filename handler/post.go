@@ -18,7 +18,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if errs.Handle(w) {
 		return
 	}
-	log.Debug(req)
+	log.DebugJson(req)
 	us := model.User{
 		Phone:    req.Phone,
 		Password: base.EncryptedPassword(req.Password),
@@ -31,9 +31,9 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	token := base.NewToken(us.Id)
 	resp := new(postUsResp)
 	resp.Id = base.HashedUserId(us.Id)
-	resp.Token = token
+	resp.Token = "Bearer " + token
 	go dbms.CreateToken(us.Id, token)
-	log.Debug(resp)
+	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
 
