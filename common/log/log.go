@@ -48,9 +48,13 @@ func Println(args ...interface{}) {
 // Should add no more than one description
 func DebugJson(args ...interface{}) {
 	if len(args) == 1 {
+		//common case
 		Logger.Debug("\n", marshalWithIndent(args[0]))
 	} else if len(args) == 2 {
 		Logger.Debug(args[0].(string)+"\n", marshalWithIndent(args[1]))
+	} else {
+		//should use Debug instead
+		Logger.Debug(args...)
 	}
 
 }
