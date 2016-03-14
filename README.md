@@ -28,14 +28,14 @@ samaritan为其实现部分。此处仅简单介绍后台部分的一些架构�
 
 - 静态资源： 头像，图片等交由nginx处理 ，后期考虑七牛云等。
 
-- RPC: 采用基于ProtoBuf的gRPC。消息推送, 邮件发送等功能直接通过rpc实现, 形成微服务。非必须, 兴趣而已。
+- RPC: 采用基于ProtoBuf的gRPC。消息推送(websocket/apns), 邮件发送等功能直接通过rpc实现, 形成微服务。非必须, 兴趣而已。
 
 - TLS：虽然golang本身支持TLS，但实测下来效率不如nginx加解密HTTPS流量+golang处理HTTP请求的模式(与服务器应该有关系，待测)，所以直接交由nginx处理TLS，并开启HTTP/2支持。
 
 ### 引用库说明
 golang的一大特点便是fork优秀的开源库再针对自己的项目进行优化使用，所以samaritan也是这么搭建而成的，真心感谢开源作者们。
 
--  [negroni](https://github.com/codegangsta/negroni): Martini作者停止维护Martini后着手的新的web中间件管理项目，fork之后加了HTTPS支持。
+- [negroni](https://github.com/codegangsta/negroni): Martini作者停止维护Martini后着手的新的web中间件管理项目，fork之后加了HTTPS支持。
 
 - [binding](https://github.com/mholt/binding): HTTP请求内容与定义的结构体绑定中间件，规范请求参数，方便调试。fork后修改了错误内容的输出模式。
 
