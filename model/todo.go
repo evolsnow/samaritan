@@ -12,6 +12,7 @@ type Todo struct {
 	Place      string   `json:"place,omitempty" redis:"place"`
 	Pictures   []string `json:"pictures,omitempty" redis:"-"`
 	Repeat     bool     `json:"repeat,omitempty" redis:"repeat"`
+	AllDay     bool     `json:"allDay,omitempty" redis:"allDay"`
 	RepeatMode int      `json:"repeatMode,omitempty" redis:"repeatMode"`
 	Desc       string   `json:"desc,omitempty" redis:"desc"` //description for the action
 	Remark     string   `json:"remark,omitempty" redis:"remark"`
@@ -28,7 +29,7 @@ func (td *Todo) GetOwner() (owner *User) {
 		log.Error("Error get user with todo:", err)
 		return nil
 	}
-	log.Debug("get owner:", owner)
+	log.DebugJson("get owner:", owner)
 	return
 }
 
@@ -55,6 +56,6 @@ func (td *Todo) Finish() (err error) {
 
 //save a new to-do
 func (td *Todo) Save() {
-	log.Debug("create todo:", td)
+	log.DebugJson("create todo:", td)
 	createTodo(td)
 }

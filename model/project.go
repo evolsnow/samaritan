@@ -19,7 +19,7 @@ func (p *Project) GetCreator() (creator *User) {
 		log.Error("Error get creator:", err)
 		return nil
 	}
-	log.Debug("creator:", creator)
+	log.DebugJson("creator:", creator)
 	return
 }
 
@@ -68,6 +68,6 @@ func (p *Project) GetMembersId() []int {
 }
 
 func (p *Project) Save() {
-	log.Debug("create project:", p)
+	log.DebugJson("create project:", p)
 	createProject(p)
 }
