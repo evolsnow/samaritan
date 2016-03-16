@@ -1,6 +1,5 @@
-test-results/
-tmp/
+
 .idea/
-output/
 doc
+/gpns
 config.json
