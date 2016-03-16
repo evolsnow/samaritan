@@ -6,6 +6,7 @@ import (
 	"github.com/evolsnow/samaritan/common/caches"
 	"github.com/evolsnow/samaritan/common/log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -24,9 +25,10 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 					goto Success
 				} else {
 					//If failed, parse token and add token to cache
-					err := base.ParseToken(ah[7:], &ps)
+					uid, err := base.ParseToken(ah[7:])
 					if err == nil {
-						go lru.Add(ah[7:], ps.Get("authId"))
+						ps.Set("authId", strconv.Itoa(uid))
+						go lru.Add(ah[7:], uid)
 						goto Success
 					} else {
 						msg := "Invalid Token"

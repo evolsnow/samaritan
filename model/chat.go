@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/rpc"
-	"github.com/gorilla/websocket"
 	"time"
 )
 
@@ -40,7 +40,7 @@ func (ct *Chat) Save(uid int) {
 	}
 }
 
-func (ct *Chat) Response(scm map[int]*websocket.Conn, dm map[int]string) {
+func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
 	case InvitedToMission, KickedFromMission:
@@ -65,40 +65,32 @@ func (ct *Chat) Response(scm map[int]*websocket.Conn, dm map[int]string) {
 			}
 		}
 	}
-	ct.send(scm, dm)
+	ct.send()
 }
 
-func (ct *Chat) send(scm map[int]*websocket.Conn, dm map[int]string) {
+func (ct *Chat) send() {
 	ct.Timestamp = time.Now().Unix()
-	offlineIds := make([]int, len(ct.ReceiversId), len(ct.ReceiversId))
+	var userTokens []string
 	for _, uid := range ct.ReceiversId {
-		sc, ok := scm[uid]
-		if ok {
-			go func(*websocket.Conn, int) {
-				if err := sc.WriteJSON(ct); err != nil {
-					offlineIds = append(offlineIds, uid)
-				}
-			}(sc, uid)
-		} else {
-			go ct.Save(uid)
-			offlineIds = append(offlineIds, uid)
-		}
+		userTokens = append(userTokens, base.MakeToken(uid))
+	}
+	offlineTokens := rpc.SocketPush(userTokens, ct.Msg) //use webSocket push
+	for _, ft := range offlineTokens {
+		uid, _ := base.ParseToken(ft)
+		go ct.Save(uid)
 	}
 	if ct.Type == PeerToPeer || ct.Type == Discuss {
-		applePush(offlineIds, ct, dm)
+		applePush(offlineTokens, ct)
 	}
 }
 
-func applePush(ids []int, ct *Chat, dm map[int]string) {
-	deviceList := make([]string, len(ids), len(ids))
-	for _, uid := range ids {
-		token, ok := dm[uid]
-		if !ok {
-			//load from redis
-			token, _ = readDeviceToken(uid)
-			dm[uid] = token
-		}
-		deviceList = append(deviceList, token)
+func applePush(tokens []string, ct *Chat) {
+	deviceList := make([]string, len(tokens), len(tokens))
+	//read device token from db
+	for _, token := range tokens {
+		uid, _ := base.ParseToken(token)
+		dt, _ := readDeviceToken(uid)
+		deviceList = append(deviceList, dt)
 	}
 	rpc.IOSPush(deviceList, ct.Msg)
 }

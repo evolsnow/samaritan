@@ -9,7 +9,7 @@ var ah string
 var raw = "raw"
 
 func TestNewToken(t *testing.T) {
-	ah = NewToken(123)
+	ah = MakeToken(123)
 	if ah == "" {
 		t.Error("generate new token error")
 	}

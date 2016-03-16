@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/evolsnow/httprouter"
 	"golang.org/x/crypto/scrypt"
 	"strconv"
 )
@@ -21,26 +20,25 @@ const (
 	CommentIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 )
 
-func NewToken(id int) string {
+func MakeToken(id int) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Set some claims
 	token.Claims["userId"] = id
 	token.Claims["salt"] = TokenSalt
 	// Sign and get the complete encoded token as a string
 	tokenString, _ := token.SignedString([]byte(JwtKey))
-	return tokenString
+	return "Bearer " + tokenString
 }
 
-func ParseToken(ah string, ps *httprouter.Params) (err error) {
+func ParseToken(ah string) (uid int, err error) {
 	token, err := jwt.Parse(ah, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JwtKey), nil
 	})
 	if err == nil && token.Valid {
 		userId := token.Claims["userId"].(float64)
-		ps.Set("authId", strconv.Itoa(int(userId)))
-		return nil
+		return int(userId), nil
 	} else {
-		return err
+		return 0, err
 	}
 }
 

@@ -1,3 +1,6 @@
 [submodule "doc"]
 	path = doc
 	url = https://github.com/evolsnow/APP-DOC.git
+[submodule "gpns"]
+	path = gpns
+	url = https://github.com/evolsnow/gpns

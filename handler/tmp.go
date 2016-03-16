@@ -51,7 +51,7 @@ func Pm2(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func SetJwt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tokenString := base.NewToken(123)
+	tokenString := base.MakeToken(123)
 	fmt.Fprint(w, tokenString)
 }
 func Ab(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

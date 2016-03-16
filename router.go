@@ -30,13 +30,11 @@ func newRouter() *httprouter.Router {
 	r.POST("/todos", hd.NewTodo)
 	r.POST("/projects", hd.NewProject)
 	r.POST("/privateChats", hd.NewPrivateChat)
+	//todo upload device token
 
 	//http put method
 
 	//http delete method
-
-	//webSocket
-	r.GET("/websocket/:deviceToken", hd.Socket)
 
 	//test
 	r.GET("/test", hd.Test)
