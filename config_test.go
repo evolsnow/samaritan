@@ -7,7 +7,7 @@ func TestParseConfig(t *testing.T) {
 	if err != nil {
 		t.Error("parse config.json errer:", err.Error())
 	}
-	if cfg.MysqlPassword == "" {
+	if cfg.MysqlS.Password == "" {
 		t.Error("parse struct error")
 	}
 	_, err = ParseConfig("non-existen.json")
