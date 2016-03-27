@@ -1,12 +1,26 @@
 {
-  "server": "127.0.0.1",
-  "port": 8080,
-  "redis_address": "127.0.0.1",
-  "redis_port": 6379,
-  "redis_db": 7,
-  "redis_password": null,
-  "mysql_address": "127.0.0.1",
-  "mysql_port": 3306,
-  "mysql_db": "db",
-  "mysql_password": "pwd"
+	"http_server": {
+		"server": "127.0.0.1",
+		"port": 8080
+	},
+	"redis_server": {
+		"address": "127.0.0.1",
+		"port": 6379,
+		"db": "7",
+		"password": null
+	},
+	"mysql_server": {
+		"address": "127.0.0.1",
+		"port": 3306,
+		"db": "db",
+		"password": "pwd"
+	},
+	"rpc_server_d": {
+		"address": "127.0.0.1",
+		"port": 8080
+	},
+	"rpc_server_f": {
+	    "address": "8.8.8.8",
+	    "port": 8080
+	}
 }

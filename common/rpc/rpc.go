@@ -7,27 +7,42 @@ import (
 	"google.golang.org/grpc"
 )
 
-var client pb.GPNSClient
+var RpcClientD pb.GPNSClient
+var RpcClientF pb.GPNSClient
+
 var Chats = make(chan string, 100)
 
-func init() {
-	conn, err := grpc.Dial("127.0.0.1:10086", grpc.WithInsecure())
+func NewClientD(server string) pb.GPNSClient {
+	conn, err := grpc.Dial(server, grpc.WithInsecure())
 	if err != nil {
-		log.Fatal("connect to rpc server failed")
+		log.Fatal("connect to domestic rpc server failed")
 	}
-	client = pb.NewGPNSClient(conn)
 	go receiveChat()
+	return pb.NewGPNSClient(conn)
+}
+
+func NewClientF(server string) pb.GPNSClient {
+	conn, err := grpc.Dial(server, grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("connect to foreign rpc server failed")
+	}
+	return pb.NewGPNSClient(conn)
 }
 
 func SendMail(to, subject, body string) (err error) {
 	log.Debug("calling rpc.SendMail")
-	_, err = client.SendMail(context.Background(), &pb.MailRequest{To: to, Subject: subject, Body: body})
+	_, err = RpcClientF.SendMail(context.Background(), &pb.MailRequest{To: to, Subject: subject, Body: body})
+	if err != nil {
+		log.Warn(err)
+	} else {
+		log.Debug("mail sent")
+	}
 	return
 }
 
 func SocketPush(tokenList []string, msg string) []string {
 	log.Debug("calling rpc.SocketPush")
-	spr, err := client.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, UserToken: tokenList})
+	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, UserToken: tokenList})
 	if err != nil {
 		log.Error("socket push err:", err)
 	}
@@ -36,12 +51,12 @@ func SocketPush(tokenList []string, msg string) []string {
 
 func IOSPush(tokenList []string, msg string) {
 	log.Debug("calling rpc.IOSPush")
-	client.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, DeviceToken: tokenList})
+	RpcClientF.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, DeviceToken: tokenList})
 }
 
 func receiveChat() {
 	req := new(pb.ReceiveChatRequest)
-	stream, err := client.ReceiveMsg(context.Background(), req)
+	stream, err := RpcClientD.ReceiveMsg(context.Background(), req)
 	if err != nil {
 		log.Error(err)
 	}
@@ -49,7 +64,7 @@ func receiveChat() {
 		rcv, err := stream.Recv()
 		if err != nil {
 			log.Warn(err)
-			stream, err = client.ReceiveMsg(context.Background(), req)
+			stream, err = RpcClientD.ReceiveMsg(context.Background(), req)
 			continue
 		}
 		Chats <- rcv.Chat

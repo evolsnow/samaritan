@@ -15,7 +15,7 @@ var Pool *redis.Pool
 
 var CachePool *redis.Pool
 
-func NewPool(server, password string, db int) *redis.Pool {
+func NewPool(server, password string, db string) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,

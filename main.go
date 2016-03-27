@@ -5,12 +5,13 @@ import (
 	"github.com/evolsnow/negroni"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
+	"github.com/evolsnow/samaritan/common/rpc"
 	mw "github.com/evolsnow/samaritan/middleware"
 	"net"
 	"strconv"
 )
 
-const CacheDB = 0
+const CacheDB = "0"
 
 func main() {
 	var debug bool
@@ -26,18 +27,30 @@ func main() {
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
 	}
-	if cfg.RedisDB == CacheDB {
+	if cfg.RedisS.DB == CacheDB {
 		log.Fatal("redis db can not be same as cache db: '0'")
 	}
 
 	//init redis  pool
-	redisPort := strconv.Itoa(cfg.RedisPort)
-	redisServer := net.JoinHostPort(cfg.RedisAddress, redisPort)
-	dbms.Pool = dbms.NewPool(redisServer, cfg.RedisPassword, cfg.RedisDB)
-	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisPassword, CacheDB)
+	redisServer := net.JoinHostPort(cfg.RedisS.Address, strconv.Itoa(cfg.RedisS.Port))
+	dbms.Pool = dbms.NewPool(redisServer, cfg.RedisS.Password, cfg.RedisS.DB)
+	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, cfg.RedisS.DB)
 
 	//init mysql database
-	dbms.DB = dbms.NewDB(cfg.MysqlPassword, cfg.MysqlAddress, cfg.MysqlPort, cfg.MysqlDB)
+	dbms.DB = dbms.NewDB(cfg.MysqlS.Password, cfg.MysqlS.Address, cfg.MysqlS.Port, cfg.MysqlS.DB)
+
+	//init rpc client, domestic+foreign
+	rpcServerD := net.JoinHostPort(cfg.RpcSD.Address, strconv.Itoa(cfg.RpcSD.Port))
+	rpc.RpcClientD = rpc.NewClientD(rpcServerD)
+	rpcServerF := net.JoinHostPort(cfg.RpcSF.Address, strconv.Itoa(cfg.RpcSF.Port))
+	rpc.RpcClientF = rpc.NewClientF(rpcServerF)
+
+	//go func() {
+	//	title := "帐号注册"
+	//	body := "您好，您的注册验证码是：" + base.RandomCode() + "，有效期为5分钟。（请勿直接回复本邮件）"
+	//	go rpc.SendMail("gsc1215225@gmail.com", title, body)
+	//go rpc.SendMail("lieyan104545@qq.com", title, body)
+	//}()
 
 	//init server
 	n := negroni.New(
@@ -47,6 +60,5 @@ func main() {
 	)
 	r := newRouter()
 	n.UseHandler(r)
-	srvPort := strconv.Itoa(cfg.Port)
-	n.Run(net.JoinHostPort(cfg.Server, srvPort))
+	n.Run(net.JoinHostPort(cfg.HttpS.Address, strconv.Itoa(cfg.HttpS.Port)))
 }

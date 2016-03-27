@@ -6,17 +6,18 @@ import (
 	"os"
 )
 
+type ListenServer struct {
+	Address  string `json:"address,omitempty"`
+	Port     int    `json:"port"`
+	DB       string `json:"db,omitempty"`
+	Password string `json:"password,omitempty"`
+}
 type Config struct {
-	Server        string `json:"server"`
-	Port          int    `json:"port"`
-	RedisAddress  string `json:"redis_address"`
-	RedisPort     int    `json:"redis_port"`
-	RedisDB       int    `json:"redis_db"`
-	RedisPassword string `json:"redis_password"`
-	MysqlAddress  string `json:"mysql_address"`
-	MysqlPort     int    `json:"mysql_port"`
-	MysqlDB       string `json:"mysql_db"`
-	MysqlPassword string `json:"mysql_password"`
+	HttpS  ListenServer `json:"http_server"`
+	RedisS ListenServer `json:"redis_server"`
+	MysqlS ListenServer `json:"mysql_server"`
+	RpcSD  ListenServer `json:"rpc_server_d"`
+	RpcSF  ListenServer `json:"rpc_server_f"`
 }
 
 func ParseConfig(path string) (config *Config, err error) {

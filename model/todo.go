@@ -7,7 +7,7 @@ import (
 type Todo struct {
 	Id         int      `json:"-" redis:"id"` //private id
 	Pid        string   `json:"id,omitempty" redis:"pid"`
-	createTime int64    `json:"createTime,omitempty" redis:"createTime"`
+	createTime int64    `redis:"createTime"`
 	StartTime  int64    `json:"startTime,omitempty" redis:"startTime"` //start timestamp of this action
 	Place      string   `json:"place,omitempty" redis:"place"`
 	Pictures   []string `json:"pictures,omitempty" redis:"-"`
