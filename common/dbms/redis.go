@@ -9,6 +9,10 @@ import (
 const (
 	userToken = "user:%d:token"
 	samIdSet  = "allSamId"
+
+	LoginPhoneIndex = "login:phone:%s"
+	LoginMailIndex  = "login:mail:%s"
+	LoginSamIndex   = "login:sam:%s"
 )
 
 // All extra redis actions
@@ -44,6 +48,41 @@ func CreateToken(uid int, token string) {
 	defer c.Close()
 	key := fmt.Sprintf(userToken, uid)
 	c.Do("SET", key, token)
+}
+
+func CreateLoginIndex(uid int, info, source string) {
+	c := Pool.Get()
+	defer c.Close()
+	switch source {
+	case "phone":
+		c.Do("SET", fmt.Sprintf(LoginPhoneIndex, info), uid)
+	case "mail":
+		c.Do("SET", fmt.Sprintf(LoginMailIndex, info), uid)
+	case "samId":
+		c.Do("SET", fmt.Sprintf(LoginSamIndex, info), uid)
+	}
+}
+
+func ReadLoginUid(info, source string) (uid int) {
+	c := Pool.Get()
+	defer c.Close()
+	switch source {
+	case "phone":
+		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginPhoneIndex, info)))
+	case "mail":
+		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginMailIndex, info)))
+	case "samId":
+		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginSamIndex, info)))
+	}
+	return
+}
+
+func ReadToken(uid int) (token string) {
+	c := Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(userToken, uid)
+	token, _ = redis.String(c.Do("GET", key))
+	return
 }
 
 func ReadIfSamIdExist(sid string) (exist bool) {

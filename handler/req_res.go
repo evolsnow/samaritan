@@ -4,21 +4,17 @@ import (
 	"encoding/json"
 	"github.com/evolsnow/binding"
 	"github.com/evolsnow/samaritan/common/base"
-	"github.com/evolsnow/samaritan/common/caches"
 	"net/http"
 )
 
-//get cache
-var cache = caches.NewCache()
-
 //base response for all requests
 type baseResp struct {
-	Code  int   `json:"code,omitempty"`
-	Error error `json:"error,omitempty"`
+	Code int    `json:"code,omitempty"`
+	Msg  string `json:"msg,omitempty"`
 }
 
 func makeBaseResp(w http.ResponseWriter, r *http.Request) {
-	makeResp(w, r, baseResp{Code: 200})
+	makeResp(w, r, baseResp{Code: http.StatusOK})
 }
 
 //struct to post to-do request
@@ -53,9 +49,12 @@ type postTdResp struct {
 }
 
 type postUsReq struct {
-	Name     string
-	Phone    string
-	Password string
+	Name       string
+	Phone      string
+	Mail       string
+	Password   string
+	Source     string
+	VerifyCode string
 }
 
 func (pu *postUsReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -64,17 +63,20 @@ func (pu *postUsReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "name",
 			Required: true,
 		},
-		&pu.Phone: binding.Field{
-			Form:     "phone",
-			Required: true,
-		},
 		&pu.Password: binding.Field{
 			Form:     "password",
 			Required: true,
 		},
-		//&pu.StartTime:    "startTime",
-		//&pu.Done: "done",
-		//&pu.MissionId:    "missionId",
+		&pu.Source: binding.Field{
+			Form:     "source",
+			Required: true,
+		},
+		&pu.VerifyCode: binding.Field{
+			Form:     "verifyCode",
+			Required: true,
+		},
+		&pu.Phone: "phone",
+		&pu.Mail:  "mail",
 	}
 }
 
@@ -128,6 +130,58 @@ func (ppc *postPrivateChatReq) FieldMap(req *http.Request) binding.FieldMap {
 type postPrivateChatResp struct {
 	baseResp
 	PrivateChatId string `json:"chatId"`
+}
+
+type postVerifyCodeReq struct {
+	To  string `json:"to"`
+	Use string `json:"use"`
+}
+
+func (pvc *postVerifyCodeReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pvc.To: binding.Field{
+			Form:     "to",
+			Required: true,
+		},
+		&pvc.Use: binding.Field{
+			Form:     "use",
+			Required: true,
+		},
+	}
+}
+
+type postVerifyCodeResp struct {
+	baseResp
+}
+
+type postAccessTokenReq struct {
+	Phone    string
+	Mail     string
+	SamId    string
+	Source   string
+	Password string
+}
+
+func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pat.Password: binding.Field{
+			Form:     "password",
+			Required: true,
+		},
+		&pat.Source: binding.Field{
+			Form:     "source",
+			Required: true,
+		},
+		&pat.Phone: "phone",
+		&pat.Mail:  "mail",
+		&pat.SamId: "samId",
+	}
+}
+
+type postAccessTokenResp struct {
+	baseResp
+	Id    string `json:"id"`
+	Token string `json:"token"`
 }
 
 //bind json to user defined struct

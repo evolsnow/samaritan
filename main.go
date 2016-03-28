@@ -35,7 +35,7 @@ func main() {
 	//init redis  pool
 	redisServer := net.JoinHostPort(cfg.RedisS.Address, strconv.Itoa(cfg.RedisS.Port))
 	dbms.Pool = dbms.NewPool(redisServer, cfg.RedisS.Password, cfg.RedisS.DB)
-	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, cfg.RedisS.DB)
+	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, CacheDB)
 
 	//init mysql database
 	dbms.DB = dbms.NewDB(cfg.MysqlS.Password, cfg.MysqlS.Address, cfg.MysqlS.Port, cfg.MysqlS.DB)

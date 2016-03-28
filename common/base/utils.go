@@ -8,7 +8,9 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -42,16 +44,29 @@ func GenerateAvatar(phone string) (string, error) {
 
 //set http status and reply error
 func SetError(w http.ResponseWriter, desc string, status int) {
-	e := map[string]interface{}{"code": status, "error": desc}
+	e := map[string]interface{}{"code": status, "msg": desc}
 	msg, _ := json.Marshal(e)
 	w.WriteHeader(status)
 	w.Write(msg)
 }
 
-func RandomCode() string {
+func RandomCodeSix() string {
 	rand.Seed(time.Now().UTC().UnixNano())
 	code := 100000 + rand.Intn(900000)
 	return strconv.Itoa(code)
+}
+
+func ValidPhone(phone string) bool {
+	pattern, _ := regexp.Compile("(13[0-9]|15[01235678]|17[0-9]|18[0-9]|14[57])[0-9]{8}")
+	return pattern.MatchString(phone)
+}
+
+func ValidMail(mail string) bool {
+	idx := strings.LastIndex(mail, "@")
+	if idx < 1 || idx == len(mail)-1 {
+		return false
+	}
+	return true
 }
 
 //check http bad request error
@@ -60,6 +75,6 @@ func BadReqErrHandle(w http.ResponseWriter, desc string) {
 }
 
 //http 403 error
-func ForbidErrorHandler(w http.ResponseWriter) {
-	SetError(w, "user match error", http.StatusForbidden)
+func ForbidErrorHandler(w http.ResponseWriter, desc string) {
+	SetError(w, desc, http.StatusForbidden)
 }

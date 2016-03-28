@@ -30,6 +30,8 @@ func newRouter() *httprouter.Router {
 	r.POST("/todos", hd.NewTodo)
 	r.POST("/projects", hd.NewProject)
 	r.POST("/privateChats", hd.NewPrivateChat)
+	r.POST("/verifyCode/:source", hd.NewVerifyCode)
+	r.POST("/accessToken", hd.NewAccessToken)
 	//todo upload device token
 
 	//http put method
