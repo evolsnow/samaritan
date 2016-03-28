@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"fmt"
 	"github.com/evolsnow/samaritan/common/log"
 	pb "github.com/evolsnow/samaritan/gpns/protos"
 	"golang.org/x/net/context"
@@ -40,6 +41,19 @@ func SendMail(to, subject, body string) (err error) {
 	return
 }
 
+func SendSMS(to, text string) (err error) {
+	log.Debug("calling rpc.SendSMS")
+	resp, err := RpcClientD.SendSMS(context.Background(), &pb.SMSRequest{To: to, Text: text})
+	if err != nil {
+		log.Warn(err)
+		return
+	}
+	if resp.Success {
+		return nil
+	}
+	return fmt.Errorf(resp.Reason)
+
+}
 func SocketPush(tokenList []string, msg string) []string {
 	log.Debug("calling rpc.SocketPush")
 	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, UserToken: tokenList})

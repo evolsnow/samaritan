@@ -19,6 +19,7 @@ func main() {
 	flag.BoolVar(&debug, "d", false, "debug mode")
 	flag.StringVar(&conf, "c", "config.json", "specify config file")
 	flag.Parse()
+
 	//set global log level
 	log.SetLogLevel(debug)
 
@@ -50,7 +51,8 @@ func main() {
 	//	body := "您好，您的注册验证码是：" + base.RandomCode() + "，有效期为5分钟。（请勿直接回复本邮件）"
 	//	go rpc.SendMail("gsc1215225@gmail.com", title, body)
 	//go rpc.SendMail("lieyan104545@qq.com", title, body)
-	//}()
+	//}
+	//log.Info(rpc.SendSMS("13213213131", "【GoDo日程】您的注册验证码为 123456，5分钟内有效。"))
 
 	//init server
 	n := negroni.New(
