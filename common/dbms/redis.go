@@ -63,10 +63,10 @@ func CreateLoginIndex(uid int, info, source string) {
 	}
 }
 
-func ReadLoginUid(info, source string) (uid int) {
+func ReadLoginUid(info, loginType string) (uid int) {
 	c := Pool.Get()
 	defer c.Close()
-	switch source {
+	switch loginType {
 	case "phone":
 		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginPhoneIndex, info)))
 	case "mail":

@@ -158,7 +158,7 @@ type postAccessTokenReq struct {
 	Phone    string
 	Mail     string
 	SamId    string
-	Source   string
+	Type     string
 	Password string
 }
 
@@ -168,8 +168,8 @@ func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "password",
 			Required: true,
 		},
-		&pat.Source: binding.Field{
-			Form:     "source",
+		&pat.Type: binding.Field{
+			Form:     "type",
 			Required: true,
 		},
 		&pat.Phone: "phone",

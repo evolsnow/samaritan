@@ -175,13 +175,13 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 	log.DebugJson(req)
 	var uid int
-	switch req.Source {
+	switch req.Type {
 	case "phone":
-		uid = dbms.ReadLoginUid(req.Phone, req.Source)
+		uid = dbms.ReadLoginUid(req.Phone, req.Type)
 	case "mail":
-		uid = dbms.ReadLoginUid(req.Mail, req.Source)
+		uid = dbms.ReadLoginUid(req.Mail, req.Type)
 	case "samId":
-		uid = dbms.ReadLoginUid(req.SamId, req.Source)
+		uid = dbms.ReadLoginUid(req.SamId, req.Type)
 	}
 	if uid == 0 {
 		base.SetError(w, "user not registered", http.StatusNotFound)
