@@ -56,6 +56,13 @@ func (td *Todo) Finish() (err error) {
 
 //save a new to-do
 func (td *Todo) Save() {
-	log.DebugJson("create todo:", td)
-	createTodo(td)
+	if td.Id == 0 {
+		//new user
+		log.DebugJson("create todo:", td)
+		createTodo(td)
+	} else {
+		kvMap := prepareToUpdate(td)
+		log.Debug("update user with: ", kvMap)
+		updateTodo(td.Id, kvMap)
+	}
 }

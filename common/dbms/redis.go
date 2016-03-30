@@ -63,7 +63,7 @@ func CreateLoginIndex(uid int, info, loginType string) {
 	}
 }
 
-func ReadLoginUid(info, loginType string) (uid int) {
+func ReadUidIndex(info, loginType string) (uid int) {
 	c := Pool.Get()
 	defer c.Close()
 	switch loginType {

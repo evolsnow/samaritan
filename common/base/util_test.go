@@ -41,3 +41,24 @@ func TestValidMail(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestValidSamId(t *testing.T) {
+	if !ValidSamId("valid_id") {
+		t.Error("valid_id")
+	}
+	if !ValidSamId("0111") {
+		t.Error("0111 valid")
+	}
+	if !ValidSamId("abc") {
+		t.Error("abc valid")
+	}
+	if ValidSamId("invalid#!id") {
+		t.Error("middle")
+	}
+	if ValidSamId("*%invalid#!id") {
+		t.Error("begin")
+	}
+	if ValidSamId("") {
+		t.Error("empty")
+	}
+}

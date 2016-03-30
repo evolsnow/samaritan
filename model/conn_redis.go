@@ -223,6 +223,15 @@ func updatePassword(id int, pwd string) error {
 	return err
 }
 
+func updateUser(uid int, kvMap map[string]interface{}) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	for k, v := range kvMap {
+		c.Send("HSET", "user:"+strconv.Itoa(uid), k, v)
+	}
+	return c.Flush()
+}
+
 //redis actions of model to-do
 func createTodo(td *Todo) {
 	c := dbms.Pool.Get()
@@ -276,6 +285,15 @@ func updateTodoStatus(uid, tid int) error {
 	notDone := fmt.Sprintf(userTdNotDoneSet, uid)
 	_, err := c.Do("SMOVE", notDone, done, tid)
 	return err
+}
+
+func updateTodo(tid int, kvMap map[string]interface{}) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	for k, v := range kvMap {
+		c.Send("HSET", "todo:"+strconv.Itoa(tid), k, v)
+	}
+	return c.Flush()
 }
 
 //redis actions of model mission
@@ -394,6 +412,15 @@ func readMissionReceiversId(mid int) (ids []int, err error) {
 	return
 }
 
+func updateMission(mid int, kvMap map[string]interface{}) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	for k, v := range kvMap {
+		c.Send("HSET", "mission:"+strconv.Itoa(mid), k, v)
+	}
+	return c.Flush()
+}
+
 //redis actions of model project
 func createProject(p *Project) {
 	c := dbms.Pool.Get()
@@ -489,6 +516,16 @@ func updateProjectMember(pid, uid, action int) (err error) {
 	return
 }
 
+func updateProject(pid int, kvMap map[string]interface{}) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	for k, v := range kvMap {
+		c.Send("HSET", "project:"+strconv.Itoa(pid), k, v)
+	}
+	return c.Flush()
+}
+
+//chat
 func createChat(ct *Chat) int {
 	c := dbms.Pool.Get()
 	defer c.Close()

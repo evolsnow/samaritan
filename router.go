@@ -24,7 +24,7 @@ func newRouter() *httprouter.Router {
 	r.NotFound = NotFound{}
 
 	//http get method
-
+	r.GET("/samIds/:samId", hd.SamIdStatus)
 	//http post method
 	r.POST("/users", hd.NewUser)
 	r.POST("/todos", hd.NewTodo)
@@ -35,7 +35,7 @@ func newRouter() *httprouter.Router {
 	//todo upload device token
 
 	//http put method
-
+	r.PUT("/password/:identity", hd.UpdatePassword)
 	//http delete method
 
 	//test
@@ -52,10 +52,10 @@ func newRouter() *httprouter.Router {
 
 // ServeHTTP makes the NAllowed implement the http.Handler interface.
 func (NotAllowed) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	base.SetError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	base.MethodNAErr(w, http.StatusText(http.StatusMethodNotAllowed))
 }
 
 // ServeHTTP makes the NFound implement the http.Handler interface.
 func (NotFound) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	base.SetError(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	base.NotFoundErr(w, http.StatusText(http.StatusNotFound))
 }

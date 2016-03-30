@@ -28,15 +28,15 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		code = cache.Get(req.Mail + ":code")
 		info, source = req.Mail, "mail"
 	} else {
-		base.ForbidErrorHandler(w, "unknown register source")
+		base.BadReqErr(w, "unknown register type")
 		return
 	}
 	if code == "" {
-		base.ForbidErrorHandler(w, "code has expired")
+		base.ForbidErr(w, "code has expired")
 		return
 	}
 	if code != req.VerifyCode {
-		base.ForbidErrorHandler(w, "code mismatch")
+		base.ForbidErr(w, "code mismatch")
 		return
 	}
 	us := model.User{
@@ -145,23 +145,23 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		body = "您正在申请重置密码，验证码为： " + code + "，有效期为5分钟。（如非本人操作，请尽快查看账户操作情况）"
 		text = "【GoDo日程】" + body
 	default:
-		base.BadReqErrHandle(w, "unknown use")
+		base.BadReqErr(w, "unknown use")
 		return
 	}
 	if source == "sms" {
 		if !base.ValidPhone(req.To) {
-			base.BadReqErrHandle(w, "invalid phone number")
+			base.BadReqErr(w, "invalid phone number")
 			return
 		}
 		go rpc.SendSMS(req.To, text)
 	} else if source == "mail" {
 		if !base.ValidMail(req.To) {
-			base.BadReqErrHandle(w, "invalid mail address")
+			base.BadReqErr(w, "invalid mail address")
 			return
 		}
 		go rpc.SendMail(req.To, title, body)
 	} else {
-		base.BadReqErrHandle(w, "unknown source")
+		base.BadReqErr(w, "unknown source")
 		return
 	}
 	go cache.Set(req.To+":code", code, time.Minute*5)
@@ -178,20 +178,20 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	var uid int
 	switch req.Type {
 	case "phone":
-		uid = dbms.ReadLoginUid(req.Phone, req.Type)
+		uid = dbms.ReadUidIndex(req.Phone, req.Type)
 	case "mail":
-		uid = dbms.ReadLoginUid(req.Mail, req.Type)
+		uid = dbms.ReadUidIndex(req.Mail, req.Type)
 	case "samId":
-		uid = dbms.ReadLoginUid(req.SamId, req.Type)
+		uid = dbms.ReadUidIndex(req.SamId, req.Type)
 	}
 	if uid == 0 {
-		base.SetError(w, "user not registered", http.StatusNotFound)
+		base.NotFoundErr(w, "user not registered")
 		return
 	}
 	us := new(model.User)
 	us.Id = uid
 	if base.EncryptedPassword(req.Password) != us.GetPassword() {
-		base.ForbidErrorHandler(w, "password mismatch")
+		base.ForbidErr(w, "password mismatch")
 		return
 	}
 	resp := new(postAccessTokenResp)

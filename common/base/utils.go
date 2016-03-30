@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -42,14 +41,6 @@ func GenerateAvatar(phone string) (string, error) {
 	return "", err
 }
 
-//set http status and reply error
-func SetError(w http.ResponseWriter, desc string, status int) {
-	e := map[string]interface{}{"code": status, "msg": desc}
-	msg, _ := json.Marshal(e)
-	w.WriteHeader(status)
-	w.Write(msg)
-}
-
 func RandomCodeSix() string {
 	rand.Seed(time.Now().UTC().UnixNano())
 	code := 100000 + rand.Intn(900000)
@@ -57,24 +48,54 @@ func RandomCodeSix() string {
 }
 
 func ValidPhone(phone string) bool {
-	pattern, _ := regexp.Compile("(13[0-9]|15[01235678]|17[0-9]|18[0-9]|14[57])[0-9]{8}")
+	pattern := regexp.MustCompile("(13[0-9]|15[01235678]|17[0-9]|18[0-9]|14[57])[0-9]{8}")
 	return pattern.MatchString(phone)
 }
 
 func ValidMail(mail string) bool {
-	idx := strings.LastIndex(mail, "@")
-	if idx < 1 || idx == len(mail)-1 {
-		return false
-	}
-	return true
+	pattern := regexp.MustCompile("[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})")
+	return pattern.MatchString(mail)
 }
 
-//check http bad request error
-func BadReqErrHandle(w http.ResponseWriter, desc string) {
-	SetError(w, desc, http.StatusBadRequest)
+func ValidSamId(samId string) bool {
+	pattern := regexp.MustCompile("^(\\w)+$")
+	return pattern.MatchString(samId)
 }
 
-//http 403 error
-func ForbidErrorHandler(w http.ResponseWriter, desc string) {
-	SetError(w, desc, http.StatusForbidden)
+//400 bad request error
+func BadReqErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusBadRequest)
+}
+
+//403 forbidden error
+func ForbidErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusForbidden)
+}
+
+//405 method not allowed error
+func MethodNAErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusMethodNotAllowed)
+}
+
+//401 unauthorized error
+func UnAuthErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusUnauthorized)
+}
+
+//404 not found error
+func NotFoundErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusNotFound)
+}
+
+//500 internal error
+func InternalErr(w http.ResponseWriter, desc string) {
+	setError(w, desc, http.StatusInternalServerError)
+}
+
+//set http status and reply error
+func setError(w http.ResponseWriter, desc string, status int) {
+	e := map[string]interface{}{"code": status, "msg": desc}
+	msg, _ := json.Marshal(e)
+	w.WriteHeader(status)
+	w.Write(msg)
 }

@@ -32,17 +32,17 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 						goto Success
 					} else {
 						msg := "Invalid Token"
-						base.SetError(w, msg, http.StatusUnauthorized)
+						base.UnAuthErr(w, msg)
 						return
 					}
 				}
 			} else {
 				msg := "Invaild Authorization Method"
-				base.SetError(w, msg, http.StatusUnauthorized)
+				base.UnAuthErr(w, msg)
 				return
 			}
 		} else {
-			base.SetError(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			base.UnAuthErr(w, http.StatusText(http.StatusUnauthorized))
 			return
 		}
 	Success:

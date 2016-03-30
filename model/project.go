@@ -68,6 +68,13 @@ func (p *Project) GetMembersId() []int {
 }
 
 func (p *Project) Save() {
-	log.DebugJson("create project:", p)
-	createProject(p)
+	if p.Id == 0 {
+		//new user
+		log.DebugJson("create project:", p)
+		createProject(p)
+	} else {
+		kvMap := prepareToUpdate(p)
+		log.Debug("update project with: ", kvMap)
+		updateTodo(p.Id, kvMap)
+	}
 }

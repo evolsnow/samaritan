@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-const CacheDB = "0"
+const CacheDB = "8"
 
 func main() {
 	var debug bool

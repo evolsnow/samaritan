@@ -48,14 +48,20 @@ func (u *User) CreateAvatar() {
 
 //full url of avatar img
 func (u *User) FullAvatarUrl() string {
-	prefix := "https://samaritan.tech:10000"
+	prefix := "https://img.samaritan.tech"
 	log.Debug(prefix + u.Avatar)
 	return prefix + u.Avatar
 }
 
-//save a new user
+//create or update a new user
 func (u *User) Save() {
-	//return user id for jwt token use
-	log.DebugJson("create user:", u)
-	createUser(u)
+	if u.Id == 0 {
+		//new user
+		log.DebugJson("create user:", u)
+		createUser(u)
+	} else {
+		kvMap := prepareToUpdate(u)
+		log.Debug("update user with: ", kvMap)
+		updateUser(u.Id, kvMap)
+	}
 }

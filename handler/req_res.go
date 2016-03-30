@@ -48,6 +48,7 @@ type postTdResp struct {
 	Id string `json:"id"`
 }
 
+//new user
 type postUsReq struct {
 	Name       string
 	Phone      string
@@ -88,6 +89,7 @@ type postUsResp struct {
 	Token string `json:"token"`
 }
 
+//new project
 type postPjReq struct {
 	Desc string
 	Name string
@@ -111,6 +113,7 @@ type postPjResp struct {
 	Id string `json:"id"`
 }
 
+//new chat
 type postPrivateChatReq struct {
 	From string
 	To   string
@@ -134,6 +137,7 @@ type postPrivateChatResp struct {
 	PrivateChatId string `json:"chatId"`
 }
 
+//new verify code
 type postVerifyCodeReq struct {
 	To  string `json:"to"`
 	Use string `json:"use"`
@@ -156,6 +160,7 @@ type postVerifyCodeResp struct {
 	baseResp
 }
 
+//login
 type postAccessTokenReq struct {
 	Phone    string
 	Mail     string
@@ -186,13 +191,58 @@ type postAccessTokenResp struct {
 	Token string `json:"token"`
 }
 
+//get method
+
+//samId available status
+
+type samIdStatusResp struct {
+	baseResp
+	Available bool `json:"available"`
+}
+
+//put method
+
+//change password
+type putPasswordReq struct {
+	Phone      string
+	SamId      string
+	Mail       string
+	Password   string
+	Type       string
+	VerifyCode string
+}
+
+func (pp *putPasswordReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pp.Password: binding.Field{
+			Form:     "password",
+			Required: true,
+		},
+		&pp.Type: binding.Field{
+			Form:     "type",
+			Required: true,
+		},
+		&pp.VerifyCode: binding.Field{
+			Form:     "verifyCode",
+			Required: true,
+		},
+		&pp.Phone: "phone",
+		&pp.Mail:  "mail",
+		&pp.SamId: "samId",
+	}
+}
+
+type putPasswordResp struct {
+	baseResp
+}
+
 //bind json to user defined struct
 func parseReq(w http.ResponseWriter, r *http.Request, ds interface{}) bool {
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(ds)
 	if err != nil {
-		base.SetError(w, err.Error(), http.StatusBadRequest)
+		base.BadReqErr(w, err.Error())
 		return false
 	}
 	return true
@@ -203,6 +253,6 @@ func makeResp(w http.ResponseWriter, r *http.Request, src interface{}) {
 	encoder := json.NewEncoder(w)
 	err := encoder.Encode(src)
 	if err != nil {
-		base.SetError(w, err.Error(), http.StatusInternalServerError)
+		base.InternalErr(w, err.Error())
 	}
 }
