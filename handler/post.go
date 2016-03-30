@@ -21,10 +21,10 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	log.DebugJson(req)
 	var code, info, source string
-	if req.Source == "phone" {
+	if req.Type == "phone" {
 		code = cache.Get(req.Phone + ":code")
 		info, source = req.Phone, "phone"
-	} else if req.Source == "mail" {
+	} else if req.Type == "mail" {
 		code = cache.Get(req.Mail + ":code")
 		info, source = req.Mail, "mail"
 	} else {
@@ -40,10 +40,11 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	us := model.User{
-		Phone:    req.Phone,
-		Email:    req.Mail,
-		Password: base.EncryptedPassword(req.Password),
-		Name:     req.Name,
+		Phone:      req.Phone,
+		Email:      req.Mail,
+		Password:   base.EncryptedPassword(req.Password),
+		Name:       req.Name,
+		StudentNum: req.StuNum,
 	}
 	go us.CreateAvatar()
 	//assign id to user

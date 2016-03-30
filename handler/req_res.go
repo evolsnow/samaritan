@@ -51,9 +51,10 @@ type postTdResp struct {
 type postUsReq struct {
 	Name       string
 	Phone      string
+	StuNum     string
 	Mail       string
 	Password   string
-	Source     string
+	Type       string
 	VerifyCode string
 }
 
@@ -67,16 +68,17 @@ func (pu *postUsReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "password",
 			Required: true,
 		},
-		&pu.Source: binding.Field{
-			Form:     "source",
+		&pu.Type: binding.Field{
+			Form:     "type",
 			Required: true,
 		},
 		&pu.VerifyCode: binding.Field{
 			Form:     "verifyCode",
 			Required: true,
 		},
-		&pu.Phone: "phone",
-		&pu.Mail:  "mail",
+		&pu.Phone:  "phone",
+		&pu.Mail:   "mail",
+		&pu.StuNum: "stuNum",
 	}
 }
 

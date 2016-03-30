@@ -50,10 +50,10 @@ func CreateToken(uid int, token string) {
 	c.Do("SET", key, token)
 }
 
-func CreateLoginIndex(uid int, info, source string) {
+func CreateLoginIndex(uid int, info, loginType string) {
 	c := Pool.Get()
 	defer c.Close()
-	switch source {
+	switch loginType {
 	case "phone":
 		c.Do("SET", fmt.Sprintf(LoginPhoneIndex, info), uid)
 	case "mail":
