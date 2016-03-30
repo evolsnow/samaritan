@@ -13,17 +13,18 @@ func prepareToUpdate(s interface{}) map[string]interface{} {
 			continue
 		}
 		value := v.FieldByName(name)
-		if !isEmptyValue(value) {
+		if !isEmptyOrSkipValue(value) {
 			kvMap[fieldInfo.Tag.Get("redis")] = value
 		}
 	}
 	return kvMap
 }
 
-func isEmptyValue(v reflect.Value) bool {
+func isEmptyOrSkipValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
-		return v.Len() == 0
+		//return v.Len() == 0
+		return true
 	case reflect.Bool:
 		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
