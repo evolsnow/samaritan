@@ -1,18 +1,24 @@
 package dbms
 
 import (
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
 
 const (
-	userToken = "user:%d:token"
-	samIdSet  = "allSamId"
+	samIdSet = "allSamId"
 
-	LoginPhoneIndex = "login:phone:%s"
-	LoginMailIndex  = "login:mail:%s"
-	LoginSamIndex   = "login:sam:%s"
+	SearchPhoneIndex = "index:search:phone"
+	SearchMailIndex  = "index:search:mail"
+	SearchSamIndex   = "index:search:sam"
+)
+
+const (
+	//index
+	UserIndex    = "index:user"
+	TodoIndex    = "index:todo"
+	MissionIndex = "index:mission"
+	ProjectIndex = "index:project"
 )
 
 // All extra redis actions
@@ -50,45 +56,30 @@ func CacheDelete(key string) {
 	c.Do("DEL", key)
 }
 
-func CreateToken(uid int, token string) {
+func CreateSearchIndex(uid int, info, searchType string) {
 	c := Pool.Get()
 	defer c.Close()
-	key := fmt.Sprintf(userToken, uid)
-	c.Do("SET", key, token)
+	switch searchType {
+	case "phone":
+		c.Do("HSET", SearchPhoneIndex, info, uid)
+	case "mail":
+		c.Do("HSET", SearchMailIndex, info, uid)
+	case "samId":
+		c.Do("HSET", SearchSamIndex, info, uid)
+	}
 }
 
-func CreateLoginIndex(uid int, info, loginType string) {
+func ReadUserIdWithIndex(info, loginType string) (uid int) {
 	c := Pool.Get()
 	defer c.Close()
 	switch loginType {
 	case "phone":
-		c.Do("SET", fmt.Sprintf(LoginPhoneIndex, info), uid)
+		uid, _ = redis.Int(c.Do("HGET", SearchPhoneIndex, info))
 	case "mail":
-		c.Do("SET", fmt.Sprintf(LoginMailIndex, info), uid)
+		uid, _ = redis.Int(c.Do("HGET", SearchMailIndex, info))
 	case "samId":
-		c.Do("SET", fmt.Sprintf(LoginSamIndex, info), uid)
+		uid, _ = redis.Int(c.Do("HGET", SearchSamIndex, info))
 	}
-}
-
-func ReadUidIndex(info, loginType string) (uid int) {
-	c := Pool.Get()
-	defer c.Close()
-	switch loginType {
-	case "phone":
-		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginPhoneIndex, info)))
-	case "mail":
-		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginMailIndex, info)))
-	case "samId":
-		uid, _ = redis.Int(c.Do("GET", fmt.Sprintf(LoginSamIndex, info)))
-	}
-	return
-}
-
-func ReadToken(uid int) (token string) {
-	c := Pool.Get()
-	defer c.Close()
-	key := fmt.Sprintf(userToken, uid)
-	token, _ = redis.String(c.Do("GET", key))
 	return
 }
 
@@ -109,4 +100,51 @@ func DeleteSamId(sid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("SREM", samIdSet, sid)
+}
+
+//create index
+func CreateUserIndex(uid int, uPid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", UserIndex, uPid, uid)
+}
+
+func CreateTodoIndex(tid int, tPid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", TodoIndex, tPid, tid)
+}
+
+func CreateMissionIndex(mid int, mPid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", MissionIndex, mPid, mid)
+}
+
+func CreateProjectIndex(pid int, pPid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", ProjectIndex, pPid, pid)
+}
+
+//get real id from public id
+func ReadUserId(uPid string) (uid int) {
+	c := Pool.Get()
+	defer c.Close()
+	uid, _ = redis.Int(c.Do("HGET", UserIndex, uPid))
+	return
+}
+
+func ReadMissionId(mPid string) (mid int) {
+	c := Pool.Get()
+	defer c.Close()
+	mid, _ = redis.Int(c.Do("HGET", MissionIndex, mPid))
+	return
+}
+
+func ReadProjectId(pPid string) (pid int) {
+	c := Pool.Get()
+	defer c.Close()
+	pid, _ = redis.Int(c.Do("HGET", ProjectIndex, pPid))
+	return
 }

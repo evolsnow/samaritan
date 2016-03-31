@@ -18,26 +18,18 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 	log.DebugJson(req)
 	identity := ps.Get("identity")
-	var code string
-	if req.Type == "phone" {
-		code = cache.GetSet(req.Phone+":code", "")
-	} else if req.Type == "mail" {
-		code = cache.GetSet(req.Mail+":code", "")
-	} else {
-		base.BadReqErr(w, "unknown type")
-		return
-	}
+	code := cache.GetSet(identity+":code", "")
 	if code == "" {
-		base.ForbidErr(w, "code has expired")
+		base.ForbidErr(w, ExpiredErr)
 		return
 	}
 	if code != req.VerifyCode {
-		base.ForbidErr(w, "code mismatch")
+		base.ForbidErr(w, CodeMismatchErr)
 		return
 	}
-	uid := dbms.ReadUidIndex(identity, req.Type)
+	uid := dbms.ReadUserIdWithIndex(identity, req.Type)
 	if uid == 0 {
-		base.NotFoundErr(w, "user not found")
+		base.NotFoundErr(w, NotRegistedErr)
 		return
 	}
 	us := new(model.User)

@@ -22,9 +22,11 @@ func prepareToUpdate(s interface{}) map[string]interface{} {
 
 func isEmptyOrSkipValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+	case reflect.Array, reflect.Map, reflect.Slice:
 		//return v.Len() == 0
 		return true
+	case reflect.String:
+		return v.Len() == 0
 	case reflect.Bool:
 		return !v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:

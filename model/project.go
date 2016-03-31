@@ -1,6 +1,9 @@
 package model
 
-import "github.com/evolsnow/samaritan/common/log"
+import (
+	"github.com/evolsnow/samaritan/common/dbms"
+	"github.com/evolsnow/samaritan/common/log"
+)
 
 type Project struct {
 	Id         int    `json:"-" redis:"id"`             //private id
@@ -56,7 +59,7 @@ func (p *Project) GetMembers() (members []*User) {
 
 func (p *Project) GetMembersId() []int {
 	if p.Id == 0 {
-		p.Id = ReadProjectId(p.Pid)
+		p.Id = dbms.ReadProjectId(p.Pid)
 	}
 	ids, err := readProjectMembersId(p.Id)
 	if err != nil {

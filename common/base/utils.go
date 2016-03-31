@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/evolsnow/samaritan/common/log"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -96,6 +97,7 @@ func InternalErr(w http.ResponseWriter, desc string) {
 func setError(w http.ResponseWriter, desc string, status int) {
 	e := map[string]interface{}{"code": status, "msg": desc}
 	msg, _ := json.Marshal(e)
+	log.DebugJson(e)
 	w.WriteHeader(status)
 	w.Write(msg)
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/evolsnow/samaritan/common/base"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/rpc"
 	"time"
 )
@@ -44,12 +45,12 @@ func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
 	case InvitedToMission, KickedFromMission:
-		uid := ReadUserId(ct.Target)
+		uid := dbms.ReadUserId(ct.Target)
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
 	//notify one user
 	case PeerToPeer:
-		uid := ReadUserId(ct.To[0])
+		uid := dbms.ReadUserId(ct.To[0])
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
 	//notify other members in this conversation

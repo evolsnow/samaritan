@@ -13,6 +13,20 @@ import (
 	"time"
 )
 
+const (
+	UnknownTypeErr  = "unknown type"
+	ExpiredErr      = "code has expired"
+	CodeMismatchErr = "code mismatch"
+
+	UnknownUseErr    = "unknown use"
+	UnknownSourceErr = "unknown source"
+	InvalidPhoneErr  = "invalid phone number"
+	InvalidMailErr   = "invalid mail address"
+
+	NotRegistedErr      = "user not registered"
+	PasswordMismatchErr = "password mismatch"
+)
+
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postUsReq)
 	errs := binding.Bind(r, req)
@@ -28,15 +42,15 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		code = cache.GetSet(req.Mail+":code", "")
 		info, source = req.Mail, "mail"
 	} else {
-		base.BadReqErr(w, "unknown type")
+		base.BadReqErr(w, UnknownTypeErr)
 		return
 	}
 	if code == "" {
-		base.ForbidErr(w, "code has expired")
+		base.ForbidErr(w, ExpiredErr)
 		return
 	}
 	if code != req.VerifyCode {
-		base.ForbidErr(w, "code mismatch")
+		base.ForbidErr(w, CodeMismatchErr)
 		return
 	}
 	us := model.User{
@@ -49,14 +63,12 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	go us.CreateAvatar()
 	//assign id to user
 	us.Save()
-	//create user login index
-	go dbms.CreateLoginIndex(us.Id, info, source)
-	//return jwt token
-	token := base.MakeToken(us.Id)
+	//create user login/search index
+	go dbms.CreateSearchIndex(us.Id, info, source)
+	//return jwt token and public user id
 	resp := new(postUsResp)
-	resp.Id = base.HashedUserId(us.Id)
-	resp.Token = token
-	go dbms.CreateToken(us.Id, token)
+	resp.Id = us.Pid
+	resp.Token = base.MakeToken(us.Id)
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
@@ -107,7 +119,7 @@ func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		return
 	}
 	fd := ps.GetInt("userId")
-	td := model.ReadUserId(req.To)
+	td := dbms.ReadUserId(req.To)
 	raw := ""
 	if fd < td {
 		raw = fmt.Sprintf("%d&%d", fd, td)
@@ -145,23 +157,23 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		body = "您正在申请重置密码，验证码为： " + code + "，有效期为5分钟。（如非本人操作，请尽快查看账户操作情况）"
 		text = "【GoDo日程】" + body
 	default:
-		base.BadReqErr(w, "unknown use")
+		base.BadReqErr(w, UnknownSourceErr)
 		return
 	}
 	if source == "sms" {
 		if !base.ValidPhone(req.To) {
-			base.BadReqErr(w, "invalid phone number")
+			base.BadReqErr(w, InvalidPhoneErr)
 			return
 		}
 		go rpc.SendSMS(req.To, text)
 	} else if source == "mail" {
 		if !base.ValidMail(req.To) {
-			base.BadReqErr(w, "invalid mail address")
+			base.BadReqErr(w, InvalidMailErr)
 			return
 		}
 		go rpc.SendMail(req.To, title, body)
 	} else {
-		base.BadReqErr(w, "unknown source")
+		base.BadReqErr(w, UnknownUseErr)
 		return
 	}
 	go cache.Set(req.To+":code", code, time.Minute*5)
@@ -178,25 +190,25 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	var uid int
 	switch req.Type {
 	case "phone":
-		uid = dbms.ReadUidIndex(req.Phone, req.Type)
+		uid = dbms.ReadUserIdWithIndex(req.Phone, req.Type)
 	case "mail":
-		uid = dbms.ReadUidIndex(req.Mail, req.Type)
+		uid = dbms.ReadUserIdWithIndex(req.Mail, req.Type)
 	case "samId":
-		uid = dbms.ReadUidIndex(req.SamId, req.Type)
+		uid = dbms.ReadUserIdWithIndex(req.SamId, req.Type)
 	}
 	if uid == 0 {
-		base.NotFoundErr(w, "user not registered")
+		base.NotFoundErr(w, NotRegistedErr)
 		return
 	}
 	us := new(model.User)
 	us.Id = uid
 	if base.EncryptedPassword(req.Password) != us.GetPassword() {
-		base.ForbidErr(w, "password mismatch")
+		base.ForbidErr(w, PasswordMismatchErr)
 		return
 	}
 	resp := new(postAccessTokenResp)
 	resp.Id = base.HashedUserId(us.Id)
-	resp.Token = dbms.ReadToken(us.Id)
+	resp.Token = base.MakeToken(us.Id)
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }

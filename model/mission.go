@@ -1,6 +1,9 @@
 package model
 
-import "github.com/evolsnow/samaritan/common/log"
+import (
+	"github.com/evolsnow/samaritan/common/dbms"
+	"github.com/evolsnow/samaritan/common/log"
+)
 
 type Mission struct {
 	Id            int       `json:"-" redis:"id"`             //private id
@@ -26,7 +29,7 @@ type Comment struct {
 
 func (m *Mission) GetReceiversId() []int {
 	if m.Id == 0 {
-		m.Id = ReadMissionId(m.Pid)
+		m.Id = dbms.ReadMissionId(m.Pid)
 	}
 	ids, err := readMissionReceiversId(m.Id)
 	if err != nil {

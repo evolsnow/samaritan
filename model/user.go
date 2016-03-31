@@ -13,7 +13,7 @@ type User struct {
 	Alias      string `json:"alias,omitempty" redis:"alias"` //nick name
 	Name       string `json:"name,omitempty" redis:"name"`   //real name
 	Phone      string `json:"phone,omitempty" redis:"phone"`
-	Password   string `json:"passwd" redis:"passwd"`
+	Password   string `json:"password" redis:"password"`
 	Email      string `json:"email,omitempty" redis:"email"`
 	Avatar     string `json:"avatar,omitempty" redis:"avatar"` //avatar url
 	School     string `json:"school,omitempty" redis:"school"`
@@ -61,7 +61,7 @@ func (u *User) Save() {
 		createUser(u)
 	} else {
 		kvMap := prepareToUpdate(u)
-		log.Debug("update user with: ", kvMap)
+		log.DebugJson("update user with: ", kvMap)
 		updateUser(u.Id, kvMap)
 	}
 }

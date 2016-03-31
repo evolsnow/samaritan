@@ -19,11 +19,11 @@ func makeBaseResp(w http.ResponseWriter, r *http.Request) {
 
 //struct to post to-do request
 type postTdReq struct {
-	StartTime int64
-	Desc      string
-	Repeat    bool
-	Place     string
-	ProjectId int
+	StartTime int64  `json:"startTime"`
+	Desc      string `json:"desc"`
+	Repeat    bool   `json:"repeat"`
+	Place     string `json:"place"`
+	ProjectId int    `json:"projectId"`
 }
 
 func (pt *postTdReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -50,13 +50,13 @@ type postTdResp struct {
 
 //new user
 type postUsReq struct {
-	Name       string
-	Phone      string
-	StuNum     string
-	Mail       string
-	Password   string
-	Type       string
-	VerifyCode string
+	Name       string `json:"name"`
+	Phone      string `json:"phone"`
+	StuNum     string `json:"stuNum"`
+	Mail       string `json:"mail"`
+	Password   string `json:"password"`
+	Type       string `json:"pe"`
+	VerifyCode string `json:"verifyCode"`
 }
 
 func (pu *postUsReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -91,8 +91,8 @@ type postUsResp struct {
 
 //new project
 type postPjReq struct {
-	Desc string
-	Name string
+	Desc string `json:"desc"`
+	Name string `json:"name"`
 }
 
 func (pp *postPjReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -115,8 +115,8 @@ type postPjResp struct {
 
 //new chat
 type postPrivateChatReq struct {
-	From string
-	To   string
+	From string `json:"from"`
+	To   string `json:"to"`
 }
 
 func (ppc *postPrivateChatReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -162,11 +162,11 @@ type postVerifyCodeResp struct {
 
 //login
 type postAccessTokenReq struct {
-	Phone    string
-	Mail     string
-	SamId    string
-	Type     string
-	Password string
+	Phone    string `json:"phone"`
+	Mail     string `json:"mail"`
+	SamId    string `json:"samId"`
+	Type     string `json:"type"`
+	Password string `json:"password"`
 }
 
 func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -204,12 +204,12 @@ type samIdStatusResp struct {
 
 //change password
 type putPasswordReq struct {
-	Phone      string
-	SamId      string
-	Mail       string
-	Password   string
-	Type       string
-	VerifyCode string
+	//Phone      string
+	//SamId      string
+	//Mail       string
+	Password   string `json:"password"`
+	Type       string `json:"type"`
+	VerifyCode string `json:"verifyCode"`
 }
 
 func (pp *putPasswordReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -226,9 +226,9 @@ func (pp *putPasswordReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "verifyCode",
 			Required: true,
 		},
-		&pp.Phone: "phone",
-		&pp.Mail:  "mail",
-		&pp.SamId: "samId",
+		//&pp.Phone: "phone",
+		//&pp.Mail:  "mail",
+		//&pp.SamId: "samId",
 	}
 }
 

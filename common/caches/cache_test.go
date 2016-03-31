@@ -9,7 +9,7 @@ import (
 var cache *SimpleCache
 
 func init() {
-	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "1")
+	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "8")
 	cache = NewCache()
 }
 

@@ -19,7 +19,7 @@ const (
 	UAlias      = "alias"
 	UName       = "name"
 	UPhone      = "phone"
-	UPassword   = "passwd"
+	UPassword   = "password"
 	UEmail      = "email"
 	UAvatar     = "avatar"
 	USchool     = "school"
@@ -113,37 +113,15 @@ const (
 	deviceToken    = "deviceToken:%d"     //ios device token
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
 
-	//additional
-	UserId    = "userId:"    //index for userId, UserId:john's pid return john's userId
-	MissionId = "missionId:" //index for Mission Id, missionId:a's pid return mission a's Id
-	ProjectId = "project:"   //project:a's name return a's id
-
 )
-
-//visible func
-func ReadUserId(uPid string) (uid int) {
-	key := UserId + uPid
-	uid, _ = redis.Int(dbms.Get(key))
-	return
-}
-
-func ReadMissionId(mPid string) (mid int) {
-	key := MissionId + mPid
-	mid, _ = redis.Int(dbms.Get(key))
-	return
-}
-
-func ReadProjectId(pPid string) (pid int) {
-	key := ProjectId + pPid
-	pid, _ = redis.Int(dbms.Get(key))
-	return
-}
 
 //redis actions of model User
 func createUser(u *User) {
 	c := dbms.Pool.Get()
 	u.Id, _ = redis.Int(c.Do("INCR", "autoIncrUser"))
 	u.Pid = base.HashedUserId(u.Id)
+	//index
+	go dbms.CreateUserIndex(u.Id, u.Pid)
 	//return user's id asap
 	go func() {
 		lua := `
@@ -155,14 +133,13 @@ func createUser(u *User) {
 					KEYS[23], KEYS[24], KEYS[25], KEYS[26], KEYS[27], KEYS[28],
 					KEYS[29], KEYS[30])
 			redis.call("SADD", KEYS[31], uid)
-			redis.call("SET", KEYS[32], uid)
 			`
 		ka := []interface{}{
 			//user model
 			UId, u.Id,
 			UPid, u.Pid,
 			USamId, u.SamId,
-			UCreateTime, u.createTime,
+			UCreateTime, time.Now().Unix(),
 			UAlias, u.Alias,
 			UName, u.Name,
 			UPhone, u.Phone,
@@ -177,7 +154,6 @@ func createUser(u *User) {
 			//redis set
 			//todo not now (::0:)?
 			fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class),
-			UserId + u.Pid,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -216,14 +192,6 @@ func readPassword(uid int) (pwd string, err error) {
 	return
 }
 
-func updatePassword(id int, pwd string) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	user := "user:" + strconv.Itoa(id)
-	_, err := c.Do("HSET", user, UPassword, pwd)
-	return err
-}
-
 func updateUser(uid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -238,6 +206,7 @@ func createTodo(td *Todo) {
 	c := dbms.Pool.Get()
 	td.Id, _ = redis.Int(c.Do("INCR", "autoIncrTodo"))
 	td.Pid = base.HashedTodoId(td.Id)
+	go dbms.CreateTodoIndex(td.Id, td.Pid)
 	go func() {
 		lua := `
 			local tid = KEYS[2]
@@ -255,7 +224,7 @@ func createTodo(td *Todo) {
 			TId, td.Id,
 			TDesc, td.Desc,
 			TRemark, td.Remark,
-			TCreateTime, td.createTime,
+			TCreateTime, time.Now().Unix(),
 			TStartTime, td.StartTime,
 			TPlace, td.Place,
 			TRepeat, td.Repeat,
@@ -302,6 +271,7 @@ func createMission(m *Mission) {
 	c := dbms.Pool.Get()
 	m.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	m.Pid = base.HashedMissionId(m.Id)
+	go dbms.CreateMissionIndex(m.Id, m.Pid)
 	go func() {
 		lua := `
 			local mid = KEYS[2]
@@ -311,7 +281,6 @@ func createMission(m *Mission) {
 					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
 			redis.call("SADD", KEYS[17], mid)
 			redis.call("SADD", KEYS[18], mid)
-			redis.call("SET", KEYS[19], mid)
 			`
 		ka := []interface{}{
 			//mission models
@@ -326,7 +295,6 @@ func createMission(m *Mission) {
 			//redis set
 			fmt.Sprintf(userMsPublishedSet, m.PublisherId),
 			fmt.Sprintf(userMsAcceptedSet, m.PublisherId),
-			MissionId + m.Pid,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -342,7 +310,7 @@ func createMissionComment(cm *Comment) {
 	cm.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	cm.Pid = base.HashedCommentId(cm.Id)
 	go func() {
-		mid := ReadMissionId(cm.MissionPid)
+		mid := dbms.ReadMissionId(cm.MissionPid)
 		lua := `
 			local cmid = KEYS[2]
 			redis.call("HMSET", "comment:"..cmid,
@@ -427,6 +395,7 @@ func createProject(p *Project) {
 	c := dbms.Pool.Get()
 	p.Id, _ = redis.Int(c.Do("INCR", "autoIncrProject"))
 	p.Pid = base.HashedProjectId(p.Id)
+	go dbms.CreateProjectIndex(p.Id, p.Pid)
 	go func() {
 		lua := `
 			local pid = KEYS[2]
@@ -450,7 +419,6 @@ func createProject(p *Project) {
 			//redis set
 			fmt.Sprintf(userPjJoinedSet, p.CreatorId),
 			fmt.Sprintf(userPjCreatedSet, p.CreatorId),
-			MissionId + p.Name,
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)

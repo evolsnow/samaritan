@@ -28,7 +28,7 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 					uid, err := base.ParseToken(ah[7:])
 					if err == nil {
 						ps.Set("authId", strconv.Itoa(uid))
-						go lru.Add(ah[7:], uid)
+						lru.Add(ah[7:], uid)
 						goto Success
 					} else {
 						msg := "Invalid Token"

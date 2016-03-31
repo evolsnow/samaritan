@@ -7,13 +7,6 @@ import (
 	"testing"
 )
 
-func init() {
-	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
-	c := dbms.Pool.Get()
-	defer c.Close()
-	c.Do("FLUSHDB")
-}
-
 func get(reqURL string, ds interface{}) {
 	var t testing.T
 	//reqURL = url.QueryEscape(reqURL)
