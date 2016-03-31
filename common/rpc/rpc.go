@@ -52,8 +52,8 @@ func SendSMS(to, text string) (err error) {
 		return nil
 	}
 	return fmt.Errorf(resp.Reason)
-
 }
+
 func SocketPush(tokenList []string, msg string) []string {
 	log.Debug("calling rpc.SocketPush")
 	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, UserToken: tokenList})

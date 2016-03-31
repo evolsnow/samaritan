@@ -3,22 +3,20 @@ package handler
 import (
 	"encoding/json"
 	"github.com/evolsnow/samaritan/common/dbms"
-	"github.com/evolsnow/samaritan/common/log"
 	"net/http"
 	"testing"
 )
 
 func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
-	//c := dbms.Pool.Get()
-	//defer c.Close()
-	//c.Do("FLUSHDB")
+	c := dbms.Pool.Get()
+	defer c.Close()
+	c.Do("FLUSHDB")
 }
 
 func get(reqURL string, ds interface{}) {
 	var t testing.T
 	//reqURL = url.QueryEscape(reqURL)
-	log.Info(reqURL)
 	resp, err := http.Get(reqURL)
 	if err != nil {
 		t.Error("http get err")
