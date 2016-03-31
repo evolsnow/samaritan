@@ -8,9 +8,9 @@ services:
 
 script:
  - go build -o rpc ./gpns
- - ./rpc
+ - ./rpc &
  - go build -o testServer .
- - ./testServer -c config.json.example
+ - ./testServer -c config.json.example &
  - go test -v ./...
  - killall testServer
  - killall rpc
