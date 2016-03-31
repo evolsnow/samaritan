@@ -31,6 +31,13 @@ func CacheGet(key string) string {
 	return value
 }
 
+func CacheGetSet(key, newValue string) string {
+	c := CachePool.Get()
+	defer c.Close()
+	value, _ := redis.String(c.Do("GETSET", key, newValue))
+	return value
+}
+
 func CacheSet(key string, value interface{}, px time.Duration) {
 	c := CachePool.Get()
 	defer c.Close()
@@ -96,4 +103,10 @@ func UpdateSamIdSet(sid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("SADD", samIdSet, sid)
+}
+
+func DeleteSamId(sid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("SREM", samIdSet, sid)
 }

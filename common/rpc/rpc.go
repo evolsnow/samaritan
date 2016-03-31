@@ -73,14 +73,15 @@ func receiveChat() {
 	stream, err := RpcClientD.ReceiveMsg(context.Background(), req)
 	if err != nil {
 		log.Error(err)
-	}
-	for {
-		rcv, err := stream.Recv()
-		if err != nil {
-			log.Warn(err)
-			stream, _ = RpcClientD.ReceiveMsg(context.Background(), req)
-			continue
+	} else {
+		for {
+			rcv, err := stream.Recv()
+			if err != nil {
+				log.Warn(err)
+				stream, _ = RpcClientD.ReceiveMsg(context.Background(), req)
+				continue
+			}
+			Chats <- rcv.Chat
 		}
-		Chats <- rcv.Chat
 	}
 }

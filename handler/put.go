@@ -20,9 +20,9 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	identity := ps.Get("identity")
 	var code string
 	if req.Type == "phone" {
-		code = cache.Get(req.Phone + ":code")
+		code = cache.GetSet(req.Phone+":code", "")
 	} else if req.Type == "mail" {
-		code = cache.Get(req.Mail + ":code")
+		code = cache.GetSet(req.Mail+":code", "")
 	} else {
 		base.BadReqErr(w, "unknown type")
 		return

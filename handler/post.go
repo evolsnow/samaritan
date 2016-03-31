@@ -22,13 +22,13 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(req)
 	var code, info, source string
 	if req.Type == "phone" {
-		code = cache.Get(req.Phone + ":code")
+		code = cache.GetSet(req.Phone+":code", "")
 		info, source = req.Phone, "phone"
 	} else if req.Type == "mail" {
-		code = cache.Get(req.Mail + ":code")
+		code = cache.GetSet(req.Mail+":code", "")
 		info, source = req.Mail, "mail"
 	} else {
-		base.BadReqErr(w, "unknown register type")
+		base.BadReqErr(w, "unknown type")
 		return
 	}
 	if code == "" {

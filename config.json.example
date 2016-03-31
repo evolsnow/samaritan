@@ -6,7 +6,7 @@
 	"redis_server": {
 		"address": "127.0.0.1",
 		"port": 6379,
-		"db": "7",
+		"db": "1",
 		"password": null
 	},
 	"mysql_server": {
@@ -17,10 +17,10 @@
 	},
 	"rpc_server_d": {
 		"address": "127.0.0.1",
-		"port": 8080
+		"port": 10086
 	},
 	"rpc_server_f": {
 	    "address": "8.8.8.8",
-	    "port": 8080
+	    "port": 10086
 	}
 }

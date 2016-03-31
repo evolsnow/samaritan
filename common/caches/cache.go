@@ -30,6 +30,11 @@ func (c *SimpleCache) Get(key string) (value string) {
 	return dbms.CacheGet(key)
 }
 
+// GetSet looks up a key's value from the cache and set a new value.
+func (c *SimpleCache) GetSet(key, newValue string) (value string) {
+	return dbms.CacheGetSet(key, newValue)
+}
+
 // Delete deletes a key immediately
 func (c *SimpleCache) Delete(key string) {
 	dbms.CacheDelete(key)

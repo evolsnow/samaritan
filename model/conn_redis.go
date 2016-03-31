@@ -75,6 +75,7 @@ const (
 	PCreatorId  = "creatorId"
 	PPrivate    = "private"
 )
+
 const (
 	ChId        = "id"
 	ChConvId    = "convId"
