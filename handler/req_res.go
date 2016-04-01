@@ -55,7 +55,7 @@ type postUsReq struct {
 	StuNum     string `json:"stuNum"`
 	Mail       string `json:"mail"`
 	Password   string `json:"password"`
-	Type       string `json:"pe"`
+	Type       string `json:"type"`
 	VerifyCode string `json:"verifyCode"`
 }
 
