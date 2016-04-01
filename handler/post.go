@@ -39,14 +39,12 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		code = cache.GetSet(req.Phone+":code", "")
 		info, source = req.Phone, "phone"
 	} else if req.Type == "mail" {
-		code = cache.GetSet(req.Mail+":code", "")
+		//code = cache.GetSet(req.Mail+":code", "")
+		code = cache.Get(req.Mail+":code")
 		info, source = req.Mail, "mail"
 	} else {
 		base.BadReqErr(w, UnknownTypeErr)
 		return
-	}
-	if req.Mail == "test@samaritan.tech" {
-		code = "123456"
 	}
 	if code == "" {
 		base.ForbidErr(w, ExpiredErr)
