@@ -34,13 +34,23 @@ func (u *User) GetPassword() (pwd string) {
 }
 
 //user created projects
-func (u *User) GetCreatedProjects() {
-
+func (u *User) GetCreatedProjects() []*Project {
+	ret, err := readCreatedProjects(u.Id)
+	if err != nil {
+		log.Error("Err get created projects:", err)
+		return nil
+	}
+	return ret
 }
 
 //user joined projects
-func (u *User) GetJoinedProjects() {
-
+func (u *User) GetJoinedProjects() []*Project {
+	ret, err := readJoinedProjects(u.Id)
+	if err != nil {
+		log.Error("Err get joined projects:", err)
+		return nil
+	}
+	return ret
 }
 
 //generate avatar url for user
