@@ -42,6 +42,13 @@ func TestNewTodo(t *testing.T) {
 	src, _ := json.Marshal(req)
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
 	auth := base.MakeToken(uid)
+
+	post("http://127.0.0.1:8080/todos", "", src, reply)
+	if reply.Code != http.StatusUnauthorized {
+		t.Error("unauthorized to create todo")
+	}
+	//normal case
+	reply = new(postTdResp)
 	post("http://127.0.0.1:8080/todos", auth, src, reply)
 	t.Log(reply)
 	if reply.Id == "" {

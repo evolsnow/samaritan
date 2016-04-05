@@ -27,9 +27,9 @@ func newRouter() *httprouter.Router {
 	r.GET("/samIds/:samId", hd.SamIdStatus)
 	//http post method
 	r.POST("/users", hd.NewUser)
-	r.POST("/todos", hd.NewTodo)
-	r.POST("/projects", hd.NewProject)
-	r.POST("/privateChats", hd.NewPrivateChat)
+	r.POST("/todos", mw.Auth(hd.NewTodo))
+	r.POST("/projects", mw.Auth(hd.NewProject))
+	r.POST("/privateChats", mw.Auth(hd.NewPrivateChat))
 	r.POST("/verifyCode/:source", hd.NewVerifyCode)
 	r.POST("/accessToken", hd.NewAccessToken)
 	//todo upload device token
