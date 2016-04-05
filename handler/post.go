@@ -18,13 +18,14 @@ const (
 	ExpiredErr      = "验证码未发生或已过期"
 	CodeMismatchErr = "验证码不匹配"
 
-	UnknownUseErr    = "未知的验证码用途"
+	UnknownUseErr    = "未知验证码用途"
 	UnknownSourceErr = "未知的发送渠道"
 	InvalidPhoneErr  = "非法的手机号格式"
 	InvalidMailErr   = "非法的邮箱地址格式"
 
-	NotRegisteredErr    = "用户未注册"
-	PasswordMismatchErr = "密码不匹配"
+	NotRegisteredErr     = "用户未注册"
+	AlreadyRegisteredErr = "用户已注册"
+	PasswordMismatchErr  = "密码不匹配"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -149,13 +150,22 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	var title, body, text string
 	switch req.Use {
 	case "register":
+		if dbms.ReadUserIdWithIndex(req.To, source) != 0 {
+			base.ForbidErr(w, AlreadyRegisteredErr)
+			return
+		}
 		title = "帐号注册"
 		body = "您的注册验证码是： " + code + "，有效期为5分钟。"
 		text = "【GoDo日程】" + body
 	case "resetPasswd":
+		if dbms.ReadUserIdWithIndex(req.To, source) == 0 {
+			base.NotFoundErr(w, NotRegisteredErr)
+			return
+		}
 		title = "重置密码"
 		body = "您正在申请重置密码，验证码为： " + code + "，有效期为5分钟。（如非本人操作，请尽快查看账户操作情况）"
 		text = "【GoDo日程】" + body
+
 	default:
 		base.BadReqErr(w, UnknownUseErr)
 		return

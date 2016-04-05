@@ -32,18 +32,18 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 						lru.Add(ah[7:], strconv.Itoa(uid))
 						goto Success
 					} else {
-						msg := "Invalid Token"
+						msg := "token错误，请重新登录"
 						base.UnAuthErr(w, msg)
 						return
 					}
 				}
 			} else {
-				msg := "Invaild Authorization Method"
+				msg := "未知认证方式"
 				base.UnAuthErr(w, msg)
 				return
 			}
 		} else {
-			base.UnAuthErr(w, http.StatusText(http.StatusUnauthorized))
+			base.UnAuthErr(w, "鉴权失败，请登录")
 			return
 		}
 	Success:
