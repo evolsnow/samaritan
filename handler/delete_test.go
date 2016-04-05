@@ -14,9 +14,7 @@ func del(reqURL string, auth string, ds interface{}) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("DELETE", reqURL, nil)
 	req.Header.Set("Content-Type", "application/json")
-	if auth != "" {
-		req.Header.Set("Authorization", auth)
-	}
+	req.Header.Set("Authorization", auth)
 	resp, err := client.Do(req)
 	if err != nil {
 		t.Error("http delete err")
@@ -36,12 +34,17 @@ func TestDeleteTodo(t *testing.T) {
 	reply := new(delTodoResp)
 	//unauthorized
 	del("http://127.0.0.1:8080/todos/"+tPid, "", reply)
-	if reply.Code == 200 {
+	if reply.Code != http.StatusUnauthorized {
 		t.Error("unauthorized to delete this todo")
 	}
-
+	//belong err
+	del("http://127.0.0.1:8080/todos/"+tPid, base.MakeToken(111), reply)
+	if reply.Code != http.StatusForbidden || reply.Msg != BelongErr {
+		t.Error("forbidden to delete other user's todo:", reply.Msg)
+	}
+	//normal case
 	del("http://127.0.0.1:8080/todos/"+tPid, auth, reply)
 	if reply.Code != 200 {
-		t.Error("delete to do failed:", reply.Msg)
+		t.Error("delete todo failed:", reply.Msg)
 	}
 }

@@ -45,6 +45,8 @@ func TestUpdatePassword(t *testing.T) {
 	u := &model.User{
 		Id: uid,
 	}
+	//wait redis
+	//time.Sleep(time.Second)
 	if u.GetPassword() != base.EncryptedPassword(req.Password) {
 		//t.Error(u.GetPassword())
 		//t.Error(base.EncryptedPassword(req.Password))

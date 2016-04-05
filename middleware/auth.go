@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
+var lru = caches.NewLRUCache(100)
+
 func Auth(h httprouter.Handle) httprouter.Handle {
-	lru := caches.NewLRUCache(100)
 	//jwt
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		// Look for an Authorization header
@@ -28,7 +29,7 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 					uid, err := base.ParseToken(ah[7:])
 					if err == nil {
 						ps.Set("authId", strconv.Itoa(uid))
-						lru.Add(ah[7:], uid)
+						lru.Add(ah[7:], strconv.Itoa(uid))
 						goto Success
 					} else {
 						msg := "Invalid Token"

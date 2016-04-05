@@ -9,13 +9,15 @@ import (
 )
 
 const (
-	BelongErr = "this todo doesn't belong to you?"
+	BelongErr = "the todo doesn't belong to this user"
 )
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	tid := dbms.ReadTodoId(ps.Get("todo"))
 	uid := ps.GetInt("authId")
-	td := &model.Todo{Id: tid}
+	td := &model.Todo{
+		Id: tid,
+	}
 	if td.GetOwner().Id != uid {
 		base.ForbidErr(w, BelongErr)
 		return

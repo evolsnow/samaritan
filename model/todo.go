@@ -24,7 +24,12 @@ type Todo struct {
 
 //get user from to-do's owner id
 func (td *Todo) GetOwner() (owner *User) {
-	owner, err := readUser(td.OwnerId)
+	var err error
+	if td.OwnerId == 0 {
+		owner, err = readOwner(td.Id)
+	} else {
+		owner, err = readUser(td.OwnerId)
+	}
 	if err != nil {
 		log.Error("Error get user with todo:", err)
 		return nil
@@ -35,7 +40,12 @@ func (td *Todo) GetOwner() (owner *User) {
 
 //get project from to-do's project id
 func (td *Todo) GetMission() (m *Mission) {
-	m, err := readMission(td.MissionId)
+	var err error
+	if td.MissionId == 0 {
+		m, err = readBelongedMission(td.Id)
+	} else {
+		m, err = readMission(td.MissionId)
+	}
 	if err != nil {
 		log.Error("Error get mission with todo:", err)
 		return nil

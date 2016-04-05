@@ -35,6 +35,6 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	us := new(model.User)
 	us.Id = uid
 	us.Password = base.EncryptedPassword(req.Password)
-	go us.Save()
+	us.Save()
 	makeBaseResp(w, r)
 }

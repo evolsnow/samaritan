@@ -249,6 +249,26 @@ func createTodo(td *Todo) {
 	}()
 }
 
+func readOwner(tid int) (*User, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	uid, err := redis.Int(c.Do("HGET", "todo:"+strconv.Itoa(tid), TOwnerId))
+	if err != nil {
+		return nil, err
+	}
+	return readUser(uid)
+}
+
+func readBelongedMission(tid int) (*Mission, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	mid, err := redis.Int(c.Do("HGET", "todo:"+strconv.Itoa(tid), TMissionId))
+	if err != nil {
+		return nil, err
+	}
+	return readMission(mid)
+}
+
 func updateTodoStatus(uid, tid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()

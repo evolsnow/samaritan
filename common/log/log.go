@@ -2,6 +2,7 @@ package log
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Sirupsen/logrus"
 )
 
@@ -46,17 +47,20 @@ func Println(args ...interface{}) {
 
 // DebugJson pretty print the request and response
 // Should add no more than one description
-func DebugJson(args ...interface{}) {
+func DebugJson(args ...interface{}) error {
 	if len(args) == 1 {
 		//common case
 		Logger.Debug("\n", marshalWithIndent(args[0]))
 	} else if len(args) == 2 {
+		if _, ok := args[0].(string); !ok {
+			return fmt.Errorf("first arg should be string")
+		}
 		Logger.Debug(args[0].(string)+"\n", marshalWithIndent(args[1]))
 	} else {
 		//should use Debug instead
 		Logger.Debug(args...)
 	}
-
+	return nil
 }
 
 func marshalWithIndent(s interface{}) interface{} {

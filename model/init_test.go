@@ -1,13 +1,12 @@
-package handler
+package model
 
 import (
 	"github.com/evolsnow/samaritan/common/caches"
 	"github.com/evolsnow/samaritan/common/dbms"
-	"github.com/evolsnow/samaritan/model"
 	"time"
 )
 
-//var cache *caches.SimpleCache
+var cache *caches.SimpleCache
 
 func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
@@ -23,7 +22,7 @@ func init() {
 
 func beforeTest() {
 	cache = caches.NewCache()
-	u := &model.User{
+	u := &User{
 		SamId:    "evol",
 		Alias:    "evol",
 		Name:     "张三",
@@ -35,7 +34,7 @@ func beforeTest() {
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
 
-	t := &model.Todo{
+	t := &Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
 		Desc:      "desc here",
