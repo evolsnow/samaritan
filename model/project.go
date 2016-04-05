@@ -72,7 +72,7 @@ func (p *Project) GetMembersId() []int {
 
 func (p *Project) Save() {
 	if p.Id == 0 {
-		//new user
+		//new project
 		log.DebugJson("create project:", p)
 		createProject(p)
 	} else {

@@ -242,6 +242,39 @@ type putPasswordResp struct {
 	baseResp
 }
 
+//update to-do
+type putTdReq struct {
+	StartTime  int64  `json:"startTime"`
+	Place      string `json:"place"`
+	Repeat     bool   `json:"repeat"`
+	RepeatMode int    `json:"repeatMode"`
+	AllDay     bool   `json:"allDay"`
+	Desc       string `json:"desc"`
+	Remark     string `json:"remark"`
+	MissionPId string `json:"missionId"`
+	Done       bool   `json:"done"`
+	FinishTime int64  `json:"finishTime"`
+}
+
+func (pt *putTdReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pt.StartTime:  "startTime",
+		&pt.Desc:       "desc",
+		&pt.Place:      "place",
+		&pt.Repeat:     "repeat",
+		&pt.RepeatMode: "repeatMode",
+		&pt.AllDay:     "allDay",
+		&pt.Remark:     "remark",
+		&pt.MissionPId: "missionId",
+		&pt.Done:       "done",
+		&pt.FinishTime: "finishTime",
+	}
+}
+
+type putTdResp struct {
+	baseResp
+}
+
 //delete method
 
 //delete to-do

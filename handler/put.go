@@ -32,9 +32,41 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		base.NotFoundErr(w, NotRegisteredErr)
 		return
 	}
-	us := new(model.User)
-	us.Id = uid
-	us.Password = base.EncryptedPassword(req.Password)
+	us := &model.User{
+		Id:       uid,
+		Password: base.EncryptedPassword(req.Password),
+	}
 	us.Save()
+	makeBaseResp(w, r)
+}
+
+func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putTdReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	td := &model.Todo{
+		Id:         dbms.ReadTodoId(ps.Get("todo")),
+		StartTime:  req.StartTime,
+		Place:      req.Place,
+		Repeat:     req.Repeat,
+		RepeatMode: req.RepeatMode,
+		AllDay:     req.AllDay,
+		Desc:       req.Desc,
+		Remark:     req.Remark,
+		MissionId:  dbms.ReadMissionId(req.MissionPId),
+		Done:       req.Done,
+		FinishTime: req.FinishTime,
+	}
+	if td.GetOwner().Id != ps.GetInt("authId") {
+		base.ForbidErr(w, BelongErr)
+		return
+	}
+	if td.Done {
+		td.Finish()
+	}
+	td.Save()
 	makeBaseResp(w, r)
 }

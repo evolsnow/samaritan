@@ -249,6 +249,18 @@ func createTodo(td *Todo) {
 	}()
 }
 
+func readFullTodo(td *Todo) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	todo := "todo:" + strconv.Itoa(td.Id)
+	ret, err := redis.Values(c.Do("HGETALL", todo))
+	if err != nil {
+		return err
+	}
+	err = redis.ScanStruct(ret, td)
+	return err
+}
+
 func readOwner(tid int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()

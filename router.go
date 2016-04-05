@@ -36,6 +36,7 @@ func newRouter() *httprouter.Router {
 
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
+	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
 	//test

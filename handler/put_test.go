@@ -11,12 +11,13 @@ import (
 	"time"
 )
 
-func put(reqURL string, src []byte, ds interface{}) {
+func put(reqURL, auth string, src []byte, ds interface{}) {
 	var t testing.T
 	//reqURL = url.QueryEscape(reqURL)
 	client := &http.Client{}
 	req, _ := http.NewRequest("PUT", reqURL, bytes.NewReader(src))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", auth)
 	resp, err := client.Do(req)
 	if err != nil {
 		t.Error("http put err")
@@ -37,7 +38,7 @@ func TestUpdatePassword(t *testing.T) {
 	}
 	src, _ := json.Marshal(req)
 	reply := new(putPasswordResp)
-	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", src, reply)
+	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", "", src, reply)
 	if reply.Code != 200 {
 		t.Error("update failed")
 	}
@@ -56,7 +57,7 @@ func TestUpdatePassword(t *testing.T) {
 	req.VerifyCode = "000000"
 	src, _ = json.Marshal(req)
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
-	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", src, reply)
+	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", "", src, reply)
 	if reply.Msg != CodeMismatchErr {
 		t.Error("code mismatch")
 	}
@@ -64,8 +65,41 @@ func TestUpdatePassword(t *testing.T) {
 	req.VerifyCode = "123456"
 	src, _ = json.Marshal(req)
 	cache.Set("gsc@gmail.com:code", "123456", time.Minute*5)
-	put("http://127.0.0.1:8080/users/password/gsc@gmail.com", src, reply)
+	put("http://127.0.0.1:8080/users/password/gsc@gmail.com", "", src, reply)
 	if reply.Msg != NotRegisteredErr {
 		t.Error("not registed")
+	}
+}
+
+func TestUpdateTodo(t *testing.T) {
+	req := &putTdReq{
+		Place:  "new place",
+		Repeat: true,
+	}
+	src, _ := json.Marshal(req)
+	reply := new(putTdResp)
+	tPid := cache.Get("put_test_todo_pid")
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+
+	//unauthorized
+	put("http://127.0.0.1:8080/todos/"+tPid, "", src, reply)
+	if reply.Code != http.StatusUnauthorized {
+		t.Error("unauthorized to update this todo")
+	}
+	//belong err
+	put("http://127.0.0.1:8080/todos/"+tPid, base.MakeToken(111), src, reply)
+	if reply.Code != http.StatusForbidden || reply.Msg != BelongErr {
+		t.Error("forbidden to update other user's todo:", reply.Msg)
+	}
+	//normal case
+	put("http://127.0.0.1:8080/todos/"+tPid, auth, src, reply)
+	if reply.Code != 200 {
+		t.Error("update todo failed")
+	}
+	td := model.Todo{Id: dbms.ReadTodoId(tPid)}
+	td.Load()
+	if td.Place != req.Place {
+		t.Error("todo place not changed")
 	}
 }

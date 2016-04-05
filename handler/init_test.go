@@ -43,4 +43,13 @@ func beforeTest() {
 	t.Save()
 	dbms.CreateTodoIndex(t.Id, t.Pid)
 	cache.Set("delete_test_todo_pid", t.Pid, time.Minute*5)
+
+	t2 := &model.Todo{
+		OwnerId:   u.Id,
+		StartTime: time.Now().Unix(),
+		Desc:      "desc here",
+	}
+	t2.Save()
+	dbms.CreateTodoIndex(t2.Id, t2.Pid)
+	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
 }

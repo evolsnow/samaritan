@@ -56,6 +56,9 @@ func (td *Todo) GetMission() (m *Mission) {
 
 //update to-do done status
 func (td *Todo) Finish() (err error) {
+	if td.OwnerId == 0 {
+		td.OwnerId = td.GetOwner().Id
+	}
 	err = updateTodoStatus(td.OwnerId, td.Id)
 	if err != nil {
 		log.Error("Error update to-do status:", err)
@@ -67,12 +70,12 @@ func (td *Todo) Finish() (err error) {
 //save a new to-do
 func (td *Todo) Save() {
 	if td.Id == 0 {
-		//new user
+		//new to-do
 		log.DebugJson("create todo:", td)
 		createTodo(td)
 	} else {
 		kvMap := prepareToUpdate(td)
-		log.Debug("update user with: ", kvMap)
+		log.Debug("update todo with: ", kvMap)
 		updateTodo(td.Id, kvMap)
 	}
 }
@@ -81,6 +84,15 @@ func (td *Todo) Save() {
 func (td *Todo) Remove() (err error) {
 	if err = deleteTodo(td.Id); err != nil {
 		log.Error("Error delete todo:", err)
+	}
+	return
+}
+
+//full read from redis
+func (td *Todo) Load() (err error) {
+	err = readFullTodo(td)
+	if err != nil {
+		log.Debug(err)
 	}
 	return
 }
