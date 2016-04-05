@@ -207,9 +207,11 @@ func createTodo(td *Todo) {
 	c := dbms.Pool.Get()
 	td.Id, _ = redis.Int(c.Do("INCR", "autoIncrTodo"))
 	td.Pid = base.HashedTodoId(td.Id)
-	go dbms.CreateTodoIndex(td.Id, td.Pid)
-	go func() {
-		lua := `
+	//go dbms.CreateTodoIndex(td.Id, td.Pid)
+	dbms.CreateTodoIndex(td.Id, td.Pid)
+
+	//go func() {
+	lua := `
 			local tid = KEYS[2]
 			redis.call("HMSET", "todo:"..tid,
 					KEYS[1], tid, KEYS[3], KEYS[4], KEYS[5], KEYS[6], KEYS[7], KEYS[8],
@@ -220,33 +222,33 @@ func createTodo(td *Todo) {
 			redis.call("RPUSH", KEYS[29], tid)
 			redis.call("SADD", KEYS[30], tid)
 			`
-		ka := []interface{}{
-			//to-do model
-			TId, td.Id,
-			TDesc, td.Desc,
-			TRemark, td.Remark,
-			TCreateTime, time.Now().Unix(),
-			TStartTime, td.StartTime,
-			TPlace, td.Place,
-			TRepeat, td.Repeat,
-			TAllDay, td.AllDay,
-			TRepeatMode, td.RepeatMode,
-			TDone, td.Done,
-			TFinishTime, td.FinishTime,
-			TOwnerId, td.OwnerId,
-			TMissionId, td.MissionId,
-			TPid, td.Pid,
-			//redis list
-			fmt.Sprintf(userTdList, td.OwnerId),
-			fmt.Sprintf(userTdNotDoneSet, td.OwnerId),
-		}
-		script := redis.NewScript(len(ka), lua)
-		_, err := script.Do(c, ka...)
-		if err != nil {
-			log.Error("Error create todo:", err)
-		}
-		c.Close()
-	}()
+	ka := []interface{}{
+		//to-do model
+		TId, td.Id,
+		TDesc, td.Desc,
+		TRemark, td.Remark,
+		TCreateTime, time.Now().Unix(),
+		TStartTime, td.StartTime,
+		TPlace, td.Place,
+		TRepeat, td.Repeat,
+		TAllDay, td.AllDay,
+		TRepeatMode, td.RepeatMode,
+		TDone, td.Done,
+		TFinishTime, td.FinishTime,
+		TOwnerId, td.OwnerId,
+		TMissionId, td.MissionId,
+		TPid, td.Pid,
+		//redis list
+		fmt.Sprintf(userTdList, td.OwnerId),
+		fmt.Sprintf(userTdNotDoneSet, td.OwnerId),
+	}
+	script := redis.NewScript(len(ka), lua)
+	_, err := script.Do(c, ka...)
+	if err != nil {
+		log.Error("Error create todo:", err)
+	}
+	c.Close()
+	//}()
 }
 
 func readFullTodo(td *Todo) error {

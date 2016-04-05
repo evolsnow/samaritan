@@ -13,11 +13,13 @@ func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
 	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "8")
 	c := dbms.Pool.Get()
-	defer c.Close()
 	c.Do("FLUSHDB")
+	c.Close()
+
 	cc := dbms.CachePool.Get()
-	defer cc.Close()
 	cc.Do("FLUSHDB")
+	cc.Close()
+
 	beforeTest()
 }
 
@@ -35,21 +37,22 @@ func beforeTest() {
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
 
-	t := &model.Todo{
+	t1 := &model.Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
 		Desc:      "desc here",
 	}
-	t.Save()
-	dbms.CreateTodoIndex(t.Id, t.Pid)
-	cache.Set("delete_test_todo_pid", t.Pid, time.Minute*5)
+	t1.Save()
+	//dbms.CreateTodoIndex(t.Id, t.Pid)
+	cache.Set("delete_test_todo_pid", t1.Pid, time.Minute*5)
 
 	t2 := &model.Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
-		Desc:      "desc here",
+		Desc:      "desc here 2",
 	}
 	t2.Save()
-	dbms.CreateTodoIndex(t2.Id, t2.Pid)
+	//dbms.CreateTodoIndex(t2.Id, t2.Pid)
 	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
+
 }

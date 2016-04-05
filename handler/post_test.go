@@ -108,7 +108,6 @@ func TestNewTodo(t *testing.T) {
 	}
 	tid := dbms.ReadTodoId(reply.Id)
 	td := &model.Todo{Id: tid}
-	time.Sleep(time.Second)
 	td.Load()
 	if td.Desc != req.Desc || td.Place != req.Place {
 		t.Error("save todo error")
