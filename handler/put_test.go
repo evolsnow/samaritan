@@ -39,7 +39,7 @@ func TestUpdatePassword(t *testing.T) {
 	}
 	reply := new(putPasswordResp)
 	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", "", req, reply)
-	if reply.Code != 200 {
+	if reply.Code != 0 {
 		t.Error("update failed")
 	}
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
@@ -91,7 +91,7 @@ func TestUpdateTodo(t *testing.T) {
 	}
 	//normal case
 	put("http://127.0.0.1:8080/todos/"+tPid, auth, req, reply)
-	if reply.Code != 200 {
+	if reply.Code != 0 {
 		t.Error("update todo failed")
 	}
 	td := model.Todo{Id: dbms.ReadTodoId(tPid)}

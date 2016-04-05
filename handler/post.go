@@ -14,17 +14,17 @@ import (
 )
 
 const (
-	UnknownTypeErr  = "unknown type"
-	ExpiredErr      = "code has expired"
-	CodeMismatchErr = "code mismatch"
+	UnknownTypeErr  = "未知验证码类型"
+	ExpiredErr      = "验证码未发生或已过期"
+	CodeMismatchErr = "验证码不匹配"
 
-	UnknownUseErr    = "unknown use"
-	UnknownSourceErr = "unknown source"
-	InvalidPhoneErr  = "invalid phone number"
-	InvalidMailErr   = "invalid mail address"
+	UnknownUseErr    = "未知的验证码用途"
+	UnknownSourceErr = "未知的发送渠道"
+	InvalidPhoneErr  = "非法的手机号格式"
+	InvalidMailErr   = "非法的邮箱地址格式"
 
-	NotRegisteredErr    = "user not registered"
-	PasswordMismatchErr = "password mismatch"
+	NotRegisteredErr    = "用户未注册"
+	PasswordMismatchErr = "密码不匹配"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -152,16 +152,12 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		title = "帐号注册"
 		body = "您的注册验证码是： " + code + "，有效期为5分钟。"
 		text = "【GoDo日程】" + body
-	case "forgetPasswd":
-		title = "找回密码"
-		body = "您正在申请找回密码，验证码为： " + code + "，有效期为5分钟。（如非本人操作，请尽快查看账户操作情况）"
-		text = "【GoDo日程】" + body
 	case "resetPasswd":
 		title = "重置密码"
 		body = "您正在申请重置密码，验证码为： " + code + "，有效期为5分钟。（如非本人操作，请尽快查看账户操作情况）"
 		text = "【GoDo日程】" + body
 	default:
-		base.BadReqErr(w, UnknownSourceErr)
+		base.BadReqErr(w, UnknownUseErr)
 		return
 	}
 	if source == "sms" {
@@ -177,7 +173,7 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		}
 		go rpc.SendMail(req.To, title, body)
 	} else {
-		base.BadReqErr(w, UnknownUseErr)
+		base.BadReqErr(w, UnknownSourceErr)
 		return
 	}
 	go cache.Set(req.To+":code", code, time.Minute*5)

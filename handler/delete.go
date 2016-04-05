@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	BelongErr = "the todo doesn't belong to this user"
+	BelongErr = "请检查所登录的账户"
 )
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

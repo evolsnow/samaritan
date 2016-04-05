@@ -102,7 +102,6 @@ func TestNewTodo(t *testing.T) {
 	//normal case
 	reply = new(postTdResp)
 	post("http://127.0.0.1:8080/todos", auth, req, reply)
-	t.Log(reply)
 	if reply.Id == "" {
 		t.Error("post todo error")
 		t.FailNow()

@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	LengthErr  = "length should be 4-8"
-	CharsetErr = "charset should be a-z, A-Z, 0-9 or _"
-	ExistErr   = "already registered"
+	LengthErr  = "长度应为4-8位"
+	CharsetErr = "仅支持a-z, A-Z, 0-9 以及 _"
+	ExistErr   = "已经被注册"
 )
 
 func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

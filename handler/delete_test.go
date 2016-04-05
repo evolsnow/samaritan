@@ -44,7 +44,7 @@ func TestDeleteTodo(t *testing.T) {
 	}
 	//normal case
 	del("http://127.0.0.1:8080/todos/"+tPid, auth, reply)
-	if reply.Code != 200 {
+	if reply.Code != 0 {
 		t.Error("delete todo failed:", reply.Msg)
 	}
 }

@@ -9,12 +9,12 @@ import (
 
 //base response for all requests
 type baseResp struct {
-	Code int    `json:"code,omitempty"`
+	Code int    `json:"code"`
 	Msg  string `json:"msg,omitempty"`
 }
 
 func makeBaseResp(w http.ResponseWriter, r *http.Request) {
-	makeResp(w, r, baseResp{Code: http.StatusOK})
+	makeResp(w, r, baseResp{Code: 0})
 }
 
 //struct to post to-do request
