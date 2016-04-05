@@ -89,15 +89,15 @@ const (
 //other useful index set key name
 const (
 	//user
-	userGroup          = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
-	userTdList         = "user:%d:todoList"     //user's all to-do, redis-type:List
-	userTdNotDoneSet   = "user:%d:todoStatus:0" //to-do status, redis-type:Set
-	userTdDoneSet      = "user:%d:todoStatus:1"
-	userPjJoinedSet    = "user:%d:projects:participate" //user's all projects redis-type:Set
-	userPjCreatedSet   = "user:%d:projects:create"
-	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
-	userMsPublishedSet = "user:%d:missions:publish"
-	userPjColorList    = "user:%d:project:%d:color" //user defined project color redis-type:List
+	userGroup           = "%s:%s:%d:%s"          //just for further analysis-> school:department:grade:class
+	userTdList          = "user:%d:todoList"     //user's all to-do, redis-type:List
+	userTdNotDoneSet    = "user:%d:todoStatus:0" //to-do status, redis-type:Set
+	userTdDoneSet       = "user:%d:todoStatus:1"
+	userPjJoinedList    = "user:%d:projects:participate" //user's all projects redis-type:List
+	userPjCreatedList   = "user:%d:projects:create"
+	userMsAcceptedList  = "user:%d:missions:accept" //user's all missions redis-type:Set
+	userMsPublishedList = "user:%d:missions:publish"
+	userPjColorList     = "user:%d:project:%d:color" //user defined project color redis-type:List
 
 	//to-do
 	todoPictureList = "todo:%d:pictures" //to-do's pictures redis-type:List
@@ -319,8 +319,8 @@ func createMission(m *Mission) {
 					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
 					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
-			redis.call("SADD", KEYS[17], mid)
-			redis.call("SADD", KEYS[18], mid)
+			redis.call("LPUSH", KEYS[17], mid)
+			redis.call("LPUSH", KEYS[18], mid)
 			`
 		ka := []interface{}{
 			//mission models
@@ -332,9 +332,9 @@ func createMission(m *Mission) {
 			MPublisherId, m.PublisherId,
 			MCompletionNum, m.CompletionNum,
 			MCompletedTime, m.CompletedTime,
-			//redis set
-			fmt.Sprintf(userMsPublishedSet, m.PublisherId),
-			fmt.Sprintf(userMsAcceptedSet, m.PublisherId),
+			//redis list
+			fmt.Sprintf(userMsPublishedList, m.PublisherId),
+			fmt.Sprintf(userMsAcceptedList, m.PublisherId),
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)
@@ -444,9 +444,8 @@ func createProject(p *Project) {
 					   KEYS[1], pid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12]
 					   KEYS[13], KYES[14])
-			redis.call("SADD", KEYS[15], pid)
-			redis.call("SADD", KEYS[16], pid)
-			redis.call("SET", KEYS[17], pid)
+			redis.call("LPUSH", KEYS[15], pid)
+			redis.call("LPUSH", KEYS[16], pid)
 			`
 		ka := []interface{}{
 			//project models
@@ -457,9 +456,9 @@ func createProject(p *Project) {
 			PCreatorId, p.CreatorId,
 			PPrivate, p.Private,
 			PName, p.Name,
-			//redis set
-			fmt.Sprintf(userPjJoinedSet, p.CreatorId),
-			fmt.Sprintf(userPjCreatedSet, p.CreatorId),
+			//redis list
+			fmt.Sprintf(userPjJoinedList, p.CreatorId),
+			fmt.Sprintf(userPjCreatedList, p.CreatorId),
 		}
 		script := redis.NewScript(len(ka), lua)
 		_, err := script.Do(c, ka...)

@@ -71,7 +71,6 @@ func TestNewAccessToken(t *testing.T) {
 	}
 	reply := new(postAccessTokenResp)
 	post("http://127.0.0.1:8080/accessToken", "", req, reply)
-	//t.Log(*reply)
 	if reply.Id == "" || reply.Token == "" {
 		t.Error("login failed")
 	}
@@ -109,8 +108,8 @@ func TestNewTodo(t *testing.T) {
 	}
 	tid := dbms.ReadTodoId(reply.Id)
 	td := &model.Todo{Id: tid}
+	time.Sleep(time.Second)
 	td.Load()
-	//t.Log(*td)
 	if td.Desc != req.Desc || td.Place != req.Place {
 		t.Error("save todo error")
 	}
