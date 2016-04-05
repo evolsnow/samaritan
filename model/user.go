@@ -33,6 +33,16 @@ func (u *User) GetPassword() (pwd string) {
 	return
 }
 
+//user created projects
+func (u *User) GetCreatedProjects() {
+
+}
+
+//user joined projects
+func (u *User) GetJoinedProjects() {
+
+}
+
 //generate avatar url for user
 func (u *User) CreateAvatar() {
 	path, err := base.GenerateAvatar(u.Phone)

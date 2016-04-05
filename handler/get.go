@@ -40,3 +40,10 @@ func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
+
+//func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	uid:=ps.GetInt("authId")
+//	pjType := r.URL.Query().Get("type")
+//	us:=&model.User{Id:uid}
+//	us.
+//}
