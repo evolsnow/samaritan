@@ -29,7 +29,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	}
 	uid := dbms.ReadUserIdWithIndex(identity, req.Type)
 	if uid == 0 {
-		base.NotFoundErr(w, NotRegistedErr)
+		base.NotFoundErr(w, NotRegisteredErr)
 		return
 	}
 	us := new(model.User)

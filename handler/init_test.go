@@ -31,4 +31,12 @@ func beforeTest() {
 	u.Save()
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
+
+	t := &model.Todo{
+		OwnerId:   u.Id,
+		StartTime: time.Now().Unix(),
+		Desc:      "desc here",
+	}
+	t.Save()
+	cache.Set("delete_test_todo_pid", t.Pid, time.Minute*5)
 }

@@ -19,26 +19,32 @@ func makeBaseResp(w http.ResponseWriter, r *http.Request) {
 
 //struct to post to-do request
 type postTdReq struct {
-	StartTime int64  `json:"startTime"`
-	Desc      string `json:"desc"`
-	Repeat    bool   `json:"repeat"`
-	Place     string `json:"place"`
-	ProjectId int    `json:"projectId"`
+	StartTime  int64  `json:"startTime"`
+	Place      string `json:"place"`
+	Repeat     bool   `json:"repeat"`
+	RepeatMode int    `json:"repeatMode"`
+	AllDay     bool   `json:"allDay"`
+	Desc       string `json:"desc"`
+	Remark     string `json:"remark"`
+	MissionPId string `json:"missionId"`
 }
 
 func (pt *postTdReq) FieldMap(req *http.Request) binding.FieldMap {
 	return binding.FieldMap{
-		&pt.Desc: binding.Field{
-			Form:     "desc",
-			Required: true,
-		},
 		&pt.StartTime: binding.Field{
 			Form:     "startTime",
 			Required: true,
 		},
-		&pt.Place:     "place",
-		&pt.Repeat:    "repeat",
-		&pt.ProjectId: "projectId",
+		&pt.Desc: binding.Field{
+			Form:     "desc",
+			Required: true,
+		},
+		&pt.Place:      "place",
+		&pt.Repeat:     "repeat",
+		&pt.RepeatMode: "repeatMode",
+		&pt.AllDay:     "allDay",
+		&pt.Remark:     "remark",
+		&pt.MissionPId: "missionId",
 	}
 }
 
@@ -233,6 +239,13 @@ func (pp *putPasswordReq) FieldMap(req *http.Request) binding.FieldMap {
 }
 
 type putPasswordResp struct {
+	baseResp
+}
+
+//delete method
+
+//delete to-do
+type delTodoResp struct {
 	baseResp
 }
 

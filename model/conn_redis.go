@@ -164,16 +164,17 @@ func createUser(u *User) {
 	}()
 }
 
-func readUser(id int) (u *User, err error) {
+func readUser(id int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(id)
 	ret, err := redis.Values(c.Do("HGETALL", user))
 	if err != nil {
-		return
+		return nil, err
 	}
+	u := new(User)
 	err = redis.ScanStruct(ret, u)
-	return
+	return u, err
 }
 
 func createUserAvatar(uid int, avatarUrl string) error {
@@ -266,6 +267,13 @@ func updateTodo(tid int, kvMap map[string]interface{}) error {
 	return c.Flush()
 }
 
+func deleteTodo(tid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := redis.Bool(c.Do("DEL", "todo:"+strconv.Itoa(tid)))
+	return err
+}
+
 //redis actions of model mission
 func createMission(m *Mission) {
 	c := dbms.Pool.Get()
@@ -338,16 +346,17 @@ func createMissionComment(cm *Comment) {
 	}()
 }
 
-func readMission(mid int) (m *Mission, err error) {
+func readMission(mid int) (*Mission, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	mission := "mission:" + strconv.Itoa(mid)
 	ret, err := redis.Values(c.Do("HGETALL", mission))
 	if err != nil {
-		return
+		return nil, err
 	}
+	m := new(Mission)
 	err = redis.ScanStruct(ret, m)
-	return
+	return m, err
 }
 
 func readMissionComments(mid int) (cms []*Comment, err error) {

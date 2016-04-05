@@ -54,7 +54,7 @@ func TestUpdatePassword(t *testing.T) {
 	req.VerifyCode = "000000"
 	src, _ = json.Marshal(req)
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
-	put("http://127.0.0.1:8080/password/gsc1215225@gmail.com", src, reply)
+	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", src, reply)
 	if reply.Msg != CodeMismatchErr {
 		t.Error("code mismatch")
 	}
@@ -62,8 +62,8 @@ func TestUpdatePassword(t *testing.T) {
 	req.VerifyCode = "123456"
 	src, _ = json.Marshal(req)
 	cache.Set("gsc@gmail.com:code", "123456", time.Minute*5)
-	put("http://127.0.0.1:8080/password/gsc@gmail.com", src, reply)
-	if reply.Msg != NotRegistedErr {
-		t.Error("not register")
+	put("http://127.0.0.1:8080/users/password/gsc@gmail.com", src, reply)
+	if reply.Msg != NotRegisteredErr {
+		t.Error("not registed")
 	}
 }

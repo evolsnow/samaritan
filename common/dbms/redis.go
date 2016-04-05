@@ -135,6 +135,13 @@ func ReadUserId(uPid string) (uid int) {
 	return
 }
 
+func ReadTodoId(tPid string) (tid int) {
+	c := Pool.Get()
+	defer c.Close()
+	tid, _ = redis.Int(c.Do("HGET", TodoIndex, tPid))
+	return
+}
+
 func ReadMissionId(mPid string) (mid int) {
 	c := Pool.Get()
 	defer c.Close()

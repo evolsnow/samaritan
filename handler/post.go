@@ -23,7 +23,7 @@ const (
 	InvalidPhoneErr  = "invalid phone number"
 	InvalidMailErr   = "invalid mail address"
 
-	NotRegistedErr      = "user not registered"
+	NotRegisteredErr    = "user not registered"
 	PasswordMismatchErr = "password mismatch"
 )
 
@@ -40,7 +40,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		info, source = req.Phone, "phone"
 	} else if req.Type == "mail" {
 		//code = cache.GetSet(req.Mail+":code", "")
-		code = cache.Get(req.Mail+":code")
+		code = cache.Get(req.Mail + ":code")
 		info, source = req.Mail, "mail"
 	} else {
 		base.BadReqErr(w, UnknownTypeErr)
@@ -54,7 +54,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		base.ForbidErr(w, CodeMismatchErr)
 		return
 	}
-	us := model.User{
+	us := &model.User{
 		Phone:      req.Phone,
 		Email:      req.Mail,
 		Password:   base.EncryptedPassword(req.Password),
@@ -81,13 +81,16 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	uid := ps.GetInt("userId")
-	td := model.Todo{
-		OwnerId:   uid,
-		Desc:      req.Desc,
-		StartTime: req.StartTime,
-		Place:     req.Place,
-		Repeat:    req.Repeat,
-		MissionId: req.ProjectId,
+	td := &model.Todo{
+		OwnerId:    uid,
+		StartTime:  req.StartTime,
+		Place:      req.Place,
+		Repeat:     req.Repeat,
+		RepeatMode: req.RepeatMode,
+		AllDay:     req.AllDay,
+		Desc:       req.Desc,
+		Remark:     req.Remark,
+		MissionId:  dbms.ReadMissionId(req.MissionPId),
 	}
 	td.Save()
 	resp := new(postTdResp)
@@ -101,7 +104,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if errs.Handle(w) {
 		return
 	}
-	pj := model.Project{
+	pj := &model.Project{
 		Desc: req.Desc,
 		Name: req.Name,
 	}
@@ -198,7 +201,7 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		uid = dbms.ReadUserIdWithIndex(req.SamId, req.Type)
 	}
 	if uid == 0 {
-		base.NotFoundErr(w, NotRegistedErr)
+		base.NotFoundErr(w, NotRegisteredErr)
 		return
 	}
 	us := new(model.User)

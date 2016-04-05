@@ -12,8 +12,8 @@ type Todo struct {
 	Place      string   `json:"place,omitempty" redis:"place"`
 	Pictures   []string `json:"pictures,omitempty" redis:"-"`
 	Repeat     bool     `json:"repeat,omitempty" redis:"repeat"`
-	AllDay     bool     `json:"allDay,omitempty" redis:"allDay"`
 	RepeatMode int      `json:"repeatMode,omitempty" redis:"repeatMode"`
+	AllDay     bool     `json:"allDay,omitempty" redis:"allDay"`
 	Desc       string   `json:"desc,omitempty" redis:"desc"` //description for the action
 	Remark     string   `json:"remark,omitempty" redis:"remark"`
 	OwnerId    int      `json:"ownerId,omitempty" redis:"ownerId"` //whose
@@ -65,4 +65,12 @@ func (td *Todo) Save() {
 		log.Debug("update user with: ", kvMap)
 		updateTodo(td.Id, kvMap)
 	}
+}
+
+//delete a to-do
+func (td *Todo) Remove() (err error) {
+	if err = deleteTodo(td.Id); err != nil {
+		log.Error("Error delete todo:", err)
+	}
+	return
 }
