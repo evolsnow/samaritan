@@ -35,7 +35,7 @@ func newRouter() *httprouter.Router {
 	//todo upload device token
 
 	//http put method
-	r.PUT("/password/:identity", hd.UpdatePassword)
+	r.PUT("/users/password/:identity", hd.UpdatePassword)
 	//http delete method
 
 	//test

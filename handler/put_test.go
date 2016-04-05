@@ -37,7 +37,7 @@ func TestUpdatePassword(t *testing.T) {
 	}
 	src, _ := json.Marshal(req)
 	reply := new(putPasswordResp)
-	put("http://127.0.0.1:8080/password/gsc1215225@gmail.com", src, reply)
+	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", src, reply)
 	if reply.Code != 200 {
 		t.Error("update failed")
 	}
