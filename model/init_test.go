@@ -9,8 +9,8 @@ import (
 var cache *caches.SimpleCache
 
 func init() {
-	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "2")
-	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "9")
+	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
+	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "8")
 	c := dbms.Pool.Get()
 	defer c.Close()
 	c.Do("FLUSHDB")
