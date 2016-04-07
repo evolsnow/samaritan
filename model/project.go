@@ -17,12 +17,12 @@ type Project struct {
 }
 
 func (p *Project) GetCreator() (creator *User) {
-	creator, err := readUser(p.CreatorId)
+	creator, err := readCreator(p.Id)
 	if err != nil {
 		log.Error("Error get creator:", err)
 		return nil
 	}
-	log.DebugJson("creator:", creator)
+	log.DebugJson("get creator:", creator)
 	return
 }
 
@@ -78,6 +78,29 @@ func (p *Project) Save() {
 	} else {
 		kvMap := prepareToUpdate(p)
 		log.Debug("update project with: ", kvMap)
-		updateTodo(p.Id, kvMap)
+		updateProject(p.Id, kvMap)
 	}
+}
+
+//delete a project
+func (p *Project) Remove() (err error) {
+	if err = deleteProject(p.Id); err != nil {
+		log.Error("Error delete project:", err)
+	}
+	if p.CreatorId == 0 {
+		p.CreatorId = p.GetCreator().Id
+	}
+	if err = updateUserProjectSet(p.Id, p.CreatorId); err != nil {
+		log.Error("Err update pj set")
+	}
+	return
+}
+
+//full read from redis
+func (p *Project) Load() (err error) {
+	err = readFullProject(p)
+	if err != nil {
+		log.Debug(err)
+	}
+	return
 }

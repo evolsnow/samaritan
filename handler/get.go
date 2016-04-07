@@ -5,6 +5,7 @@ import (
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
+	"github.com/evolsnow/samaritan/model"
 	"net/http"
 )
 
@@ -18,32 +19,68 @@ func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	samId := ps.Get("samId")
 	resp := new(samIdStatusResp)
 	if len(samId) > 8 || len(samId) < 4 {
+		resp.Code = 1
 		resp.Msg = LengthErr
 		log.DebugJson(resp)
 		makeResp(w, r, resp)
 		return
 	}
 	if !base.ValidSamId(samId) {
+		resp.Code = 2
 		resp.Msg = CharsetErr
 		log.DebugJson(resp)
 		makeResp(w, r, resp)
 		return
 	}
 	if dbms.ReadIfSamIdExist(samId) {
-		resp.Available = false
+		resp.Code = 3
 		resp.Msg = ExistErr
 		log.DebugJson(resp)
 		makeResp(w, r, resp)
 		return
 	}
-	resp.Available = true
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
 
-//func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-//	uid:=ps.GetInt("authId")
-//	pjType := r.URL.Query().Get("type")
-//	us:=&model.User{Id:uid}
-//	us.
-//}
+func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	uid := ps.GetInt("authId")
+	pjType := r.URL.Query().Get("type")
+	us := &model.User{Id: uid}
+	resp := new(userProjectsResp)
+	var pjs []model.Project
+	switch pjType {
+	case "joined":
+		pjs = us.GetJoinedProjects()
+	case "created":
+		pjs = us.GetCreatedProjects()
+	case "":
+		pjs = us.GetAllProjects()
+	default:
+		base.BadReqErr(w, UnknownTypeErr)
+		return
+	}
+	nps := make([]NestedProjects, len(pjs))
+	var createdOrJoined string
+	for i, p := range pjs {
+		log.DebugJson(p)
+		if p.CreatorId == uid {
+			createdOrJoined = "created"
+		} else {
+			createdOrJoined = "joined"
+		}
+		np := NestedProjects{
+			Id:          p.Pid,
+			Name:        p.Name,
+			Desc:        p.Desc,
+			CreatorId:   base.HashedUserId(p.CreatorId),
+			CreatorName: p.GetCreator().Name,
+			Private:     p.Private,
+			Type:        createdOrJoined,
+		}
+		nps[i] = np
+	}
+	resp.Np = nps
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}

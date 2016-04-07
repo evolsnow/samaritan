@@ -25,6 +25,8 @@ func newRouter() *httprouter.Router {
 
 	//http get method
 	r.GET("/samIds/:samId", hd.SamIdStatus)
+	r.GET("/projects", mw.Auth(hd.UserProjectList))
+
 	//http post method
 	r.POST("/users", hd.NewUser)
 	r.POST("/todos", mw.Auth(hd.NewTodo))
@@ -37,8 +39,11 @@ func newRouter() *httprouter.Router {
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
 	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
+
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
+	r.DELETE("/projects/:project", mw.Auth(hd.DeleteProject))
+
 	//test
 	r.GET("/test", hd.Test)
 	r.POST("/hi", hd.Hi)

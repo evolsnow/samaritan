@@ -97,8 +97,9 @@ type postUsResp struct {
 
 //new project
 type postPjReq struct {
-	Desc string `json:"desc"`
-	Name string `json:"name"`
+	Desc    string `json:"desc"`
+	Name    string `json:"name"`
+	Private bool   `json:"private"`
 }
 
 func (pp *postPjReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -111,6 +112,7 @@ func (pp *postPjReq) FieldMap(req *http.Request) binding.FieldMap {
 			Form:     "name",
 			Required: true,
 		},
+		&pp.Private: "private",
 	}
 }
 
@@ -203,7 +205,23 @@ type postAccessTokenResp struct {
 
 type samIdStatusResp struct {
 	baseResp
-	Available bool `json:"available"`
+}
+
+//user projects
+
+type NestedProjects struct {
+	Id          string `json:"id"` //public id
+	Name        string `json:"name"`
+	Desc        string `json:"desc,omitempty"` //description for the project
+	CreatorId   string `json:"creatorId"`      //who created the project
+	CreatorName string `json:"creatorName"`    //who created the project
+	Private     bool   `json:"private"`
+	Type        string `json:"type"` //joined or created
+}
+
+type userProjectsResp struct {
+	baseResp
+	Np []NestedProjects `json:"projects"`
 }
 
 //put method
@@ -279,6 +297,11 @@ type putTdResp struct {
 
 //delete to-do
 type delTodoResp struct {
+	baseResp
+}
+
+//delete project
+type delProjectResp struct {
 	baseResp
 }
 

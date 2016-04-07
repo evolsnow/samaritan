@@ -81,7 +81,7 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if errs.Handle(w) {
 		return
 	}
-	uid := ps.GetInt("userId")
+	uid := ps.GetInt("authId")
 	td := &model.Todo{
 		OwnerId:    uid,
 		StartTime:  req.StartTime,
@@ -106,10 +106,12 @@ func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	pj := &model.Project{
-		Desc: req.Desc,
-		Name: req.Name,
+		CreatorId: ps.GetInt("authId"),
+		Desc:      req.Desc,
+		Name:      req.Name,
+		Private:   req.Private,
 	}
-	pj.CreatorId = ps.GetInt("userId")
+	pj.CreatorId = ps.GetInt("authId")
 	//get pid
 	pj.Save()
 	resp := new(postPjResp)
@@ -123,7 +125,7 @@ func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	if errs.Handle(w) {
 		return
 	}
-	fd := ps.GetInt("userId")
+	fd := ps.GetInt("authId")
 	td := dbms.ReadUserId(req.To)
 	raw := ""
 	if fd < td {

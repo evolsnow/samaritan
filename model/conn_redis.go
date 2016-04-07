@@ -93,7 +93,7 @@ const (
 	userTdList         = "user:%d:todoList"     //user's all to-do, redis-type:List
 	userTdNotDoneSet   = "user:%d:todoStatus:0" //to-do status, redis-type:Set
 	userTdDoneSet      = "user:%d:todoStatus:1"
-	userPjJoinedSet    = "user:%d:projects:participate" //user's all projects redis-type:Set
+	userPjJoinedSet    = "user:%d:projects:join" //user's all projects redis-type:Set
 	userPjCreatedSet   = "user:%d:projects:create"
 	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
 	userMsPublishedSet = "user:%d:missions:publish"
@@ -118,6 +118,7 @@ const (
 //redis actions of model User
 func createUser(u *User) {
 	c := dbms.Pool.Get()
+	defer c.Close()
 	u.Id, _ = redis.Int(c.Do("INCR", "autoIncrUser"))
 	u.Pid = base.HashedUserId(u.Id)
 	//index
@@ -132,7 +133,6 @@ func createUser(u *User) {
 					KEYS[17], KEYS[18], KEYS[19], KEYS[20], KEYS[21], KEYS[22],
 					KEYS[23], KEYS[24], KEYS[25], KEYS[26], KEYS[27], KEYS[28],
 					KEYS[29], KEYS[30])
-			redis.call("SADD", KEYS[31], uid)
 			`
 	ka := []interface{}{
 		//user model
@@ -151,16 +151,15 @@ func createUser(u *User) {
 		UGrade, u.Grade,
 		UClass, u.Class,
 		UStuNum, u.StudentNum,
-		//redis set
-		//todo not now (::0:)?
-		fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class),
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
-	c.Close()
 	if err != nil {
 		log.Error("Error create user:", err)
 	}
+	//redis set
+	//todo not now (::0:)?
+	c.Do("SADD", fmt.Sprintf(userGroup, u.School, u.Department, u.Grade, u.Class), u.Id)
 	//}()
 }
 
@@ -185,17 +184,17 @@ func createUserAvatar(uid int, avatarUrl string) error {
 	return err
 }
 
-func readCreatedProjects(uid int) (ps []*Project, err error) {
+func readCreatedProjects(uid int) ([]Project, error) {
 	key := fmt.Sprintf(userPjCreatedSet, uid)
 	return readProjects(key)
 }
 
-func readJoinedProjects(uid int) (ps []*Project, err error) {
+func readJoinedProjects(uid int) ([]Project, error) {
 	key := fmt.Sprintf(userPjJoinedSet, uid)
 	return readProjects(key)
 }
 
-func readProjects(key string) (ps []*Project, err error) {
+func readProjects(key string) ([]Project, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	lua := `
@@ -208,13 +207,14 @@ func readProjects(key string) (ps []*Project, err error) {
 	`
 	script := redis.NewScript(1, lua)
 	results, err := redis.Values(script.Do(c, key))
-	ps = make([]*Project, len(results))
-	for _, v := range results {
+	var ps []Project
+	for i, _ := range results {
 		p := new(Project)
-		err = redis.ScanStruct(v.([]interface{}), p)
-		ps = append(ps, p)
+		err = redis.ScanStruct(results[i].([]interface{}), p)
+		log.DebugJson(*p)
+		ps = append(ps, *p)
 	}
-	return
+	return ps, err
 }
 
 func readPassword(uid int) (pwd string, err error) {
@@ -237,6 +237,7 @@ func updateUser(uid int, kvMap map[string]interface{}) error {
 //redis actions of model to-do
 func createTodo(td *Todo) {
 	c := dbms.Pool.Get()
+	defer c.Close()
 	td.Id, _ = redis.Int(c.Do("INCR", "autoIncrTodo"))
 	td.Pid = base.HashedTodoId(td.Id)
 	go dbms.CreateTodoIndex(td.Id, td.Pid)
@@ -250,8 +251,7 @@ func createTodo(td *Todo) {
 					KEYS[15], KEYS[16], KEYS[17], KEYS[18], KEYS[19], KEYS[20],
 					KEYS[21], KEYS[22], KEYS[23], KEYS[24], KEYS[25], KEYS[26],
 					KEYS[27], KEYS[28])
-			redis.call("RPUSH", KEYS[29], tid)
-			redis.call("SADD", KEYS[30], tid)
+
 			`
 	ka := []interface{}{
 		//to-do model
@@ -269,16 +269,16 @@ func createTodo(td *Todo) {
 		TOwnerId, td.OwnerId,
 		TMissionId, td.MissionId,
 		TPid, td.Pid,
-		//redis list
-		fmt.Sprintf(userTdList, td.OwnerId),
-		fmt.Sprintf(userTdNotDoneSet, td.OwnerId),
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
 	if err != nil {
 		log.Error("Error create todo:", err)
 	}
-	c.Close()
+
+	c.Send("RPUSH", fmt.Sprintf(userTdList, td.OwnerId), td.Id)
+	c.Send("SADD", fmt.Sprintf(userTdNotDoneSet, td.OwnerId), td.Id)
+	c.Flush()
 	//}()
 }
 
@@ -329,19 +329,24 @@ func updateTodo(tid int, kvMap map[string]interface{}) error {
 	for k, v := range kvMap {
 		c.Send("HSET", "todo:"+strconv.Itoa(tid), k, v)
 	}
+	if _, ok := kvMap[TDone]; ok {
+		uid := kvMap[TOwnerId]
+		go updateTodoStatus(uid.(int), tid)
+	}
 	return c.Flush()
 }
 
 func deleteTodo(tid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	_, err := redis.Bool(c.Do("DEL", "todo:"+strconv.Itoa(tid)))
+	_, err := c.Do("DEL", "todo:"+strconv.Itoa(tid))
 	return err
 }
 
 //redis actions of model mission
 func createMission(m *Mission) {
 	c := dbms.Pool.Get()
+	defer c.Close()
 	m.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	m.Pid = base.HashedMissionId(m.Id)
 	go dbms.CreateMissionIndex(m.Id, m.Pid)
@@ -352,8 +357,7 @@ func createMission(m *Mission) {
 					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
 					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
-			redis.call("SADD", KEYS[17], mid)
-			redis.call("SADD", KEYS[18], mid)
+
 			`
 	ka := []interface{}{
 		//mission models
@@ -365,21 +369,22 @@ func createMission(m *Mission) {
 		MPublisherId, m.PublisherId,
 		MCompletionNum, m.CompletionNum,
 		MCompletedTime, m.CompletedTime,
-		//redis list
-		fmt.Sprintf(userMsPublishedSet, m.PublisherId),
-		fmt.Sprintf(userMsAcceptedSet, m.PublisherId),
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
 	if err != nil {
 		log.Error("Error create mission:", err)
 	}
-	c.Close()
+
+	c.Send("SADD", fmt.Sprintf(userMsPublishedSet, m.PublisherId), m.Id)
+	c.Send("SADD", fmt.Sprintf(userMsAcceptedSet, m.PublisherId), m.Id)
+	c.Flush()
 	//}()
 }
 
 func createMissionComment(cm *Comment) {
 	c := dbms.Pool.Get()
+	defer c.Close()
 	cm.Id, _ = redis.Int(c.Do("INCR", "autoIncrComment"))
 	cm.Pid = base.HashedCommentId(cm.Id)
 	//go func() {
@@ -389,7 +394,6 @@ func createMissionComment(cm *Comment) {
 			redis.call("HMSET", "comment:"..cmid,
 					   KEYS[1], cmid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10])
-			redis.call("RPUSH", KEYS[11], cmid)
 			`
 	ka := []interface{}{
 		//comment models
@@ -398,16 +402,13 @@ func createMissionComment(cm *Comment) {
 		CWhen, cm.When,
 		CCriticPid, cm.CriticPid,
 		CCriticName, cm.CriticName,
-
-		//redis list
-		fmt.Sprintf(missionCommentsList, mid),
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
 	if err != nil {
 		log.Error("Error create comment:", err)
 	}
-	c.Close()
+	c.Do("RPUSH", fmt.Sprintf(missionCommentsList, mid), cm.Id)
 	//}()
 }
 
@@ -438,7 +439,6 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
 	`
 	script := redis.NewScript(1, lua)
 	rets, err := redis.Values(script.Do(c, key))
-	cms = make([]*Comment, len(rets))
 	for _, v := range rets {
 		cmt := new(Comment)
 		err = redis.ScanStruct(v.([]interface{}), cmt)
@@ -467,6 +467,7 @@ func updateMission(mid int, kvMap map[string]interface{}) error {
 //redis actions of model project
 func createProject(p *Project) {
 	c := dbms.Pool.Get()
+	defer c.Close()
 	p.Id, _ = redis.Int(c.Do("INCR", "autoIncrProject"))
 	p.Pid = base.HashedProjectId(p.Id)
 	go dbms.CreateProjectIndex(p.Id, p.Pid)
@@ -475,10 +476,8 @@ func createProject(p *Project) {
 			local pid = KEYS[2]
 			redis.call("HMSET", "project:"..pid,
 					   KEYS[1], pid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
-					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12]
-					   KEYS[13], KYES[14])
-			redis.call("SADD", KEYS[15], pid)
-			redis.call("SADD", KEYS[16], pid)
+					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
+					   KEYS[13], KEYS[14])
 			`
 	ka := []interface{}{
 		//project models
@@ -489,16 +488,16 @@ func createProject(p *Project) {
 		PCreatorId, p.CreatorId,
 		PPrivate, p.Private,
 		PName, p.Name,
-		//redis set
-		fmt.Sprintf(userPjJoinedSet, p.CreatorId),
-		fmt.Sprintf(userPjCreatedSet, p.CreatorId),
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
 	if err != nil {
 		log.Error("Error create project:", err)
 	}
-	c.Close()
+	c.Send("SADD", fmt.Sprintf(userPjJoinedSet, p.CreatorId), p.Id)
+	c.Send("SADD", fmt.Sprintf(userPjJoinedSet, p.CreatorId), p.Id)
+	c.Send("SADD", fmt.Sprintf(projectMembersSet, p.Id), p.CreatorId)
+	c.Flush()
 	//}()
 }
 
@@ -525,16 +524,26 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 	return reply, err
 }
 
-func readProject(pid int) (p *Project, err error) {
+func readFullProject(p *Project) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	project := "project:" + strconv.Itoa(pid)
-	ret, err := redis.Values(c.Do("HGETALL", project))
+	pj := "project:" + strconv.Itoa(p.Id)
+	ret, err := redis.Values(c.Do("HGETALL", pj))
 	if err != nil {
-		return
+		return err
 	}
 	err = redis.ScanStruct(ret, p)
-	return
+	return err
+}
+
+func readCreator(pid int) (*User, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	uid, err := redis.Int(c.Do("HGET", "project:"+strconv.Itoa(pid), PCreatorId))
+	if err != nil {
+		return nil, err
+	}
+	return readUser(uid)
 }
 
 func readProjectMembersId(pid int) (ids []int, err error) {
@@ -564,6 +573,21 @@ func updateProject(pid int, kvMap map[string]interface{}) error {
 	for k, v := range kvMap {
 		c.Send("HSET", "project:"+strconv.Itoa(pid), k, v)
 	}
+	return c.Flush()
+}
+
+func deleteProject(pid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	c.Send("DEL", "project:"+strconv.Itoa(pid))
+	return c.Flush()
+}
+
+func updateUserProjectSet(pid, uid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	c.Send("SREM", fmt.Sprintf(userPjJoinedSet, uid), pid)
+	c.Send("SREM", fmt.Sprintf(userPjCreatedSet, uid), pid)
 	return c.Flush()
 }
 

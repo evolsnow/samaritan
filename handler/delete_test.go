@@ -48,3 +48,14 @@ func TestDeleteTodo(t *testing.T) {
 		t.Error("delete todo failed:", reply.Msg)
 	}
 }
+
+func TestDeleteProject(t *testing.T) {
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	pid := cache.Get("delete_test_project_pid")
+	reply := new(delProjectResp)
+	del("http://127.0.0.1:8080/projects/"+pid, auth, reply)
+	if reply.Code != 0 {
+		t.Error("delete project failed:", reply.Msg)
+	}
+}

@@ -40,7 +40,7 @@ func beforeTest() {
 	t1 := &model.Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
-		Desc:      "desc here",
+		Desc:      "todo 1 desc here",
 	}
 	t1.Save()
 	//dbms.CreateTodoIndex(t.Id, t.Pid)
@@ -49,10 +49,17 @@ func beforeTest() {
 	t2 := &model.Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
-		Desc:      "desc here 2",
+		Desc:      "todo 2 desc here",
 	}
 	t2.Save()
 	//dbms.CreateTodoIndex(t2.Id, t2.Pid)
 	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
 
+	p := &model.Project{
+		CreatorId: u.Id,
+		Name:      "pj name",
+		Desc:      "pj desc",
+	}
+	p.Save()
+	cache.Set("delete_test_project_pid", p.Pid, time.Minute*5)
 }

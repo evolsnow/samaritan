@@ -113,3 +113,27 @@ func TestNewTodo(t *testing.T) {
 		t.Error("save todo error")
 	}
 }
+
+func TestNewProject(t *testing.T) {
+	req := &postPjReq{
+		Name:    "name",
+		Desc:    "desc",
+		Private: false,
+	}
+
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	//normal case
+	reply := new(postPjResp)
+	post("http://127.0.0.1:8080/projects", auth, req, reply)
+	if reply.Id == "" {
+		t.Error("post projects error")
+		t.FailNow()
+	}
+	pid := dbms.ReadProjectId(reply.Id)
+	pj := &model.Project{Id: pid}
+	pj.Load()
+	if pj.Desc != req.Desc || pj.Private != req.Private {
+		t.Error("save project error")
+	}
+}

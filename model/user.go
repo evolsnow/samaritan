@@ -34,7 +34,7 @@ func (u *User) GetPassword() (pwd string) {
 }
 
 //user created projects
-func (u *User) GetCreatedProjects() []*Project {
+func (u *User) GetCreatedProjects() []Project {
 	ret, err := readCreatedProjects(u.Id)
 	if err != nil {
 		log.Error("Err get created projects:", err)
@@ -44,7 +44,7 @@ func (u *User) GetCreatedProjects() []*Project {
 }
 
 //user joined projects
-func (u *User) GetJoinedProjects() []*Project {
+func (u *User) GetJoinedProjects() []Project {
 	ret, err := readJoinedProjects(u.Id)
 	if err != nil {
 		log.Error("Err get joined projects:", err)
@@ -53,9 +53,29 @@ func (u *User) GetJoinedProjects() []*Project {
 	return ret
 }
 
+//all projects
+func (u *User) GetAllProjects() []Project {
+	pjs := u.GetCreatedProjects()
+	tmp := u.GetJoinedProjects()
+	in := func(a Project, list []Project) bool {
+		for _, b := range list {
+			if b.Id == a.Id {
+				return true
+			}
+		}
+		return false
+	}
+	for _, p := range tmp {
+		if !in(p, pjs) {
+			pjs = append(pjs, p)
+		}
+	}
+	return pjs
+}
+
 //generate avatar url for user
 func (u *User) CreateAvatar() {
-	path, err := base.GenerateAvatar(u.Phone)
+	path, err := base.GenerateAvatar(u.Email)
 	if err != nil {
 		log.Error("Error generate user's avatar:", err)
 	}
