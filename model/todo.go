@@ -28,7 +28,7 @@ func (td *Todo) GetOwner() (owner *User) {
 	if td.OwnerId == 0 {
 		owner, err = readOwner(td.Id)
 	} else {
-		owner, err = readUser(td.OwnerId)
+		owner, err = readUserWithId(td.OwnerId)
 	}
 	if err != nil {
 		log.Error("Error get user with todo:", err)

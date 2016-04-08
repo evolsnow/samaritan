@@ -137,3 +137,19 @@ func TestNewProject(t *testing.T) {
 		t.Error("save project error")
 	}
 }
+
+func TestNewInvitation(t *testing.T) {
+	req := &postInvitationReq{
+		Invitee:     "gsc1215225@gmail.com",
+		ProjectId:   "e2a7af07009a48fce8b0c2646f5089d3",
+		ProjectName: "pj name",
+		Remark:      "remark",
+	}
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	reply := new(postInvitationResp)
+	post("http://127.0.0.1:8080/invitations", auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("failed to invite")
+	}
+}

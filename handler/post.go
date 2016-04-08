@@ -26,6 +26,12 @@ const (
 	NotRegisteredErr     = "用户未注册"
 	AlreadyRegisteredErr = "用户已注册"
 	PasswordMismatchErr  = "密码不匹配"
+
+	NotExistErr = "用户不存在"
+)
+
+const (
+	InvitedToJoinProject = "%s 邀请你加入项目: %s"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -223,4 +229,32 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	resp.Token = base.MakeToken(us.Id)
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
+}
+
+func NewInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postInvitationReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	user := &model.User{Id: uid}
+	user.Load()
+	go func() {
+		msg := fmt.Sprintf(InvitedToJoinProject, user.Name, req.ProjectName)
+		payload := make(map[string]string)
+		payload["invitor"] = user.Pid
+		payload["projectId"] = req.ProjectId
+		payload["remark"] = req.Remark
+		push := &model.Chat{
+			Type:      model.InvitedToProject,
+			Target:    req.Invitee,
+			Msg:       msg,
+			ExtraInfo: payload,
+		}
+		log.DebugJson(push)
+		push.Response()
+	}()
+	makeBaseResp(w, r)
 }

@@ -84,6 +84,7 @@ const (
 	ChMsg       = "msg"
 	ChGroupName = "groupName"
 	ChFrom      = "from"
+	ChTimeStamp = "timestamp"
 )
 
 //other useful index set key name
@@ -163,7 +164,7 @@ func createUser(u *User) {
 	//}()
 }
 
-func readUser(id int) (*User, error) {
+func readUserWithId(id int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(id)
@@ -174,6 +175,18 @@ func readUser(id int) (*User, error) {
 	u := new(User)
 	err = redis.ScanStruct(ret, u)
 	return u, err
+}
+
+func readFullUser(u *User) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	user := "user:" + strconv.Itoa(u.Id)
+	ret, err := redis.Values(c.Do("HGETALL", user))
+	if err != nil {
+		return err
+	}
+	err = redis.ScanStruct(ret, u)
+	return err
 }
 
 func createUserAvatar(uid int, avatarUrl string) error {
@@ -301,7 +314,7 @@ func readOwner(tid int) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return readUser(uid)
+	return readUserWithId(uid)
 }
 
 func readBelongedMission(tid int) (*Mission, error) {
@@ -543,7 +556,7 @@ func readCreator(pid int) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return readUser(uid)
+	return readUserWithId(uid)
 }
 
 func readProjectMembersId(pid int) (ids []int, err error) {
@@ -601,16 +614,16 @@ func createChat(ct *Chat) int {
 	redis.call("HMSET", "chat:"..cid,
 					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					KEYS[7], KEYS[8], KEYS[9], KEYS[10],
-					KEYS[11], KEYS[12], KEYS[13], KEYS[14])
-	rerurn cid
+					KEYS[11], KEYS[12], KEYS[13], KEYS[14], KEYS[15], KEYS[16])
+	return cid
 	`
 	ka := []interface{}{
-		CId, ct.Id,
+		ChId, ct.Id,
 		ChConvId, ct.ConversationId,
 		ChType, ct.Type,
 		ChTarget, ct.Target,
 		ChMsg, ct.Msg,
-
+		ChTimeStamp, ct.Timestamp,
 		ChGroupName, ct.GroupName,
 		ChFrom, ct.From,
 	}

@@ -54,18 +54,18 @@ func SendSMS(to, text string) (err error) {
 	return fmt.Errorf(resp.Reason)
 }
 
-func SocketPush(tokenList []string, msg string) []string {
+func SocketPush(tokenList []string, msg string, extraInfo map[string]string) []string {
 	log.Debug("calling rpc.SocketPush")
-	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, UserToken: tokenList})
+	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, ExtraInfo: extraInfo, UserToken: tokenList})
 	if err != nil {
 		log.Error("socket push err:", err)
 	}
 	return spr.UserToken
 }
 
-func IOSPush(tokenList []string, msg string) {
+func IOSPush(tokenList []string, msg string, extraInfo map[string]string) {
 	log.Debug("calling rpc.IOSPush")
-	RpcClientF.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, DeviceToken: tokenList})
+	RpcClientF.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, ExtraInfo: extraInfo, DeviceToken: tokenList})
 }
 
 func receiveChat() {

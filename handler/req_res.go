@@ -199,6 +199,35 @@ type postAccessTokenResp struct {
 	Token string `json:"token"`
 }
 
+type postInvitationReq struct {
+	Invitee     string `json:"invitee"`
+	ProjectId   string `json:"projectId"`
+	ProjectName string `json:"projectName"`
+	Remark      string `json:"remark"`
+}
+
+func (pi *postInvitationReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pi.Invitee: binding.Field{
+			Form:     "invitee",
+			Required: true,
+		},
+		&pi.ProjectId: binding.Field{
+			Form:     "projectId",
+			Required: true,
+		},
+		&pi.ProjectName: binding.Field{
+			Form:     "projectName",
+			Required: true,
+		},
+		&pi.Remark: "remark",
+	}
+}
+
+type postInvitationResp struct {
+	baseResp
+}
+
 //get method
 
 //samId available status
@@ -222,6 +251,14 @@ type NestedProjects struct {
 type userProjectsResp struct {
 	baseResp
 	Np []NestedProjects `json:"projects"`
+}
+
+//search user
+type userSearchResp struct {
+	baseResp
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
 }
 
 //put method

@@ -105,3 +105,12 @@ func (u *User) Save() {
 		updateUser(u.Id, kvMap)
 	}
 }
+
+//full read from redis
+func (u *User) Load() (err error) {
+	err = readFullUser(u)
+	if err != nil {
+		log.Debug(err)
+	}
+	return
+}

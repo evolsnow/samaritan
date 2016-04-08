@@ -26,14 +26,16 @@ func newRouter() *httprouter.Router {
 	//http get method
 	r.GET("/samIds/:samId", hd.SamIdStatus)
 	r.GET("/projects", mw.Auth(hd.UserProjectList))
+	r.GET("/users/:user", hd.SearchUser)
 
 	//http post method
 	r.POST("/users", hd.NewUser)
+	r.POST("/verifyCode/:source", hd.NewVerifyCode)
+	r.POST("/accessToken", hd.NewAccessToken)
 	r.POST("/todos", mw.Auth(hd.NewTodo))
 	r.POST("/projects", mw.Auth(hd.NewProject))
 	r.POST("/privateChats", mw.Auth(hd.NewPrivateChat))
-	r.POST("/verifyCode/:source", hd.NewVerifyCode)
-	r.POST("/accessToken", hd.NewAccessToken)
+	r.POST("/invitations", mw.Auth(hd.NewInvitation))
 	//todo upload device token
 
 	//http put method

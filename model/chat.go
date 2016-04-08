@@ -13,38 +13,29 @@ const (
 	//system call
 	UserJoined        // server -->> client
 	UserLeft          //server -->> client
-	InvitedToMission  //server -->> client
-	KickedFromMission //server -->> client
+	InvitedToProject  //server -->> client
+	KickedFromProject //server -->> client
 )
 
 type Chat struct {
-	Id             int      `json:"-" redis:"id"`
-	ConversationId string   `json:"convId,omitempty" redis:"convId"`
-	Type           int      `json:"type" redis:"type"`
-	Msg            string   `json:"msg,omitempty" redis:"msg"`
-	Target         string   `json:"target,omitempty" redis:"target"`       //joined or left user
-	GroupName      string   `json:"groupName,omitempty" redis:"groupName"` //as mission's name
-	From           string   `json:"from,omitempty" redis:"from"`
-	SenderId       int      `json:"-" redis:"-"` //server side use
-	To             []string `json:"to" redis:"to"`
-	ReceiversId    []int    `json:"-" redis:"-"` //server side use
-	Timestamp      int64    `json:"timestamp" redis:"timestamp"`
-}
-
-func (ct *Chat) Save(uid int) {
-	if ct.Id == 0 {
-		//not saved
-		ct.Id = createChat(ct)
-	} else {
-		//offline msg saved
-		updateOfflineMsg(uid, ct.Id)
-	}
+	Id             int               `json:"-" redis:"id"`
+	ConversationId string            `json:"convId,omitempty" redis:"convId"`
+	Type           int               `json:"type" redis:"type"`
+	Msg            string            `json:"msg,omitempty" redis:"msg"`
+	Target         string            `json:"target,omitempty" redis:"target"`       //joined or left user
+	GroupName      string            `json:"groupName,omitempty" redis:"groupName"` //as mission's name
+	From           string            `json:"from,omitempty" redis:"from"`
+	SenderId       int               `json:"-" redis:"-"` //server side use
+	To             []string          `json:"to,omitempty" redis:"to"`
+	ReceiversId    []int             `json:"-" redis:"-"` //server side use
+	Timestamp      int64             `json:"timestamp,omitempty" redis:"timestamp"`
+	ExtraInfo      map[string]string `json:"extraInfo" redis:"-"`
 }
 
 func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
-	case InvitedToMission, KickedFromMission:
+	case InvitedToProject, KickedFromProject:
 		uid := dbms.ReadUserId(ct.Target)
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
@@ -75,7 +66,7 @@ func (ct *Chat) send() {
 	for _, uid := range ct.ReceiversId {
 		userTokens = append(userTokens, base.MakeToken(uid))
 	}
-	offlineTokens := rpc.SocketPush(userTokens, ct.Msg) //use webSocket push
+	offlineTokens := rpc.SocketPush(userTokens, ct.Msg, ct.ExtraInfo) //use webSocket push
 	for _, ft := range offlineTokens {
 		uid, _ := base.ParseToken(ft)
 		go ct.Save(uid)
@@ -93,5 +84,15 @@ func applePush(tokens []string, ct *Chat) {
 		dt, _ := readDeviceToken(uid)
 		deviceList = append(deviceList, dt)
 	}
-	rpc.IOSPush(deviceList, ct.Msg)
+	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
+}
+
+func (ct *Chat) Save(uid int) {
+	if ct.Id == 0 {
+		//not saved
+		ct.Id = createChat(ct)
+	} else {
+		//offline msg saved
+		updateOfflineMsg(uid, ct.Id)
+	}
 }

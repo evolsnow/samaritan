@@ -33,6 +33,7 @@ func beforeTest() {
 		Password: "oldpwd",
 		Email:    "gsc1215225@gmail.com",
 	}
+	go u.CreateAvatar()
 	u.Save()
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)

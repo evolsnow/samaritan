@@ -88,3 +88,16 @@ func TestUserProjectList(t *testing.T) {
 		t.Error("should be unknow type")
 	}
 }
+
+func TestUserSearch(t *testing.T) {
+	reply := new(userSearchResp)
+	get("http://127.0.0.1:8080/users/mail@fake.com", "", reply)
+	if reply.Msg != NotExistErr {
+		t.Error("user not exist")
+	}
+	reply = new(userSearchResp)
+	get("http://127.0.0.1:8080/users/gsc1215225@gmail.com", "", reply)
+	if reply.Code != 0 || reply.Id == "" {
+		t.Error("failed to serach user")
+	}
+}

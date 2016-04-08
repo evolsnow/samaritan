@@ -84,3 +84,21 @@ func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
+
+func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userMail := ps.Get("user")
+	uid := dbms.ReadUserIdWithIndex(userMail, "mail")
+	if uid == 0 {
+		base.NotFoundErr(w, NotExistErr)
+		return
+	}
+	u := &model.User{Id: uid}
+	u.Load()
+	resp := userSearchResp{
+		Name:   u.Name,
+		Id:     u.Pid,
+		Avatar: u.FullAvatarUrl(),
+	}
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}
