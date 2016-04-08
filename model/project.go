@@ -45,9 +45,6 @@ func (p *Project) RemoveMember(uid int) (err error) {
 }
 
 func (p *Project) GetMembers() (members []*User) {
-	if len(p.MembersId) == 0 {
-		return
-	}
 	members, err := readProjectMembers(p.Id)
 	if err != nil {
 		log.Error("Error get project members:", err)
@@ -68,6 +65,16 @@ func (p *Project) GetMembersId() []int {
 	}
 	log.Debug("proj members id:", ids)
 	return ids
+}
+
+func (p *Project) GetMissions() (missions []*Mission) {
+	missions, err := readProjectMissions(p.Id)
+	if err != nil {
+		log.Error("Error get project missions:", err)
+		return nil
+	}
+	log.Debug("proj missions:", missions)
+	return
 }
 
 func (p *Project) Save() {

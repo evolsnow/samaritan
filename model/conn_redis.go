@@ -57,6 +57,7 @@ const (
 	MPublisherId   = "publisherId"
 	MCompletionNum = "completionNum"
 	MCompletedTime = "completedTime"
+	MProjectId     = "projectId"
 	//comments
 	CId         = "id"
 	CPid        = "pid"
@@ -108,8 +109,8 @@ const (
 	missionCommentsList = "mission:%d:comments"  //mission's comments redis-type:List
 
 	//project
-	projectMembersSet = "project:%d:members" //project's members redis-type:Set
-
+	projectMembersSet  = "project:%d:members" //project's members redis-type:Set
+	projectMissionsSet = "project:%d:missions"
 	//chat
 	deviceToken    = "deviceToken:%d"     //ios device token
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
@@ -220,12 +221,12 @@ func readProjects(key string) ([]Project, error) {
 	`
 	script := redis.NewScript(1, lua)
 	results, err := redis.Values(script.Do(c, key))
-	var ps []Project
+	ps := make([]Project, len(results))
 	for i, _ := range results {
 		p := new(Project)
 		err = redis.ScanStruct(results[i].([]interface{}), p)
 		log.DebugJson(*p)
-		ps = append(ps, *p)
+		ps[i] = *p
 	}
 	return ps, err
 }
@@ -369,7 +370,7 @@ func createMission(m *Mission) {
 			redis.call("HMSET", "mission:"..mid,
 					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
-					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
+					   KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18])
 
 			`
 	ka := []interface{}{
@@ -382,6 +383,7 @@ func createMission(m *Mission) {
 		MPublisherId, m.PublisherId,
 		MCompletionNum, m.CompletionNum,
 		MCompletedTime, m.CompletedTime,
+		MProjectId, m.ProjectId,
 	}
 	script := redis.NewScript(len(ka), lua)
 	_, err := script.Do(c, ka...)
@@ -391,6 +393,9 @@ func createMission(m *Mission) {
 
 	c.Send("SADD", fmt.Sprintf(userMsPublishedSet, m.PublisherId), m.Id)
 	c.Send("SADD", fmt.Sprintf(userMsAcceptedSet, m.PublisherId), m.Id)
+	if m.ProjectId != 0 {
+		c.Send("SADD", fmt.Sprintf(projectMissionsSet, m.ProjectId), m.Id)
+	}
 	c.Flush()
 	//}()
 }
@@ -451,11 +456,12 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
   		return ret
 	`
 	script := redis.NewScript(1, lua)
-	rets, err := redis.Values(script.Do(c, key))
-	for _, v := range rets {
+	results, err := redis.Values(script.Do(c, key))
+	cms = make([]*Comment, len(results))
+	for i, v := range results {
 		cmt := new(Comment)
 		err = redis.ScanStruct(v.([]interface{}), cmt)
-		cms = append(cms, cmt)
+		cms[i] = cmt
 	}
 	return
 }
@@ -526,13 +532,36 @@ func readProjectMembers(pid int) (reply []*User, err error) {
   	end
   	return ret
    	`
-	script := redis.NewScript(0, lua)
+	script := redis.NewScript(1, lua)
 	users, err := redis.Values(script.Do(c, rcvSet))
 	reply = make([]*User, len(users))
 	for _, v := range users {
 		rcv := new(User)
 		err = redis.ScanStruct(v.([]interface{}), rcv)
 		reply = append(reply, rcv)
+	}
+	return reply, err
+}
+
+func readProjectMissions(pid int) (reply []*Mission, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	msSet := fmt.Sprintf(projectMissionsSet, pid)
+	lua := `
+	local data = redis.call("SMEMBERS", KEYS[1])
+	local ret = {}
+  	for idx=1,#data do
+  		ret[idx] = redis.call("HGETALL","mission:"..data[idx])
+  	end
+  	return ret
+   	`
+	script := redis.NewScript(1, lua)
+	ms, err := redis.Values(script.Do(c, msSet))
+	reply = make([]*Mission, len(ms))
+	for i, v := range ms {
+		m := new(Mission)
+		err = redis.ScanStruct(v.([]interface{}), m)
+		reply[i] = m
 	}
 	return reply, err
 }

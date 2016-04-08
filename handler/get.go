@@ -13,6 +13,13 @@ const (
 	LengthErr  = "长度应为4-8位"
 	CharsetErr = "仅支持a-z, A-Z, 0-9 以及 _"
 	ExistErr   = "已经被注册"
+
+	UnknownTypeErr = "未知类型"
+
+	ProjectNotExistErr = "项目不存在"
+	MissionNotExistErr = "任务不存在"
+
+	NotMemberErr = "不是本项目成员,无法查看项目"
 )
 
 func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -60,16 +67,15 @@ func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 		base.BadReqErr(w, UnknownTypeErr)
 		return
 	}
-	nps := make([]NestedProjects, len(pjs))
+	nps := make([]NestedProject, len(pjs))
 	var createdOrJoined string
 	for i, p := range pjs {
-		log.DebugJson(p)
 		if p.CreatorId == uid {
 			createdOrJoined = "created"
 		} else {
 			createdOrJoined = "joined"
 		}
-		np := NestedProjects{
+		np := NestedProject{
 			Id:          p.Pid,
 			Name:        p.Name,
 			Desc:        p.Desc,
@@ -89,7 +95,7 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userMail := ps.Get("user")
 	uid := dbms.ReadUserIdWithIndex(userMail, "mail")
 	if uid == 0 {
-		base.NotFoundErr(w, NotExistErr)
+		base.NotFoundErr(w, UserNotExistErr)
 		return
 	}
 	u := &model.User{Id: uid}
@@ -99,6 +105,67 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Id:     u.Pid,
 		Avatar: u.FullAvatarUrl(),
 	}
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}
+
+func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	pid := dbms.ReadProjectId(ps.Get("project"))
+	if pid == 0 {
+		base.NotFoundErr(w, ProjectNotExistErr)
+		return
+	}
+	resp := new(projectMissionsResp)
+	p := &model.Project{Id: pid}
+	ms := p.GetMissions()
+	in := func(a int, list []int) bool {
+		for _, v := range list {
+			if a == v {
+				return true
+			}
+		}
+		return false
+	}
+	if !in(ps.GetInt("authId"), p.GetMembersId()) {
+		base.ForbidErr(w, NotMemberErr)
+		return
+	}
+	nms := make([]NestedMission, len(ms))
+	for i, v := range ms {
+		nm := NestedMission{
+			Id:            v.Pid,
+			Name:          v.Name,
+			Desc:          v.Desc,
+			completionNum: v.CompletionNum,
+		}
+		nms[i] = nm
+	}
+	resp.Nm = nms
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}
+
+func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	mid := dbms.ReadProjectId(ps.Get("mission"))
+	if mid == 0 {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
+	resp := new(missionCommentResp)
+	m := &model.Mission{Id: mid}
+	cms := m.GetComments()
+
+	ncs := make([]NestedComment, len(cms))
+	for i, v := range cms {
+		nc := NestedComment{
+			Id:         v.Pid,
+			When:       v.When,
+			CriticPid:  v.CriticPid,
+			CriticName: v.CriticName,
+		}
+		ncs[i] = nc
+	}
+	resp.Nm = ncs
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }

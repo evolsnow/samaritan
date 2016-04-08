@@ -92,12 +92,64 @@ func TestUserProjectList(t *testing.T) {
 func TestUserSearch(t *testing.T) {
 	reply := new(userSearchResp)
 	get("http://127.0.0.1:8080/users/mail@fake.com", "", reply)
-	if reply.Msg != NotExistErr {
+	if reply.Msg != UserNotExistErr {
 		t.Error("user not exist")
 	}
 	reply = new(userSearchResp)
 	get("http://127.0.0.1:8080/users/gsc1215225@gmail.com", "", reply)
 	if reply.Code != 0 || reply.Id == "" {
 		t.Error("failed to serach user")
+	}
+}
+
+func TestProjectMissionList(t *testing.T) {
+
+	reply := new(projectMissionsResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	p := &model.Project{
+		CreatorId: uid,
+		Name:      "pj2 name",
+		Desc:      "pj2 desc",
+	}
+	p.Save()
+	m := &model.Mission{
+		PublisherId:   uid,
+		ProjectId:     p.Id,
+		Name:          "ms name",
+		Desc:          "ms desc",
+		CompletionNum: 70,
+	}
+	m.Save()
+	auth := base.MakeToken(uid)
+	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, "", reply)
+	if reply.Code == 0 {
+		t.Error("should be unauthorized")
+	}
+	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, auth, reply)
+	if reply.Code != 0 || len(reply.Nm) < 1 {
+		t.Error("failed to get missions")
+	}
+	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, base.MakeToken(123), reply)
+	if reply.Code == 0 || reply.Msg != NotMemberErr {
+		t.Error("not member")
+	}
+}
+
+func TestMissionCommentList(t *testing.T) {
+
+	reply := new(missionCommentResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+
+	m := &model.Mission{
+		PublisherId:   uid,
+		Name:          "ms name 3",
+		Desc:          "ms desc 3",
+		CompletionNum: 10,
+	}
+	m.Save()
+	auth := base.MakeToken(uid)
+	get("http://127.0.0.1:8080/missions/comments/"+m.Pid, auth, reply)
+	if reply.Code != 0 {
+		t.Error("failed to get comment")
 	}
 }

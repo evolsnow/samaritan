@@ -16,6 +16,7 @@ type Mission struct {
 	CompletionNum int       `json:"completionNum,omitempty" redis:"completionNum"` //completed number
 	CompletedTime int64     `json:"completedTime,omitempty" redis:"completedTime"`
 	Comments      []Comment `json:"comments,omitempty" redis:"-"`
+	ProjectId     int       `json:"projectId,omitempty" redis:"projectId"` //belong to which mission
 }
 
 type Comment struct {
@@ -38,6 +39,29 @@ func (m *Mission) GetReceiversId() []int {
 	}
 	log.Debug("receivers id:", ids)
 	return ids
+}
+
+func (m *Mission) GetComments() (comments []*Comment) {
+	comments, err := readMissionComments(m.Id)
+	if err != nil {
+		log.Error("Error get mission comments:", err)
+		return nil
+	}
+	log.Debug("mission comments:", comments)
+	return
+}
+
+//save a new mission
+func (m *Mission) Save() {
+	if m.Id == 0 {
+		//new mission
+		log.DebugJson("create mission:", m)
+		createMission(m)
+	} else {
+		kvMap := prepareToUpdate(m)
+		log.Debug("update mission with: ", kvMap)
+		updateMission(m.Id, kvMap)
+	}
 }
 
 func (cm *Comment) Save() {

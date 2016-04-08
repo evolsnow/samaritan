@@ -88,8 +88,7 @@ func (u *User) CreateAvatar() {
 
 //full url of avatar img
 func (u *User) FullAvatarUrl() string {
-	prefix := "https://img.samaritan.tech"
-	log.Debug(prefix + u.Avatar)
+	prefix := "https://img.samaritan.tech/"
 	return prefix + u.Avatar
 }
 

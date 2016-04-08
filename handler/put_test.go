@@ -40,7 +40,7 @@ func TestUpdatePassword(t *testing.T) {
 	reply := new(putPasswordResp)
 	put("http://127.0.0.1:8080/users/password/gsc1215225@gmail.com", "", req, reply)
 	if reply.Code != 0 {
-		t.Error("update failed")
+		t.Error("update failed", reply.Msg)
 	}
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
 	u := &model.User{

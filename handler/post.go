@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	UnknownTypeErr  = "未知验证码类型"
-	ExpiredErr      = "验证码未发生或已过期"
-	CodeMismatchErr = "验证码不匹配"
+	UnknownCodeTypeErr = "未知验证码类型"
+	ExpiredErr         = "验证码未发送或已过期"
+	CodeMismatchErr    = "验证码不匹配"
 
 	UnknownUseErr    = "未知验证码用途"
 	UnknownSourceErr = "未知的发送渠道"
@@ -27,7 +27,7 @@ const (
 	AlreadyRegisteredErr = "用户已注册"
 	PasswordMismatchErr  = "密码不匹配"
 
-	NotExistErr = "用户不存在"
+	UserNotExistErr = "用户不存在"
 )
 
 const (
@@ -50,7 +50,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		code = cache.Get(req.Mail + ":code")
 		info, source = req.Mail, "mail"
 	} else {
-		base.BadReqErr(w, UnknownTypeErr)
+		base.BadReqErr(w, UnknownCodeTypeErr)
 		return
 	}
 	if code == "" {

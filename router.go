@@ -26,6 +26,8 @@ func newRouter() *httprouter.Router {
 	//http get method
 	r.GET("/samIds/:samId", hd.SamIdStatus)
 	r.GET("/projects", mw.Auth(hd.UserProjectList))
+	r.GET("/projects/missions/:project", mw.Auth(hd.ProjectMissionList))
+	r.GET("/missions/comments/:mission", mw.Auth(hd.MissionCommentList))
 	r.GET("/users/:user", hd.SearchUser)
 
 	//http post method

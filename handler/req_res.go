@@ -238,7 +238,7 @@ type samIdStatusResp struct {
 
 //user projects
 
-type NestedProjects struct {
+type NestedProject struct {
 	Id          string `json:"id"` //public id
 	Name        string `json:"name"`
 	Desc        string `json:"desc,omitempty"` //description for the project
@@ -250,7 +250,7 @@ type NestedProjects struct {
 
 type userProjectsResp struct {
 	baseResp
-	Np []NestedProjects `json:"projects"`
+	Np []NestedProject `json:"projects"`
 }
 
 //search user
@@ -259,6 +259,34 @@ type userSearchResp struct {
 	Id     string `json:"id"`
 	Name   string `json:"name"`
 	Avatar string `json:"avatar"`
+}
+
+//project missions
+
+type NestedMission struct {
+	Id            string `json:"id"` //public id
+	Name          string `json:"name"`
+	Desc          string `json:"desc,omitempty"` //description for the project
+	completionNum int    `json:"completionNum"`
+}
+
+type projectMissionsResp struct {
+	baseResp
+	Nm []NestedMission `json:"missions"`
+}
+
+//mission comments
+
+type NestedComment struct {
+	Id         string `json:"id"`
+	When       int64  `json:"when"`
+	CriticPid  string `json:"userId"`
+	CriticName string `json:"userName"`
+}
+
+type missionCommentResp struct {
+	baseResp
+	Nm []NestedComment `json:"comments"`
 }
 
 //put method
