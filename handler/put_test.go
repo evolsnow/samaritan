@@ -100,3 +100,35 @@ func TestUpdateTodo(t *testing.T) {
 		t.Error("todo place not changed")
 	}
 }
+
+func TestUpdateMissionStatus(t *testing.T) {
+	mPid := cache.Get("put_test_mission_pid")
+	req := &putMsStatusReq{
+		Done: true,
+	}
+	reply := new(putMsStatusResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	//completed
+	put("http://127.0.0.1:8080/missions/status/"+mPid, auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("update mission status failed")
+	}
+	m := &model.Mission{Id: dbms.ReadMissionId(mPid)}
+	m.Load()
+	if m.CompletionNum != 50 {
+		t.Error("update mission completion failed:", m.CompletionNum)
+	}
+	//uncompleted
+	req = &putMsStatusReq{
+		Done: false,
+	}
+	reply = new(putMsStatusResp)
+	put("http://127.0.0.1:8080/missions/status/"+mPid, auth, req, reply)
+	m.Load()
+	if m.CompletionNum != 0 {
+		t.Error("update mission uncompletion failed:", m.CompletionNum)
+
+	}
+
+}

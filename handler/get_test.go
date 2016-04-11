@@ -130,7 +130,7 @@ func TestProjectMissionList(t *testing.T) {
 		t.Error("failed to get missions")
 	}
 	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, base.MakeToken(123), reply)
-	if reply.Code == 0 || reply.Msg != NotMemberErr {
+	if reply.Code == 0 || reply.Msg != NotProjectMemberErr {
 		t.Error("not member")
 	}
 }

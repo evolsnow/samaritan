@@ -101,3 +101,12 @@ func setError(w http.ResponseWriter, desc string, status int) {
 	w.WriteHeader(status)
 	w.Write(msg)
 }
+
+func InIntSlice(a int, list []int) bool {
+	for _, v := range list {
+		if a == v {
+			return true
+		}
+	}
+	return false
+}

@@ -62,3 +62,15 @@ func TestValidSamId(t *testing.T) {
 		t.Error("empty")
 	}
 }
+
+func TestInIntSlice(t *testing.T) {
+	a := 1
+	b := []int{1, 2, 3, 4, 5}
+	if !InIntSlice(a, b) {
+		t.Error("in int error")
+	}
+	a = 6
+	if InIntSlice(a, b) {
+		t.Error("not in int slice")
+	}
+}

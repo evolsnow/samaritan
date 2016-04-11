@@ -33,8 +33,8 @@ func beforeTest() {
 		Password: "oldpwd",
 		Email:    "gsc1215225@gmail.com",
 	}
-	go u.CreateAvatar()
 	u.Save()
+	go u.CreateAvatar()
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
 
@@ -55,6 +55,14 @@ func beforeTest() {
 	t2.Save()
 	//dbms.CreateTodoIndex(t2.Id, t2.Pid)
 	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
+
+	m := &model.Mission{
+		Name: "test mission",
+	}
+	m.Save()
+	m.AddReceiver(u.Id)
+	m.AddReceiver(10)
+	cache.Set("put_test_mission_pid", m.Pid, time.Minute*5)
 
 	p := &model.Project{
 		CreatorId: u.Id,

@@ -20,6 +20,22 @@ func prepareToUpdate(s interface{}) map[string]interface{} {
 	return kvMap
 }
 
+func prepareToForceUpdate(s interface{}) map[string]interface{} {
+	v := reflect.ValueOf(s).Elem() // the struct variable
+	kvMap := make(map[string]interface{})
+	for i := 0; i < v.NumField(); i++ {
+		fieldInfo := v.Type().Field(i) // a reflect.StructField
+		name := fieldInfo.Name
+		if name == "Id" {
+			//skip to update id
+			continue
+		}
+		value := v.FieldByName(name)
+		kvMap[fieldInfo.Tag.Get("redis")] = value
+	}
+	return kvMap
+}
+
 func isEmptyOrSkipValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice:

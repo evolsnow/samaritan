@@ -10,6 +10,10 @@ import (
 	"net/http"
 )
 
+const (
+	NotMissionMemberErr = "您还未接受此任务"
+)
+
 func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putPasswordReq)
 	errs := binding.Bind(r, req)
@@ -68,5 +72,38 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		td.Finish()
 	}
 	td.Save()
+	makeBaseResp(w, r)
+}
+
+func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putMsStatusReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	u := &model.User{Id: uid}
+	mid := dbms.ReadMissionId(ps.Get("mission"))
+	if mid == 0 {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
+	m := &model.Mission{Id: mid}
+	receivers := m.GetReceiversId()
+	if !base.InIntSlice(uid, receivers) {
+		base.ForbidErr(w, NotMissionMemberErr)
+		return
+	}
+	m.Load()
+	if req.Done && !base.InIntSlice(uid, u.GetAllCompletedMission()) {
+		m.CompletionNum += 100 / len(receivers)
+		u.CompleteMission(m.Id)
+	}
+	if !req.Done && base.InIntSlice(uid, u.GetAllCompletedMission()) {
+		m.CompletionNum -= 100 / len(receivers)
+		u.UnCompleteMission(m.Id)
+	}
+	m.ForceSave()
 	makeBaseResp(w, r)
 }

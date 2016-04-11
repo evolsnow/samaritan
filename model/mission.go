@@ -41,6 +41,15 @@ func (m *Mission) GetReceiversId() []int {
 	return ids
 }
 
+func (m *Mission) AddReceiver(uid int) (err error) {
+	err = updateMissionReceiver(m.Id, uid, 1)
+	if err != nil {
+		log.Error("Error add receiver:", err)
+		return err
+	}
+	return
+}
+
 func (m *Mission) GetComments() (comments []*Comment) {
 	comments, err := readMissionComments(m.Id)
 	if err != nil {
@@ -64,7 +73,29 @@ func (m *Mission) Save() {
 	}
 }
 
+//save a new mission
+func (m *Mission) ForceSave() {
+	if m.Id == 0 {
+		//new mission
+		log.DebugJson("force create mission:", m)
+		createMission(m)
+	} else {
+		kvMap := prepareToForceUpdate(m)
+		log.Debug("force update mission with: ", kvMap)
+		updateMission(m.Id, kvMap)
+	}
+}
+
 func (cm *Comment) Save() {
 	log.Debug("create comment:", cm)
 	createMissionComment(cm)
+}
+
+//full read from redis
+func (m *Mission) Load() (err error) {
+	err = readFullMission(m)
+	if err != nil {
+		log.Debug(err)
+	}
+	return
 }

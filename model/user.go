@@ -73,6 +73,26 @@ func (u *User) GetAllProjects() []Project {
 	return pjs
 }
 
+//all completed missions id
+func (u *User) GetAllCompletedMission() []int {
+	var ids []int
+	ids, err := readCompletedMissionsId(u.Id)
+	if err != nil {
+		log.Error("Err get completed missions:", err)
+	}
+	return ids
+}
+
+//complete mission
+func (u *User) CompleteMission(mid int) {
+	updateCompletedMission(u.Id, mid)
+}
+
+//uncompleted mission
+func (u *User) UnCompleteMission(mid int) {
+	updateUnCompletedMission(u.Id, mid)
+}
+
 //generate avatar url for user
 func (u *User) CreateAvatar() {
 	path, err := base.GenerateAvatar(u.Email)

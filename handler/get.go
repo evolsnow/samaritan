@@ -19,7 +19,7 @@ const (
 	ProjectNotExistErr = "项目不存在"
 	MissionNotExistErr = "任务不存在"
 
-	NotMemberErr = "不是本项目成员,无法查看项目"
+	NotProjectMemberErr = "不是本项目成员,无法查看项目"
 )
 
 func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -118,16 +118,8 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	resp := new(projectMissionsResp)
 	p := &model.Project{Id: pid}
 	ms := p.GetMissions()
-	in := func(a int, list []int) bool {
-		for _, v := range list {
-			if a == v {
-				return true
-			}
-		}
-		return false
-	}
-	if !in(ps.GetInt("authId"), p.GetMembersId()) {
-		base.ForbidErr(w, NotMemberErr)
+	if !base.InIntSlice(ps.GetInt("authId"), p.GetMembersId()) {
+		base.ForbidErr(w, NotProjectMemberErr)
 		return
 	}
 	nms := make([]NestedMission, len(ms))

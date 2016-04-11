@@ -29,7 +29,7 @@ func main() {
 		log.Fatal("a vailid json config file must exist")
 	}
 	if cfg.RedisS.DB == CacheDB {
-		log.Fatal("redis db can not be same as cache db: '0'")
+		log.Fatal("redis db can not be same as cache db: '8'")
 	}
 
 	//init redis  pool

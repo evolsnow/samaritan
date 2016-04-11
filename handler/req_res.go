@@ -104,14 +104,11 @@ type postPjReq struct {
 
 func (pp *postPjReq) FieldMap(req *http.Request) binding.FieldMap {
 	return binding.FieldMap{
-		&pp.Desc: binding.Field{
-			Form:     "desc",
-			Required: true,
-		},
 		&pp.Name: binding.Field{
 			Form:     "name",
 			Required: true,
 		},
+		&pp.Desc:    "desc",
 		&pp.Private: "private",
 	}
 }
@@ -355,6 +352,25 @@ func (pt *putTdReq) FieldMap(req *http.Request) binding.FieldMap {
 }
 
 type putTdResp struct {
+	baseResp
+}
+
+//update mission
+type putMsStatusReq struct {
+	Done bool `json:"done"`
+}
+
+func (pm *putMsStatusReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		//&pm.Done: binding.Field{
+		//	Form:     "done",
+		//	Required: true,
+		//},
+		&pm.Done: "done",
+	}
+}
+
+type putMsStatusResp struct {
 	baseResp
 }
 

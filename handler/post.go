@@ -68,9 +68,9 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Name:       req.Name,
 		StudentNum: req.StuNum,
 	}
-	go us.CreateAvatar()
 	//assign id to user
 	us.Save()
+	go us.CreateAvatar()
 	//create user login/search index
 	go dbms.CreateSearchIndex(us.Id, info, source)
 	//return jwt token and public user id

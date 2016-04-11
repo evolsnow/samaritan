@@ -99,7 +99,9 @@ const (
 	userPjCreatedSet   = "user:%d:projects:create"
 	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
 	userMsPublishedSet = "user:%d:missions:publish"
-	userPjColorList    = "user:%d:project:%d:color" //user defined project color redis-type:List
+	userMsCompletedSet = "user:%d:missions:complete"
+
+	userPjColorList = "user:%d:project:%d:color" //user defined project color redis-type:List
 
 	//to-do
 	todoPictureList = "todo:%d:pictures" //to-do's pictures redis-type:List
@@ -231,12 +233,35 @@ func readProjects(key string) ([]Project, error) {
 	return ps, err
 }
 
+func readCompletedMissionsId(uid int) ([]int, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(userMsCompletedSet, uid)
+	ids, err := redis.Ints(c.Do("SMEMBERS", key))
+	return ids, err
+
+}
+
 func readPassword(uid int) (pwd string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(uid)
 	pwd, err = redis.String(c.Do("HGET", user, UPassword))
 	return
+}
+
+func updateCompletedMission(uid, mid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := c.Do("SADD", fmt.Sprintf(userMsCompletedSet, uid), mid)
+	return err
+}
+
+func updateUnCompletedMission(uid, mid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := c.Do("SREM", fmt.Sprintf(userMsCompletedSet, uid), mid)
+	return err
 }
 
 func updateUser(uid int, kvMap map[string]interface{}) error {
@@ -443,6 +468,18 @@ func readMission(mid int) (*Mission, error) {
 	return m, err
 }
 
+func readFullMission(m *Mission) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	mission := "mission:" + strconv.Itoa(m.Id)
+	ret, err := redis.Values(c.Do("HGETALL", mission))
+	if err != nil {
+		return err
+	}
+	err = redis.ScanStruct(ret, m)
+	return err
+}
+
 func readMissionComments(mid int) (cms []*Comment, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -481,6 +518,19 @@ func updateMission(mid int, kvMap map[string]interface{}) error {
 		c.Send("HSET", "mission:"+strconv.Itoa(mid), k, v)
 	}
 	return c.Flush()
+}
+
+func updateMissionReceiver(mid, uid, action int) (err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	memSet := fmt.Sprintf(missionReceiversSet, mid)
+	if action > 0 {
+		_, err = c.Do("SADD", memSet, uid)
+
+	} else {
+		_, err = c.Do("SREM", memSet, uid)
+	}
+	return
 }
 
 //redis actions of model project
