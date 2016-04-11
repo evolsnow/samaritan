@@ -47,6 +47,7 @@ func (m *Mission) AddReceiver(uid int) (err error) {
 		log.Error("Error add receiver:", err)
 		return err
 	}
+	m.UpdateCompleteNum()
 	return
 }
 
@@ -58,6 +59,27 @@ func (m *Mission) GetComments() (comments []*Comment) {
 	}
 	log.Debug("mission comments:", comments)
 	return
+}
+
+func (m *Mission) GetCompletedUsersId() []int {
+	if m.Id == 0 {
+		m.Id = dbms.ReadMissionId(m.Pid)
+	}
+	ids, err := readMissionCompletedUsersId(m.Id)
+	if err != nil {
+		log.Error("Error get mission completed user", err)
+		return nil
+	}
+	log.Debug("users id:", ids)
+	return ids
+}
+
+func (m *Mission) UpdateCompleteNum() {
+	lg := len(m.GetReceiversId())
+	if lg == 0 {
+		return
+	}
+	m.CompletionNum = 100 * len(m.GetCompletedUsersId()) / len(m.GetReceiversId())
 }
 
 //save a new mission

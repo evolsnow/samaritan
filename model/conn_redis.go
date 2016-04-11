@@ -107,8 +107,9 @@ const (
 	todoPictureList = "todo:%d:pictures" //to-do's pictures redis-type:List
 
 	//mission
-	missionReceiversSet = "mission:%d:receivers" //mission's receivers redis-type:Set
-	missionCommentsList = "mission:%d:comments"  //mission's comments redis-type:List
+	missionReceiversSet     = "mission:%d:receivers"      //mission's receivers redis-type:Set
+	missionCommentsList     = "mission:%d:comments"       //mission's comments redis-type:List
+	missionCompletedUserSet = "mission:%d:completedUsers" //mission's completed user redis-type:Set
 
 	//project
 	projectMembersSet  = "project:%d:members" //project's members redis-type:Set
@@ -253,14 +254,23 @@ func readPassword(uid int) (pwd string, err error) {
 func updateCompletedMission(uid, mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	_, err := c.Do("SADD", fmt.Sprintf(userMsCompletedSet, uid), mid)
-	return err
+	c.Send("SADD", fmt.Sprintf(userMsCompletedSet, uid), mid)
+	c.Send("SADD", fmt.Sprintf(missionCompletedUserSet, mid), uid)
+	return c.Flush()
 }
 
 func updateUnCompletedMission(uid, mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	_, err := c.Do("SREM", fmt.Sprintf(userMsCompletedSet, uid), mid)
+	c.Send("SREM", fmt.Sprintf(userMsCompletedSet, uid), mid)
+	c.Send("SREM", fmt.Sprintf(missionCompletedUserSet, mid), uid)
+	return c.Flush()
+}
+
+func updateAcceptedMission(uid, mid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := c.Do("SADD", fmt.Sprintf(userMsAcceptedSet, uid), mid)
 	return err
 }
 
@@ -513,6 +523,14 @@ func readMissionReceiversId(mid int) (ids []int, err error) {
 	return
 }
 
+func readMissionCompletedUsersId(mid int) (ids []int, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionCompletedUserSet, mid)
+	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
 func updateMission(mid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -528,7 +546,6 @@ func updateMissionReceiver(mid, uid, action int) (err error) {
 	memSet := fmt.Sprintf(missionReceiversSet, mid)
 	if action > 0 {
 		_, err = c.Do("SADD", memSet, uid)
-
 	} else {
 		_, err = c.Do("SREM", memSet, uid)
 	}

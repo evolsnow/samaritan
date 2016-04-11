@@ -128,7 +128,20 @@ func TestUpdateMissionStatus(t *testing.T) {
 	m.Load()
 	if m.CompletionNum != 0 {
 		t.Error("update mission uncompletion failed:", m.CompletionNum)
-
 	}
+}
 
+func TestAcceptMission(t *testing.T) {
+	mPid := cache.Get("put_test_mission_pid")
+	m := &model.Mission{Id: dbms.ReadMissionId(mPid)}
+	accepted := len(m.GetReceiversId())
+	req := new(putAcceptMsReq)
+	reply := new(putAcceptMsResp)
+	put("http://127.0.0.1:8080/missions/accepted/"+mPid, base.MakeToken(123), req, reply)
+	if reply.Code != 0 {
+		t.Error("failed to accept mission")
+	}
+	if len(m.GetReceiversId())-accepted != 1 {
+		t.Error("update accept set failed:", m.GetReceiversId())
+	}
 }

@@ -463,6 +463,20 @@ type putMsStatusResp struct {
 	baseResp
 }
 
+//accept mission
+type putAcceptMsReq struct {
+}
+
+func (pm *putAcceptMsReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+	//&pm.Done: "done",
+	}
+}
+
+type putAcceptMsResp struct {
+	baseResp
+}
+
 //delete method
 
 //delete to-do

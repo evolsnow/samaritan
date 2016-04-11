@@ -37,7 +37,7 @@ func (u *User) GetPassword() (pwd string) {
 func (u *User) GetCreatedProjects() []Project {
 	ret, err := readCreatedProjects(u.Id)
 	if err != nil {
-		log.Error("Err get created projects:", err)
+		log.Error("Error get created projects:", err)
 		return nil
 	}
 	return ret
@@ -47,7 +47,7 @@ func (u *User) GetCreatedProjects() []Project {
 func (u *User) GetJoinedProjects() []Project {
 	ret, err := readJoinedProjects(u.Id)
 	if err != nil {
-		log.Error("Err get joined projects:", err)
+		log.Error("Error get joined projects:", err)
 		return nil
 	}
 	return ret
@@ -78,19 +78,27 @@ func (u *User) GetAllCompletedMission() []int {
 	var ids []int
 	ids, err := readCompletedMissionsId(u.Id)
 	if err != nil {
-		log.Error("Err get completed missions:", err)
+		log.Error("Error get completed missions:", err)
 	}
 	return ids
 }
 
 //complete mission
 func (u *User) CompleteMission(mid int) {
-	updateCompletedMission(u.Id, mid)
+	if err := updateCompletedMission(u.Id, mid); err != nil {
+		log.Error("Error update completed mission:", err)
+	}
 }
 
 //uncompleted mission
 func (u *User) UnCompleteMission(mid int) {
-	updateUnCompletedMission(u.Id, mid)
+	if err := updateUnCompletedMission(u.Id, mid); err != nil {
+		log.Error("Error update uncompleted mission:", err)
+	}
+}
+
+func (u *User) AcceptMission(mid int) {
+	updateAcceptedMission(u.Id, mid)
 }
 
 //generate avatar url for user

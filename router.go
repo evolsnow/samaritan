@@ -49,7 +49,7 @@ func newRouter() *httprouter.Router {
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
 	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
 	r.PUT("/missions/status/:mission", mw.Auth((hd.UpdateMissionStatus)))
-
+	r.PUT("/missions/accepted/:mission", mw.Auth(hd.AcceptMission))
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
 	r.DELETE("/projects/:project", mw.Auth(hd.DeleteProject))

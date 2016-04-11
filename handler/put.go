@@ -112,3 +112,23 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	m.ForceSave()
 	makeBaseResp(w, r)
 }
+
+func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putAcceptMsReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	mid := dbms.ReadMissionId(ps.Get("mission"))
+	if mid == 0 {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
+	uid := ps.GetInt("authId")
+	u := &model.User{Id: uid}
+	m := &model.Mission{Id: mid}
+	m.AddReceiver(uid)
+	u.AcceptMission(m.Id)
+	makeBaseResp(w, r)
+}
