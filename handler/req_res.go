@@ -196,14 +196,15 @@ type postAccessTokenResp struct {
 	Token string `json:"token"`
 }
 
-type postInvitationReq struct {
+//project invitation
+type postProjectInvitationReq struct {
 	Invitee     string `json:"invitee"`
 	ProjectId   string `json:"projectId"`
 	ProjectName string `json:"projectName"`
 	Remark      string `json:"remark"`
 }
 
-func (pi *postInvitationReq) FieldMap(req *http.Request) binding.FieldMap {
+func (pi *postProjectInvitationReq) FieldMap(req *http.Request) binding.FieldMap {
 	return binding.FieldMap{
 		&pi.Invitee: binding.Field{
 			Form:     "invitee",
@@ -221,8 +222,82 @@ func (pi *postInvitationReq) FieldMap(req *http.Request) binding.FieldMap {
 	}
 }
 
-type postInvitationResp struct {
+type postProjectInvitationResp struct {
 	baseResp
+}
+
+//mission invitation
+type postMissionInvitationReq struct {
+	Invitee     string `json:"invitee"`
+	MissionId   string `json:"missionId"`
+	MissionName string `json:"missionName"`
+	Remark      string `json:"remark"`
+}
+
+func (pi *postMissionInvitationReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pi.Invitee: binding.Field{
+			Form:     "invitee",
+			Required: true,
+		},
+		&pi.MissionId: binding.Field{
+			Form:     "missionId",
+			Required: true,
+		},
+		&pi.MissionName: binding.Field{
+			Form:     "missionName",
+			Required: true,
+		},
+		&pi.Remark: "remark",
+	}
+}
+
+type postMissionInvitationResp struct {
+	baseResp
+}
+
+//mission
+type postMissionReq struct {
+	Name        string   `json:"name,omitempty"`
+	Desc        string   `json:"desc,omitempty"`
+	ReceiversId []string `json:"receiversId,omitempty"`
+	ProjectId   string   `json:"projectId,omitempty"`
+}
+
+func (pm *postMissionReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pm.Name: binding.Field{
+			Form:     "name",
+			Required: true,
+		},
+		&pm.ProjectId:   "projectId",
+		&pm.Desc:        "desc",
+		&pm.ReceiversId: "receiversId",
+	}
+}
+
+type postMissionResp struct {
+	baseResp
+	Id string `json:"id"`
+}
+
+//mission comment
+type postCommentReq struct {
+	MissionPid string `json:"mission"`
+}
+
+func (pc *postCommentReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pc.MissionPid: binding.Field{
+			Form:     "mission",
+			Required: true,
+		},
+	}
+}
+
+type postCommentResp struct {
+	baseResp
+	Id string `json:"id"`
 }
 
 //get method
@@ -276,7 +351,7 @@ type projectMissionsResp struct {
 
 type NestedComment struct {
 	Id         string `json:"id"`
-	When       int64  `json:"when"`
+	CreateTime int64  `json:"createTime"`
 	CriticPid  string `json:"userId"`
 	CriticName string `json:"userName"`
 }
@@ -284,6 +359,20 @@ type NestedComment struct {
 type missionCommentResp struct {
 	baseResp
 	Nm []NestedComment `json:"comments"`
+}
+
+//mission detail
+type missionDetailResp struct {
+	baseResp
+	Id            string   `json:"id"`
+	CreateTime    int64    `json:"createTime,omitempty"`
+	Name          string   `json:"name,omitempty"`
+	Desc          string   `json:"desc,omitempty"`
+	PublisherId   string   `json:"publisherId,omitempty"`
+	ReceiversId   []string `json:"receiversId,omitempty"`
+	CompletionNum int      `json:"completionNum,omitempty"`
+	CompletedTime int64    `json:"completedTime,omitempty"`
+	ProjectId     string   `json:"projectId,omitempty"`
 }
 
 //put method

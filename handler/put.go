@@ -8,6 +8,7 @@ import (
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/model"
 	"net/http"
+	"time"
 )
 
 const (
@@ -99,10 +100,14 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	if req.Done && !base.InIntSlice(uid, u.GetAllCompletedMission()) {
 		m.CompletionNum += 100 / len(receivers)
 		u.CompleteMission(m.Id)
+		if m.CompletionNum == 100 {
+			m.CompletedTime = time.Now().Unix()
+		}
 	}
 	if !req.Done && base.InIntSlice(uid, u.GetAllCompletedMission()) {
 		m.CompletionNum -= 100 / len(receivers)
 		u.UnCompleteMission(m.Id)
+		m.CompletedTime = 0
 	}
 	m.ForceSave()
 	makeBaseResp(w, r)

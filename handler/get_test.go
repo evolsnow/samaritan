@@ -148,8 +148,26 @@ func TestMissionCommentList(t *testing.T) {
 	}
 	m.Save()
 	auth := base.MakeToken(uid)
-	get("http://127.0.0.1:8080/missions/comments/"+m.Pid, auth, reply)
+	get("http://127.0.0.1:8080/comments/"+m.Pid, auth, reply)
 	if reply.Code != 0 {
 		t.Error("failed to get comment")
+	}
+}
+
+func TestMissionDetail(t *testing.T) {
+	mPid := cache.Get("put_test_mission_pid")
+	reply := new(missionDetailResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	get("http://127.0.0.1:8080/missions/"+mPid, auth, reply)
+	if reply.Code != 0 {
+		t.Error("failed to get mission")
+		t.FailNow()
+	}
+	if reply.PublisherId == "" {
+		t.Error("failed to get mission publisher")
+	}
+	if len(reply.ReceiversId) == 0 {
+		t.Error("faield to get mission receivers")
 	}
 }

@@ -28,10 +28,14 @@ const (
 	PasswordMismatchErr  = "密码不匹配"
 
 	UserNotExistErr = "用户不存在"
+
+	UnableToCommentErr = "不是该任务发布者或者接收者,无权评论"
 )
 
 const (
 	InvitedToJoinProject = "%s 邀请你加入项目: %s"
+	InvitedToJoinMission = "%s 邀请你接受任务: %s"
+	DeliverMission       = "%s 发布了一个任务: %s"
 )
 
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -231,8 +235,8 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, resp)
 }
 
-func NewInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	req := new(postInvitationReq)
+func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postProjectInvitationReq)
 	errs := binding.Bind(r, req)
 	if errs.Handle(w) {
 		return
@@ -257,4 +261,99 @@ func NewInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		push.Response()
 	}()
 	makeBaseResp(w, r)
+}
+
+func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postMissionReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	user := &model.User{Id: uid}
+	user.Load()
+	m := &model.Mission{
+		PublisherId: uid,
+		Name:        req.Name,
+		Desc:        req.Desc,
+		ProjectId:   dbms.ReadProjectId(req.ProjectId),
+	}
+	m.Save()
+	go func() {
+		msg := fmt.Sprintf(DeliverMission, user.Name, m.Name)
+		payload := make(map[string]string)
+		payload["invitor"] = user.Pid
+		payload["missionId"] = m.Pid
+		push := &model.Chat{
+			Type:      model.InvitedToMission,
+			To:        req.ReceiversId,
+			Msg:       msg,
+			ExtraInfo: payload,
+		}
+		log.DebugJson(push)
+		push.Response()
+	}()
+	resp := &postMissionResp{
+		Id: m.Pid,
+	}
+	makeResp(w, r, resp)
+}
+
+func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postMissionInvitationReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	user := &model.User{Id: uid}
+	user.Load()
+	go func() {
+		msg := fmt.Sprintf(InvitedToJoinMission, user.Name, req.MissionName)
+		payload := make(map[string]string)
+		payload["invitor"] = user.Pid
+		payload["missionId"] = req.MissionId
+		payload["remark"] = req.Remark
+		push := &model.Chat{
+			Type:      model.InvitedToMission,
+			To:        []string{req.Invitee},
+			Msg:       msg,
+			ExtraInfo: payload,
+		}
+		log.DebugJson(push)
+		push.Response()
+	}()
+	makeBaseResp(w, r)
+}
+
+func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postCommentReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	user := &model.User{Id: uid}
+	user.Load()
+	mid := dbms.ReadMissionId(req.MissionPid)
+	m := &model.Mission{Id: mid}
+	m.Load()
+	if uid != m.PublisherId || !base.InIntSlice(uid, m.ReceiversId) {
+		log.Debug(uid, m.PublisherId, m.ReceiversId)
+		base.ForbidErr(w, UnableToCommentErr)
+		return
+	}
+	cm := &model.Comment{
+		CriticPid:  user.Pid,
+		CriticName: user.Name,
+		MissionPid: req.MissionPid,
+	}
+	cm.Save()
+	resp := new(postCommentResp)
+	resp.Id = cm.Pid
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
 }

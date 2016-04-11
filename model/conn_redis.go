@@ -61,7 +61,7 @@ const (
 	//comments
 	CId         = "id"
 	CPid        = "pid"
-	CWhen       = "when"
+	CCreateTime = "createTime"
 	CCriticPid  = "criticPid"
 	CCriticName = "criticName"
 )
@@ -442,7 +442,7 @@ func createMissionComment(cm *Comment) {
 		//comment models
 		CId, cm.Id,
 		CPid, cm.Pid,
-		CWhen, cm.When,
+		CCreateTime, time.Now().Unix(),
 		CCriticPid, cm.CriticPid,
 		CCriticName, cm.CriticName,
 	}
@@ -465,6 +465,7 @@ func readMission(mid int) (*Mission, error) {
 	}
 	m := new(Mission)
 	err = redis.ScanStruct(ret, m)
+	m.ReceiversId, _ = readMissionReceiversId(m.Id)
 	return m, err
 }
 
@@ -477,6 +478,7 @@ func readFullMission(m *Mission) error {
 		return err
 	}
 	err = redis.ScanStruct(ret, m)
+	m.ReceiversId, _ = readMissionReceiversId(m.Id)
 	return err
 }
 

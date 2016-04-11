@@ -57,12 +57,15 @@ func beforeTest() {
 	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
 
 	m := &model.Mission{
-		Name: "test mission",
+		Name:        "test mission",
+		Desc:        "test mission desc",
+		PublisherId: u.Id,
 	}
 	m.Save()
 	m.AddReceiver(u.Id)
 	m.AddReceiver(10)
 	cache.Set("put_test_mission_pid", m.Pid, time.Minute*5)
+	cache.Set("post_test_mission_pid", m.Pid, time.Minute*5)
 
 	p := &model.Project{
 		CreatorId: u.Id,
@@ -71,4 +74,12 @@ func beforeTest() {
 	}
 	p.Save()
 	cache.Set("delete_test_project_pid", p.Pid, time.Minute*5)
+
+	p2 := &model.Project{
+		CreatorId: u.Id,
+		Name:      "pj2 name",
+		Desc:      "pj2 desc",
+	}
+	p2.Save()
+	cache.Set("post_test_project_pid", p2.Pid, time.Minute*5)
 }

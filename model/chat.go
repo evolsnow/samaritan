@@ -15,6 +15,7 @@ const (
 	UserLeft          //server -->> client
 	InvitedToProject  //server -->> client
 	KickedFromProject //server -->> client
+	InvitedToMission  //server -->> client
 )
 
 type Chat struct {
@@ -55,6 +56,11 @@ func (ct *Chat) Response() {
 			} else {
 				ct.ReceiversId = append(ct.ReceiversId, uid)
 			}
+		}
+	case InvitedToMission:
+		ct.ReceiversId = make([]int, len(ct.To))
+		for i, uPid := range ct.To {
+			ct.ReceiversId[i] = dbms.ReadUserId(uPid)
 		}
 	}
 	ct.send()

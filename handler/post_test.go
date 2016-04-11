@@ -139,17 +139,71 @@ func TestNewProject(t *testing.T) {
 }
 
 func TestNewInvitation(t *testing.T) {
-	req := &postInvitationReq{
-		Invitee:     "gsc1215225@gmail.com",
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	req := &postProjectInvitationReq{
+		Invitee:     base.HashedUserId(uid),
 		ProjectId:   "e2a7af07009a48fce8b0c2646f5089d3",
 		ProjectName: "pj name",
 		Remark:      "remark",
 	}
+	auth := base.MakeToken(uid)
+	reply := new(postProjectInvitationResp)
+	post("http://127.0.0.1:8080/invitations/project", auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("failed to invite to project")
+	}
+}
+
+func TestNewComment(t *testing.T) {
+	mPid := cache.Get("post_test_mission_pid")
+	req := &postCommentReq{
+		MissionPid: mPid,
+	}
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
 	auth := base.MakeToken(uid)
-	reply := new(postInvitationResp)
-	post("http://127.0.0.1:8080/invitations", auth, req, reply)
+	reply := new(postCommentResp)
+	post("http://127.0.0.1:8080/comments", base.MakeToken(111), req, reply)
+	if reply.Msg != UnableToCommentErr {
+		t.Error("should be unable to comment")
+	}
+	post("http://127.0.0.1:8080/comments", auth, req, reply)
 	if reply.Code != 0 {
-		t.Error("failed to invite")
+		t.Error("failed to comment")
+	}
+	m := &model.Mission{Id: dbms.ReadMissionId(mPid)}
+	if len(m.GetComments()) == 0 {
+		t.Error("failed to save comment")
+	}
+}
+
+func TestNewMission(t *testing.T) {
+	req := &postMissionReq{
+		Name:        "ms name",
+		Desc:        "ms desc",
+		ReceiversId: []string{base.HashedUserId(1), base.HashedUserId(2)},
+		ProjectId:   cache.Get("post_test_project_pid"),
+	}
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	reply := new(postMissionResp)
+	post("http://127.0.0.1:8080/missions", auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("create mission error:", reply.Msg)
+	}
+}
+
+func TestNewMissionInvitation(t *testing.T) {
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	req := &postMissionInvitationReq{
+		Invitee:     base.HashedUserId(uid),
+		MissionId:   "e2a7af07009a48fce8b0c2646f5089d3",
+		MissionName: "ms name",
+		Remark:      "remark",
+	}
+	auth := base.MakeToken(uid)
+	reply := new(postMissionInvitationResp)
+	post("http://127.0.0.1:8080/invitations/mission", auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("failed to invite to mission")
 	}
 }

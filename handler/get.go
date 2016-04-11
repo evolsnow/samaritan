@@ -151,13 +151,41 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	for i, v := range cms {
 		nc := NestedComment{
 			Id:         v.Pid,
-			When:       v.When,
+			CreateTime: v.CreateTime,
 			CriticPid:  v.CriticPid,
 			CriticName: v.CriticName,
 		}
 		ncs[i] = nc
 	}
 	resp.Nm = ncs
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}
+
+func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	mid := dbms.ReadProjectId(ps.Get("mission"))
+	if mid == 0 {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
+	m := &model.Mission{Id: mid}
+	m.Load()
+	receivers := m.GetReceiversId()
+	receiversPid := make([]string, len(receivers))
+	for i, v := range receivers {
+		receiversPid[i] = base.HashedUserId(v)
+	}
+	resp := &missionDetailResp{
+		Id:            ps.Get("mission"),
+		CreateTime:    m.CreateTime,
+		Name:          m.Name,
+		Desc:          m.Desc,
+		PublisherId:   base.HashedUserId(m.PublisherId),
+		ReceiversId:   receiversPid,
+		CompletionNum: m.CompletionNum,
+		CompletedTime: m.CompletedTime,
+		ProjectId:     base.HashedProjectId(m.ProjectId),
+	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
