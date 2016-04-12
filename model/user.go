@@ -74,11 +74,21 @@ func (u *User) GetAllProjects() []Project {
 }
 
 //all completed missions id
-func (u *User) GetAllCompletedMission() []int {
+func (u *User) GetAllCompletedMissionsId() []int {
 	var ids []int
 	ids, err := readCompletedMissionsId(u.Id)
 	if err != nil {
 		log.Error("Error get completed missions:", err)
+	}
+	return ids
+}
+
+//all accepted missions id
+func (u *User) GetAllAcceptedMissionsId() []int {
+	var ids []int
+	ids, err := readAcceptedMissionsId(u.Id)
+	if err != nil {
+		log.Error("Error get accepted missions:", err)
 	}
 	return ids
 }

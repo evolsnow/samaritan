@@ -243,6 +243,13 @@ func readCompletedMissionsId(uid int) ([]int, error) {
 
 }
 
+func readAcceptedMissionsId(uid int) ([]int, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	ids, err := redis.Ints(c.Do("SMEMBERS", fmt.Sprintf(userMsAcceptedSet, uid)))
+	return ids, err
+}
+
 func readPassword(uid int) (pwd string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()

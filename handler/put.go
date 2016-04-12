@@ -97,14 +97,14 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 	m.Load()
-	if req.Done && !base.InIntSlice(uid, u.GetAllCompletedMission()) {
+	if req.Done && !base.InIntSlice(uid, u.GetAllCompletedMissionsId()) {
 		m.CompletionNum += 100 / len(receivers)
 		u.CompleteMission(m.Id)
 		if m.CompletionNum == 100 {
 			m.CompletedTime = time.Now().Unix()
 		}
 	}
-	if !req.Done && base.InIntSlice(uid, u.GetAllCompletedMission()) {
+	if !req.Done && base.InIntSlice(uid, u.GetAllCompletedMissionsId()) {
 		m.CompletionNum -= 100 / len(receivers)
 		u.UnCompleteMission(m.Id)
 		m.CompletedTime = 0

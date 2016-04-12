@@ -118,12 +118,18 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	resp := new(projectMissionsResp)
 	p := &model.Project{Id: pid}
 	ms := p.GetMissions()
-	if !base.InIntSlice(ps.GetInt("authId"), p.GetMembersId()) {
+	uid := ps.GetInt("authId")
+	u := &model.User{Id: uid}
+	userAcceptedMissions := u.GetAllAcceptedMissionsId()
+	if !base.InIntSlice(uid, p.GetMembersId()) {
 		base.ForbidErr(w, NotProjectMemberErr)
 		return
 	}
 	nms := make([]NestedMission, len(ms))
 	for i, v := range ms {
+		if !base.InIntSlice(v.Id, userAcceptedMissions) {
+			continue
+		}
 		nm := NestedMission{
 			Id:            v.Pid,
 			Name:          v.Name,
