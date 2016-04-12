@@ -6,7 +6,6 @@ services:
   - redis-server
 
 script:
- - go get -t ./...
  - go build -o rpc ./gpns
  - ./rpc &
  - go build -o testServer .
