@@ -42,7 +42,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		Password: base.EncryptedPassword(req.Password),
 	}
 	us.Save()
-	makeBaseResp(w, r)
+	makeResp(w, r, putPasswordResp{})
 }
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -73,7 +73,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		td.Finish()
 	}
 	td.Save()
-	makeBaseResp(w, r)
+	makeResp(w, r, putTdResp{})
 }
 
 func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -110,7 +110,7 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		m.CompletedTime = 0
 	}
 	m.ForceSave()
-	makeBaseResp(w, r)
+	makeResp(w, r, putMsStatusResp{})
 }
 
 func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -130,5 +130,5 @@ func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	m := &model.Mission{Id: mid}
 	m.AddReceiver(uid)
 	u.AcceptMission(m.Id)
-	makeBaseResp(w, r)
+	makeResp(w, r, putAcceptMsResp{})
 }

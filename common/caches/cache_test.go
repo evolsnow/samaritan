@@ -39,8 +39,8 @@ func TestCacheDelete(t *testing.T) {
 }
 
 func TestCacheExpiry(t *testing.T) {
-	cache.Set("foo", "bar", time.Second*1/2)
-	time.Sleep(time.Second)
+	cache.Set("foo", "bar", time.Millisecond)
+	time.Sleep(time.Millisecond * 2)
 	if cache.Get("foo") == "bar" {
 		t.Error("cache expiry error")
 	}

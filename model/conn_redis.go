@@ -68,13 +68,14 @@ const (
 
 //project redis key name
 const (
-	PId         = "id"
-	PPid        = "pid"
-	PName       = "name"
-	PCreateTime = "createTime"
-	PDesc       = "desc"
-	PCreatorId  = "creatorId"
-	PPrivate    = "private"
+	PId            = "id"
+	PPid           = "pid"
+	PName          = "name"
+	PCreateTime    = "createTime"
+	PDesc          = "desc"
+	PBackgroundPic = "backgroundPic"
+	PCreatorId     = "creatorId"
+	PPrivate       = "private"
 )
 
 const (
@@ -110,6 +111,7 @@ const (
 	missionReceiversSet     = "mission:%d:receivers"      //mission's receivers redis-type:Set
 	missionCommentsList     = "mission:%d:comments"       //mission's comments redis-type:List
 	missionCompletedUserSet = "mission:%d:completedUsers" //mission's completed user redis-type:Set
+	missionPictureList      = "mission:%d:pictures"       //mission's pictures redis-type:List
 
 	//project
 	projectMembersSet  = "project:%d:members" //project's members redis-type:Set
@@ -572,7 +574,7 @@ func createProject(p *Project) {
 			redis.call("HMSET", "project:"..pid,
 					   KEYS[1], pid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
-					   KEYS[13], KEYS[14])
+					   KEYS[13], KEYS[14], KEYS[15], KEYS[16])
 			`
 	ka := []interface{}{
 		//project models
@@ -580,6 +582,7 @@ func createProject(p *Project) {
 		PPid, p.Pid,
 		PCreateTime, time.Now().Unix(),
 		PDesc, p.Desc,
+		PBackgroundPic, p.BackgroundPic,
 		PCreatorId, p.CreatorId,
 		PPrivate, p.Private,
 		PName, p.Name,
@@ -748,13 +751,13 @@ func readChatMembers(ct *Chat) (ids []int) {
 	return
 }
 
-func readDeviceToken(uid int) (token string, err error) {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	key := fmt.Sprintf(deviceToken, uid)
-	token, err = redis.String(c.Do("GET", key))
-	return
-}
+//func readDeviceToken(uid int) (token string, err error) {
+//	c := dbms.Pool.Get()
+//	defer c.Close()
+//	key := fmt.Sprintf(deviceToken, uid)
+//	token, err = redis.String(c.Do("GET", key))
+//	return
+//}
 
 func updateOfflineMsg(uid, convId int) {
 	c := dbms.Pool.Get()

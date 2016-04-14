@@ -32,10 +32,12 @@ func newRouter() *httprouter.Router {
 	r.GET("/missions/:mission", mw.Auth(hd.MissionDetail))
 
 	//http post method
+	r.POST("/deviceTokens", mw.Auth(hd.NewDeviceToken))
 	r.POST("/users", hd.NewUser)
 	r.POST("/verifyCode/:source", hd.NewVerifyCode)
 	r.POST("/accessToken", hd.NewAccessToken)
 	r.POST("/todos", mw.Auth(hd.NewTodo))
+	//r.POST("/todos/pictures/:todo", mw.Auth(hd.NewTodoPics))
 	r.POST("/missions", mw.Auth(hd.NewMission))
 	r.POST("/comments", mw.Auth(hd.NewComment))
 	r.POST("/projects", mw.Auth(hd.NewProject))

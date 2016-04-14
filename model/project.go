@@ -6,14 +6,15 @@ import (
 )
 
 type Project struct {
-	Id         int    `json:"-" redis:"id"`             //private id
-	Pid        string `json:"id,omitempty" redis:"pid"` //public id
-	Name       string `json:"name,omitempty" redis:"name"`
-	CreateTime int64  `json:"createTime,omitempty" redis:"createTime"` //create time timestamp of this project
-	Desc       string `json:"desc,omitempty" redis:"desc"`             //description for the project
-	CreatorId  int    `json:"creatorId,omitempty" redis:"creatorId"`   //who created the project
-	Private    bool   `json:"private,omitempty" redis:"private"`
-	MembersId  []int  `json:"membersId,omitempty" redis:"-"` //user list who in this project
+	Id            int    `json:"-" redis:"id"`             //private id
+	Pid           string `json:"id,omitempty" redis:"pid"` //public id
+	Name          string `json:"name,omitempty" redis:"name"`
+	CreateTime    int64  `json:"createTime,omitempty" redis:"createTime"` //create time timestamp of this project
+	Desc          string `json:"desc,omitempty" redis:"desc"`             //description for the project
+	BackgroundPic string `json:"backgroundPic,omitempty" redis:"backgroundPic"`
+	CreatorId     int    `json:"creatorId,omitempty" redis:"creatorId"` //who created the project
+	Private       bool   `json:"private,omitempty" redis:"private"`
+	MembersId     []int  `json:"membersId,omitempty" redis:"-"` //user list who in this project
 }
 
 func (p *Project) GetCreator() (creator *User) {

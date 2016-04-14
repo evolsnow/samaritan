@@ -54,6 +54,33 @@ type postTdResp struct {
 	Id string `json:"id"`
 }
 
+////upload pic
+//type postPicReq struct {
+//	PicUrl []string `json:"picUrl"`
+//}
+//
+//type postPicResp struct {
+//	baseResp
+//}
+
+//upload device token
+type postDtReq struct {
+	DeviceToken string `json:"deviceToken"`
+}
+
+func (pd *postDtReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pd.DeviceToken: binding.Field{
+			Form:     "deviceToken",
+			Required: true,
+		},
+	}
+}
+
+type postDtResp struct {
+	baseResp
+}
+
 //new user
 type postUsReq struct {
 	Name       string `json:"name"`

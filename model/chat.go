@@ -87,8 +87,10 @@ func applePush(tokens []string, ct *Chat) {
 	//read device token from db
 	for _, token := range tokens {
 		uid, _ := base.ParseToken(token)
-		dt, _ := readDeviceToken(uid)
-		deviceList = append(deviceList, dt)
+		dt := dbms.ReadDeviceToken(uid)
+		if dt != "" {
+			deviceList = append(deviceList, dt)
+		}
 	}
 	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
 }

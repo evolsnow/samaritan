@@ -38,6 +38,17 @@ const (
 	DeliverMission       = "%s 发布了一个任务: %s"
 )
 
+func NewDeviceToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(postDtReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	dbms.CreateDeviceIndex(ps.GetInt("authId"), req.DeviceToken)
+	makeResp(w, r, postDtResp{})
+}
+
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postUsReq)
 	errs := binding.Bind(r, req)
@@ -108,6 +119,18 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp.Id = td.Pid
 	makeResp(w, r, resp)
 }
+
+//func NewTodoPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	req := new(postPicReq)
+//	errs := binding.Bind(r, req)
+//	if errs.Handle(w) {
+//		return
+//	}
+//	log.DebugJson(req)
+//	uid := ps.GetInt("authId")
+//	tid := dbms.ReadTodoId(ps.Get("todo"))
+//
+//}
 
 func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postPjReq)
@@ -199,7 +222,7 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		return
 	}
 	go cache.Set(req.To+":code", code, time.Minute*5)
-	makeBaseResp(w, r)
+	makeResp(w, r, postVerifyCodeResp{})
 }
 
 func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -260,7 +283,7 @@ func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		log.DebugJson(push)
 		push.Response()
 	}()
-	makeBaseResp(w, r)
+	makeResp(w, r, postProjectInvitationResp{})
 }
 
 func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -325,7 +348,7 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		log.DebugJson(push)
 		push.Response()
 	}()
-	makeBaseResp(w, r)
+	makeResp(w, r, postMissionInvitationResp{})
 }
 
 func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

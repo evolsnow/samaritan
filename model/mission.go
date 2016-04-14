@@ -10,7 +10,8 @@ type Mission struct {
 	Pid           string    `json:"id,omitempty" redis:"pid"`                //public id
 	CreateTime    int64     `json:"createTime,omitempty" redis:"createTime"` //create time timestamp of this mission
 	Name          string    `json:"name,omitempty" redis:"name"`
-	Desc          string    `json:"desc,omitempty" redis:"desc"`                   //description for the mission
+	Desc          string    `json:"desc,omitempty" redis:"desc"` //description for the mission
+	Pictures      []string  `json:"pictures,omitempty" redis:"-"`
 	PublisherId   int       `json:"publisherId,omitempty" redis:"publisherId"`     //who published the mission
 	ReceiversId   []int     `json:"receiversId,omitempty" redis:"-"`               //user list who accepted the mission
 	CompletionNum int       `json:"completionNum,omitempty" redis:"completionNum"` //completed number

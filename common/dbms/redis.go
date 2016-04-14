@@ -19,6 +19,7 @@ const (
 	TodoIndex    = "index:todo"
 	MissionIndex = "index:mission"
 	ProjectIndex = "index:project"
+	DeviceIndex  = "index:device"
 )
 
 // All extra redis actions
@@ -127,6 +128,12 @@ func CreateProjectIndex(pid int, pPid string) {
 	c.Do("HSET", ProjectIndex, pPid, pid)
 }
 
+func CreateDeviceIndex(uid int, dt string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", DeviceIndex, uid, dt)
+}
+
 //get real id from public id
 func ReadUserId(uPid string) (uid int) {
 	c := Pool.Get()
@@ -153,5 +160,12 @@ func ReadProjectId(pPid string) (pid int) {
 	c := Pool.Get()
 	defer c.Close()
 	pid, _ = redis.Int(c.Do("HGET", ProjectIndex, pPid))
+	return
+}
+
+func ReadDeviceToken(uid int) (dt string) {
+	c := Pool.Get()
+	defer c.Close()
+	dt, _ = redis.String(c.Do("HGET", DeviceIndex, uid))
 	return
 }
