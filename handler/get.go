@@ -120,6 +120,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	ms := p.GetMissions()
 	uid := ps.GetInt("authId")
 	u := &model.User{Id: uid}
+	u.Load()
 	userAcceptedMissions := u.GetAllAcceptedMissionsId()
 	if !base.InIntSlice(uid, p.GetMembersId()) {
 		base.ForbidErr(w, NotProjectMemberErr)
@@ -134,6 +135,9 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Id:            v.Pid,
 			Name:          v.Name,
 			Desc:          v.Desc,
+			CreatorName:   u.Name,
+			CreatorId:     u.Pid,
+			CreateTime:    v.CreateTime,
 			completionNum: v.CompletionNum,
 		}
 		nms[i] = nm

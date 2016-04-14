@@ -366,6 +366,9 @@ type NestedMission struct {
 	Id            string `json:"id"` //public id
 	Name          string `json:"name"`
 	Desc          string `json:"desc,omitempty"` //description for the project
+	CreatorName   string `json:"creatorName,omitempty"`
+	CreatorId     string `json:"creatorId,omitempty"`
+	CreateTime    int64  `json:"createTime,omitempty"`
 	completionNum int    `json:"completionNum"`
 }
 
