@@ -44,7 +44,7 @@ func (td *Todo) GetMission() (m *Mission) {
 	if td.MissionId == 0 {
 		m, err = readBelongedMission(td.Id)
 	} else {
-		m, err = readMission(td.MissionId)
+		m, err = readMissionWithId(td.MissionId)
 	}
 	if err != nil {
 		log.Error("Error get mission with todo:", err)
@@ -73,6 +73,8 @@ func (td *Todo) Save() {
 		//new to-do
 		log.DebugJson("create todo:", td)
 		createTodo(td)
+		//go CreateTodoMysql(*td)
+
 	} else {
 		kvMap := prepareToUpdate(td)
 		log.Debug("update todo with: ", kvMap)
@@ -85,6 +87,7 @@ func (td *Todo) Remove() (err error) {
 	if err = deleteTodo(td.Id); err != nil {
 		log.Error("Error delete todo:", err)
 	}
+	//go DeleteTodoMysql(td.Id)
 	return
 }
 

@@ -136,6 +136,8 @@ func (u *User) Save() {
 		//new user
 		log.DebugJson("create user:", u)
 		createUser(u)
+		//go CreateUserMysql(*u)
+
 	} else {
 		kvMap := prepareToUpdate(u)
 		log.DebugJson("update user with: ", kvMap)

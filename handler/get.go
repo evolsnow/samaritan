@@ -83,6 +83,7 @@ func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 			CreatorName: p.GetCreator().Name,
 			Private:     p.Private,
 			Type:        createdOrJoined,
+			Members:     p.GetMembersName(),
 		}
 		nps[i] = np
 	}
@@ -135,6 +136,8 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Id:            v.Pid,
 			Name:          v.Name,
 			Desc:          v.Desc,
+			Deadline:      v.Deadline,
+			Pictures:      v.GetPictures(),
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
 			CreateTime:    v.CreateTime,
@@ -190,6 +193,8 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		CreateTime:    m.CreateTime,
 		Name:          m.Name,
 		Desc:          m.Desc,
+		Deadline:      m.Deadline,
+		Pictures:      m.GetPictures(),
 		PublisherId:   base.HashedUserId(m.PublisherId),
 		ReceiversId:   receiversPid,
 		CompletionNum: m.CompletionNum,

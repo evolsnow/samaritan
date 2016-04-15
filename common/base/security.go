@@ -46,7 +46,13 @@ func ParseToken(ah string) (uid int, err error) {
 func EncryptedPassword(pwd string) string {
 	salt := fmt.Sprintf("%s@samaritan.tech", pwd)
 	dk, _ := scrypt.Key([]byte(pwd), []byte(salt), 16384, 8, 1, 32)
-	return string(dk)
+	//return string(dk)
+
+	h := md5.New()
+	h.Write(dk)
+	h.Write([]byte(salt))
+	encrypted := hex.EncodeToString(h.Sum(nil))
+	return encrypted
 }
 
 func NewPrivateChatId(raw string) string {

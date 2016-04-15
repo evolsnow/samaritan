@@ -117,6 +117,7 @@ func TestProjectMissionList(t *testing.T) {
 		ProjectId:     p.Id,
 		Name:          "ms name",
 		Desc:          "ms desc",
+		Deadline:      147258369,
 		CompletionNum: 70,
 	}
 	m.Save()

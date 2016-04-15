@@ -57,6 +57,7 @@ const (
 	MPublisherId   = "publisherId"
 	MCompletionNum = "completionNum"
 	MCompletedTime = "completedTime"
+	MDeadline      = "deadline"
 	MProjectId     = "projectId"
 	//comments
 	CId         = "id"
@@ -352,6 +353,19 @@ func readFullTodo(td *Todo) error {
 	return err
 }
 
+func readTodoWithId(id int) (*Todo, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	todo := "todo:" + strconv.Itoa(id)
+	ret, err := redis.Values(c.Do("HGETALL", todo))
+	if err != nil {
+		return nil, err
+	}
+	t := new(Todo)
+	err = redis.ScanStruct(ret, t)
+	return t, err
+}
+
 func readOwner(tid int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -369,7 +383,7 @@ func readBelongedMission(tid int) (*Mission, error) {
 	if err != nil {
 		return nil, err
 	}
-	return readMission(mid)
+	return readMissionWithId(mid)
 }
 
 func updateTodoStatus(uid, tid int) error {
@@ -414,7 +428,8 @@ func createMission(m *Mission) {
 			redis.call("HMSET", "mission:"..mid,
 					   KEYS[1], mid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					   KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
-					   KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18])
+					   KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18],
+					   KEYS[19], KEYS[20])
 
 			`
 	ka := []interface{}{
@@ -427,6 +442,7 @@ func createMission(m *Mission) {
 		MPublisherId, m.PublisherId,
 		MCompletionNum, m.CompletionNum,
 		MCompletedTime, m.CompletedTime,
+		MDeadline, m.Deadline,
 		MProjectId, m.ProjectId,
 	}
 	script := redis.NewScript(len(ka), lua)
@@ -474,7 +490,7 @@ func createMissionComment(cm *Comment) {
 	//}()
 }
 
-func readMission(mid int) (*Mission, error) {
+func readMissionWithId(mid int) (*Mission, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	mission := "mission:" + strconv.Itoa(mid)
@@ -537,6 +553,14 @@ func readMissionCompletedUsersId(mid int) (ids []int, err error) {
 	defer c.Close()
 	key := fmt.Sprintf(missionCompletedUserSet, mid)
 	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
+func readMissionPictures(mid int) (pics []string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionPictureList, mid)
+	pics, err = redis.Strings(c.Do("LRANGE", key, "0", "-1"))
 	return
 }
 
@@ -657,6 +681,19 @@ func readFullProject(p *Project) error {
 	return err
 }
 
+func readProjectWithId(pid int) (*Project, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	project := "project:" + strconv.Itoa(pid)
+	ret, err := redis.Values(c.Do("HGETALL", project))
+	if err != nil {
+		return nil, err
+	}
+	p := new(Project)
+	err = redis.ScanStruct(ret, p)
+	return p, err
+}
+
 func readCreator(pid int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -672,6 +709,23 @@ func readProjectMembersId(pid int) (ids []int, err error) {
 	defer c.Close()
 	key := fmt.Sprintf(projectMembersSet, pid)
 	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
+func readProjectMembersName(pid int) (names []string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	pSet := fmt.Sprintf(projectMembersSet, pid)
+	lua := `
+	local data = redis.call("SMEMBERS", KEYS[1])
+	local ret = {}
+  	for idx=1,#data do
+  		ret[idx] = redis.call("HGET","user:"..data[idx], KEYS[2])
+  	end
+  	return ret
+   	`
+	script := redis.NewScript(2, lua)
+	names, err = redis.Strings(script.Do(c, pSet, UName))
 	return
 }
 

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 )
 
@@ -56,9 +55,6 @@ func (p *Project) GetMembers() (members []*User) {
 }
 
 func (p *Project) GetMembersId() []int {
-	if p.Id == 0 {
-		p.Id = dbms.ReadProjectId(p.Pid)
-	}
 	ids, err := readProjectMembersId(p.Id)
 	if err != nil {
 		log.Error("Error get project members", err)
@@ -66,6 +62,16 @@ func (p *Project) GetMembersId() []int {
 	}
 	log.Debug("proj members id:", ids)
 	return ids
+}
+
+func (p *Project) GetMembersName() []string {
+	names, err := readProjectMembersName(p.Id)
+	if err != nil {
+		log.Error("Error get project members", err)
+		return nil
+	}
+	log.Debug("proj members name:", names)
+	return names
 }
 
 func (p *Project) GetMissions() (missions []*Mission) {
@@ -83,6 +89,8 @@ func (p *Project) Save() {
 		//new project
 		log.DebugJson("create project:", p)
 		createProject(p)
+		//go CreateProjectMysql(*p)
+
 	} else {
 		kvMap := prepareToUpdate(p)
 		log.Debug("update project with: ", kvMap)
@@ -101,6 +109,7 @@ func (p *Project) Remove() (err error) {
 	if err = updateUserProjectSet(p.Id, p.CreatorId); err != nil {
 		log.Error("Err update pj set")
 	}
+	//go DeleteProjectMysql(p.Id)
 	return
 }
 

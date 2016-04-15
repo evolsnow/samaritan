@@ -16,6 +16,7 @@ type Mission struct {
 	ReceiversId   []int     `json:"receiversId,omitempty" redis:"-"`               //user list who accepted the mission
 	CompletionNum int       `json:"completionNum,omitempty" redis:"completionNum"` //completed number
 	CompletedTime int64     `json:"completedTime,omitempty" redis:"completedTime"`
+	Deadline      int64     `json:"deadline,omitempty" redis:"deadline"`
 	Comments      []Comment `json:"comments,omitempty" redis:"-"`
 	ProjectId     int       `json:"projectId,omitempty" redis:"projectId"` //belong to which mission
 }
@@ -83,12 +84,22 @@ func (m *Mission) UpdateCompleteNum() {
 	m.CompletionNum = 100 * len(m.GetCompletedUsersId()) / len(m.GetReceiversId())
 }
 
+func (m *Mission) GetPictures() []string {
+	pics, err := readMissionPictures(m.Id)
+	if err != nil {
+		log.Error("Error get mission pictures")
+	}
+	return pics
+}
+
 //save a new mission
 func (m *Mission) Save() {
 	if m.Id == 0 {
 		//new mission
 		log.DebugJson("create mission:", m)
 		createMission(m)
+		//go CreateMissionMysql(*m)
+
 	} else {
 		kvMap := prepareToUpdate(m)
 		log.Debug("update mission with: ", kvMap)
@@ -102,6 +113,8 @@ func (m *Mission) ForceSave() {
 		//new mission
 		log.DebugJson("force create mission:", m)
 		createMission(m)
+		//go CreateMissionMysql(*m)
+
 	} else {
 		kvMap := prepareToForceUpdate(m)
 		log.Debug("force update mission with: ", kvMap)

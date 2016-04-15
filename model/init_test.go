@@ -11,6 +11,7 @@ var cache *caches.SimpleCache
 func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "2")
 	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "9")
+	dbms.DB = dbms.NewDB(",F^[zMo=3,}ITYz", "139.129.131.112", 12306, "samaritan")
 	c := dbms.Pool.Get()
 	defer c.Close()
 	c.Do("FLUSHDB")

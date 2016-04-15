@@ -12,6 +12,7 @@ import (
 func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
 	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "8")
+	dbms.DB = dbms.NewDB(",F^[zMo=3,}ITYz", "139.129.131.112", 12306, "samaritan")
 	c := dbms.Pool.Get()
 	c.Do("FLUSHDB")
 	c.Close()
@@ -60,6 +61,7 @@ func beforeTest() {
 		Name:        "test mission",
 		Desc:        "test mission desc",
 		PublisherId: u.Id,
+		Deadline:    147258369,
 	}
 	m.Save()
 	m.AddReceiver(u.Id)

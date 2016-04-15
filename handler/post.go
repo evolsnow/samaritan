@@ -300,6 +300,7 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		PublisherId: uid,
 		Name:        req.Name,
 		Desc:        req.Desc,
+		Deadline:    req.Deadline,
 		ProjectId:   dbms.ReadProjectId(req.ProjectId),
 	}
 	m.Save()

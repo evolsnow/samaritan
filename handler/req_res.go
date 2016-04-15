@@ -287,6 +287,7 @@ type postMissionInvitationResp struct {
 type postMissionReq struct {
 	Name        string   `json:"name,omitempty"`
 	Desc        string   `json:"desc,omitempty"`
+	Deadline    int64    `json:"deadline,omitempty"`
 	ReceiversId []string `json:"receiversId,omitempty"`
 	ProjectId   string   `json:"projectId,omitempty"`
 }
@@ -300,6 +301,7 @@ func (pm *postMissionReq) FieldMap(req *http.Request) binding.FieldMap {
 		&pm.ProjectId:   "projectId",
 		&pm.Desc:        "desc",
 		&pm.ReceiversId: "receiversId",
+		&pm.Deadline:    "deadline",
 	}
 }
 
@@ -338,13 +340,14 @@ type samIdStatusResp struct {
 //user projects
 
 type NestedProject struct {
-	Id          string `json:"id"` //public id
-	Name        string `json:"name"`
-	Desc        string `json:"desc,omitempty"` //description for the project
-	CreatorId   string `json:"creatorId"`      //who created the project
-	CreatorName string `json:"creatorName"`    //who created the project
-	Private     bool   `json:"private"`
-	Type        string `json:"type"` //joined or created
+	Id          string   `json:"id"` //public id
+	Name        string   `json:"name"`
+	Desc        string   `json:"desc,omitempty"` //description for the project
+	CreatorId   string   `json:"creatorId"`      //who created the project
+	CreatorName string   `json:"creatorName"`    //who created the project
+	Private     bool     `json:"private"`
+	Type        string   `json:"type"` //joined or created
+	Members     []string `json:"members"`
 }
 
 type userProjectsResp struct {
@@ -363,13 +366,15 @@ type userSearchResp struct {
 //project missions
 
 type NestedMission struct {
-	Id            string `json:"id"` //public id
-	Name          string `json:"name"`
-	Desc          string `json:"desc,omitempty"` //description for the project
-	CreatorName   string `json:"creatorName,omitempty"`
-	CreatorId     string `json:"creatorId,omitempty"`
-	CreateTime    int64  `json:"createTime,omitempty"`
-	completionNum int    `json:"completionNum"`
+	Id            string   `json:"id"` //public id
+	Name          string   `json:"name"`
+	Desc          string   `json:"desc,omitempty"` //description for the mission
+	Pictures      []string `json:"pictures,omitempty"`
+	Deadline      int64    `json:"deadline,omitempty"`
+	CreatorName   string   `json:"creatorName,omitempty"`
+	CreatorId     string   `json:"creatorId,omitempty"`
+	CreateTime    int64    `json:"createTime,omitempty"`
+	completionNum int      `json:"completionNum"`
 }
 
 type projectMissionsResp struct {
@@ -398,6 +403,8 @@ type missionDetailResp struct {
 	CreateTime    int64    `json:"createTime,omitempty"`
 	Name          string   `json:"name,omitempty"`
 	Desc          string   `json:"desc,omitempty"`
+	Deadline      int64    `json:"deadline,omitempty"`
+	Pictures      []string `json:"pictures,omitempty"`
 	PublisherId   string   `json:"publisherId,omitempty"`
 	ReceiversId   []string `json:"receiversId,omitempty"`
 	CompletionNum int      `json:"completionNum,omitempty"`
