@@ -16,6 +16,7 @@ type Project struct {
 	MembersId     []int  `json:"membersId,omitempty" redis:"-"` //user list who in this project
 }
 
+// GetCreator gets project's creator
 func (p *Project) GetCreator() (creator *User) {
 	creator, err := readCreator(p.Id)
 	if err != nil {
@@ -26,6 +27,7 @@ func (p *Project) GetCreator() (creator *User) {
 	return
 }
 
+// AddMember adds a user to project members
 func (p *Project) AddMember(uid int) (err error) {
 	err = updateProjectMember(p.Id, uid, 1)
 	if err != nil {
@@ -35,6 +37,7 @@ func (p *Project) AddMember(uid int) (err error) {
 	return
 }
 
+// RemoveMember removes a user from project members
 func (p *Project) RemoveMember(uid int) (err error) {
 	err = updateProjectMember(p.Id, uid, -1)
 	if err != nil {
@@ -44,6 +47,7 @@ func (p *Project) RemoveMember(uid int) (err error) {
 	return
 }
 
+// GetMembers gets project members
 func (p *Project) GetMembers() (members []*User) {
 	members, err := readProjectMembers(p.Id)
 	if err != nil {
@@ -54,6 +58,7 @@ func (p *Project) GetMembers() (members []*User) {
 	return
 }
 
+// GetMembersId gets project members id
 func (p *Project) GetMembersId() []int {
 	ids, err := readProjectMembersId(p.Id)
 	if err != nil {
@@ -64,6 +69,7 @@ func (p *Project) GetMembersId() []int {
 	return ids
 }
 
+// GetMembersName gets project members name
 func (p *Project) GetMembersName() []string {
 	names, err := readProjectMembersName(p.Id)
 	if err != nil {
@@ -74,6 +80,7 @@ func (p *Project) GetMembersName() []string {
 	return names
 }
 
+// GetMission gets project's missions
 func (p *Project) GetMissions() (missions []*Mission) {
 	missions, err := readProjectMissions(p.Id)
 	if err != nil {
@@ -84,6 +91,7 @@ func (p *Project) GetMissions() (missions []*Mission) {
 	return
 }
 
+// Save a project
 func (p *Project) Save() {
 	if p.Id == 0 {
 		//new project
@@ -98,7 +106,7 @@ func (p *Project) Save() {
 	}
 }
 
-//delete a project
+// Remove deletes a project
 func (p *Project) Remove() (err error) {
 	if err = deleteProject(p.Id); err != nil {
 		log.Error("Error delete project:", err)
@@ -106,14 +114,14 @@ func (p *Project) Remove() (err error) {
 	if p.CreatorId == 0 {
 		p.CreatorId = p.GetCreator().Id
 	}
-	if err = updateUserProjectSet(p.Id, p.CreatorId); err != nil {
+	if err = deleteFromUserProjectSet(p.Id, p.CreatorId); err != nil {
 		log.Error("Err update pj set")
 	}
 	//go DeleteProjectMysql(p.Id)
 	return
 }
 
-//full read from redis
+// Load full read from redis
 func (p *Project) Load() (err error) {
 	err = readFullProject(p)
 	if err != nil {

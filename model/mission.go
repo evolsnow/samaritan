@@ -30,6 +30,7 @@ type Comment struct {
 	CriticName string `json:"uName,omitempty" redis:"criticName"`
 }
 
+// GetReceiversId gets mission's receivers' id slice
 func (m *Mission) GetReceiversId() []int {
 	if m.Id == 0 {
 		m.Id = dbms.ReadMissionId(m.Pid)
@@ -43,6 +44,7 @@ func (m *Mission) GetReceiversId() []int {
 	return ids
 }
 
+// AddReceiver adds a user to mission's receiver set
 func (m *Mission) AddReceiver(uid int) (err error) {
 	err = updateMissionReceiver(m.Id, uid, 1)
 	if err != nil {
@@ -53,6 +55,7 @@ func (m *Mission) AddReceiver(uid int) (err error) {
 	return
 }
 
+// GetComments gets mission's comments
 func (m *Mission) GetComments() (comments []*Comment) {
 	comments, err := readMissionComments(m.Id)
 	if err != nil {
@@ -63,6 +66,7 @@ func (m *Mission) GetComments() (comments []*Comment) {
 	return
 }
 
+// GetCompletedUsersId gets users id slice who have completed the mission
 func (m *Mission) GetCompletedUsersId() []int {
 	if m.Id == 0 {
 		m.Id = dbms.ReadMissionId(m.Pid)
@@ -76,6 +80,7 @@ func (m *Mission) GetCompletedUsersId() []int {
 	return ids
 }
 
+// UpdateCompleteNum when user-completed num changed
 func (m *Mission) UpdateCompleteNum() {
 	lg := len(m.GetReceiversId())
 	if lg == 0 {
@@ -84,6 +89,7 @@ func (m *Mission) UpdateCompleteNum() {
 	m.CompletionNum = 100 * len(m.GetCompletedUsersId()) / len(m.GetReceiversId())
 }
 
+// GetPictures return mission's pics
 func (m *Mission) GetPictures() []string {
 	pics, err := readMissionPictures(m.Id)
 	if err != nil {
@@ -92,7 +98,7 @@ func (m *Mission) GetPictures() []string {
 	return pics
 }
 
-//save a new mission
+// Save a new mission
 func (m *Mission) Save() {
 	if m.Id == 0 {
 		//new mission
@@ -107,7 +113,7 @@ func (m *Mission) Save() {
 	}
 }
 
-//save a new mission
+// ForceSave a new mission
 func (m *Mission) ForceSave() {
 	if m.Id == 0 {
 		//new mission
@@ -122,12 +128,13 @@ func (m *Mission) ForceSave() {
 	}
 }
 
+// Save a comment
 func (cm *Comment) Save() {
 	log.Debug("create comment:", cm)
 	createMissionComment(cm)
 }
 
-//full read from redis
+// Load full read from redis
 func (m *Mission) Load() (err error) {
 	err = readFullMission(m)
 	if err != nil {

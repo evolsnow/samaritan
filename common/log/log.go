@@ -8,6 +8,7 @@ import (
 
 var Logger = logrus.New()
 
+// SetLogLevel sets log level with the given level
 func SetLogLevel(debug bool) {
 	if debug {
 		Logger.Level = logrus.DebugLevel
@@ -17,30 +18,37 @@ func SetLogLevel(debug bool) {
 	}
 }
 
+// Panic is Logger.Panic exactly
 func Panic(args ...interface{}) {
 	Logger.Panic(args...)
 }
 
+// Fatal is Logger.Fatal exactly
 func Fatal(args ...interface{}) {
 	Logger.Fatal(args...)
 }
 
+// Error is Logger.Error exactly
 func Error(args ...interface{}) {
 	Logger.Error(args...)
 }
 
+// Warn is Logger.Warn exactly
 func Warn(args ...interface{}) {
 	Logger.Warn(args...)
 }
 
+// Info is Logger.Info exactly
 func Info(args ...interface{}) {
 	Logger.Info(args...)
 }
 
+// Debug is Logger.Debug exactly
 func Debug(args ...interface{}) {
 	Logger.Debug(args...)
 }
 
+// Println is Logger.Println exactly
 func Println(args ...interface{}) {
 	Logger.Println(args...)
 }
@@ -63,6 +71,7 @@ func DebugJson(args ...interface{}) error {
 	return nil
 }
 
+//marshal with four whitespace
 func marshalWithIndent(s interface{}) interface{} {
 	b, err := json.MarshalIndent(s, "", "    ")
 	if err != nil {

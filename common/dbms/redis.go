@@ -24,6 +24,7 @@ const (
 
 // All extra redis actions
 
+// Get reads a key from redis db
 func Get(key string) (string, error) {
 	c := Pool.Get()
 	defer c.Close()
@@ -31,6 +32,7 @@ func Get(key string) (string, error) {
 	return value, err
 }
 
+// CacheGet reads a key from redis cache db
 func CacheGet(key string) string {
 	c := CachePool.Get()
 	defer c.Close()
@@ -38,6 +40,7 @@ func CacheGet(key string) string {
 	return value
 }
 
+// CacheGetSet gets a key from the cache db and sets with a new value
 func CacheGetSet(key, newValue string) string {
 	c := CachePool.Get()
 	defer c.Close()
@@ -45,18 +48,21 @@ func CacheGetSet(key, newValue string) string {
 	return value
 }
 
+// CacheSet sets value with expire
 func CacheSet(key string, value interface{}, px time.Duration) {
 	c := CachePool.Get()
 	defer c.Close()
 	c.Do("SET", key, value, "PX", int64(px/time.Millisecond))
 }
 
+// CacheDelete delete the key from cache db
 func CacheDelete(key string) {
 	c := CachePool.Get()
 	defer c.Close()
 	c.Do("DEL", key)
 }
 
+// CreateSearchIndex creates index from user id, phone/mail/sam id
 func CreateSearchIndex(uid int, info, searchType string) {
 	c := Pool.Get()
 	defer c.Close()
@@ -70,6 +76,7 @@ func CreateSearchIndex(uid int, info, searchType string) {
 	}
 }
 
+// ReadUserIdWithIndex reads user id from redis db with index type
 func ReadUserIdWithIndex(info, loginType string) (uid int) {
 	c := Pool.Get()
 	defer c.Close()
@@ -84,6 +91,7 @@ func ReadUserIdWithIndex(info, loginType string) (uid int) {
 	return
 }
 
+// ReadIfSamIdExist tests if the given sam id is in redis db set
 func ReadIfSamIdExist(sid string) (exist bool) {
 	c := Pool.Get()
 	defer c.Close()
@@ -91,50 +99,56 @@ func ReadIfSamIdExist(sid string) (exist bool) {
 	return
 }
 
+// UpdateSamIdSet adds a sam id to the set
 func UpdateSamIdSet(sid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("SADD", samIdSet, sid)
 }
 
+// DeleteSamIdSet deletes a sam id from the set
 func DeleteSamId(sid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("SREM", samIdSet, sid)
 }
 
-//create index
+// CreateUserIndex creates 'user public id==>> user real id' index
 func CreateUserIndex(uid int, uPid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("HSET", UserIndex, uPid, uid)
 }
 
+// CreateTodoIndex creates 'to-do public id==>> to-do real id' index
 func CreateTodoIndex(tid int, tPid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("HSET", TodoIndex, tPid, tid)
 }
 
+// CreateMissionIndex creates 'mission public id==>> mission real id' index
 func CreateMissionIndex(mid int, mPid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("HSET", MissionIndex, mPid, mid)
 }
 
+// CreateProjectIndex creates 'project public id==>> project real id' index
 func CreateProjectIndex(pid int, pPid string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("HSET", ProjectIndex, pPid, pid)
 }
 
+// CreateDeviceIndex creates 'user real id==>> user device token' index
 func CreateDeviceIndex(uid int, dt string) {
 	c := Pool.Get()
 	defer c.Close()
 	c.Do("HSET", DeviceIndex, uid, dt)
 }
 
-//get real id from public id
+// ReadUserId gets user real id with public id
 func ReadUserId(uPid string) (uid int) {
 	c := Pool.Get()
 	defer c.Close()
@@ -142,6 +156,7 @@ func ReadUserId(uPid string) (uid int) {
 	return
 }
 
+// ReadTodoId gets to-do real id with public id
 func ReadTodoId(tPid string) (tid int) {
 	c := Pool.Get()
 	defer c.Close()
@@ -149,6 +164,7 @@ func ReadTodoId(tPid string) (tid int) {
 	return
 }
 
+// ReadMissionId gets mission real id with public id
 func ReadMissionId(mPid string) (mid int) {
 	c := Pool.Get()
 	defer c.Close()
@@ -156,6 +172,7 @@ func ReadMissionId(mPid string) (mid int) {
 	return
 }
 
+// ReadProjectId gets project real id with public id
 func ReadProjectId(pPid string) (pid int) {
 	c := Pool.Get()
 	defer c.Close()
@@ -163,6 +180,7 @@ func ReadProjectId(pPid string) (pid int) {
 	return
 }
 
+// ReadDeviceToken gets user device token with real id
 func ReadDeviceToken(uid int) (dt string) {
 	c := Pool.Get()
 	defer c.Close()

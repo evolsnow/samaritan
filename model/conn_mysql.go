@@ -39,6 +39,7 @@ const (
 	ProjectDelete = "DELETE FROM project WHERE redis_id = ?"
 )
 
+// CreateUserMysql creates user in mysql
 func CreateUserMysql(u User) {
 	stmt, err := dbms.DB.Prepare(UserInsert)
 	if err != nil {
@@ -47,6 +48,7 @@ func CreateUserMysql(u User) {
 	stmt.Exec(u.Id, u.Pid, u.SamId, u.CreateTime, u.Alias, u.Name, u.Phone, u.Password, u.Email, u.Avatar, u.School, u.Department, u.Grade, u.Class, u.StudentNum)
 }
 
+// UpdateUserMysql updates user in mysql
 func UpdateUserMysql(u User) {
 	stmt, err := dbms.DB.Prepare(UserUpdate)
 	if err != nil {
@@ -56,6 +58,7 @@ func UpdateUserMysql(u User) {
 
 }
 
+// DeleteUserMysql deletes user in mysql
 func DeleteUserMysql(uid int) {
 	stmt, err := dbms.DB.Prepare(UserDelete)
 	if err != nil {
@@ -64,6 +67,7 @@ func DeleteUserMysql(uid int) {
 	stmt.Exec(uid)
 }
 
+// CreateTodoMysql creates to-do in mysql
 func CreateTodoMysql(t Todo) {
 	stmt, err := dbms.DB.Prepare(TodoInsert)
 	if err != nil {
@@ -72,6 +76,7 @@ func CreateTodoMysql(t Todo) {
 	stmt.Exec(t.Id, t.Pid, t.CreateTime, t.StartTime, t.Place, t.Repeat, t.RepeatMode, t.AllDay, t.Desc, t.Remark, t.OwnerId, t.Done, t.FinishTime, t.MissionId)
 }
 
+//UpdateTodoMysql updates to-do in mysql
 func UpdateTodoMysql(t Todo) {
 	stmt, err := dbms.DB.Prepare(TodoUpdate)
 	if err != nil {
@@ -80,6 +85,7 @@ func UpdateTodoMysql(t Todo) {
 	stmt.Exec(t.StartTime, t.Place, t.Repeat, t.RepeatMode, t.AllDay, t.Desc, t.Remark, t.Done, t.FinishTime, t.Id)
 }
 
+// DeleteTodoMysql deletes to-do in mysql
 func DeleteTodoMysql(tid int) {
 	stmt, err := dbms.DB.Prepare(TodoDelete)
 	if err != nil {
@@ -88,6 +94,7 @@ func DeleteTodoMysql(tid int) {
 	stmt.Exec(tid)
 }
 
+// CreateMissionMysql creates mission in mysql
 func CreateMissionMysql(m Mission) {
 	stmt, err := dbms.DB.Prepare(MissionInsert)
 	if err != nil {
@@ -96,6 +103,7 @@ func CreateMissionMysql(m Mission) {
 	stmt.Exec(m.Id, m.Pid, m.CreateTime, m.Name, m.Desc, m.PublisherId, m.CompletionNum, m.CompletedTime, m.Deadline, m.ProjectId)
 }
 
+// UpdateMissionMysql updates mission in mysql
 func UpdateMissionMysql(m Mission) {
 	stmt, err := dbms.DB.Prepare(MissionUpdate)
 	if err != nil {
@@ -104,6 +112,7 @@ func UpdateMissionMysql(m Mission) {
 	stmt.Exec(m.Name, m.Desc, m.PublisherId, m.CompletionNum, m.CompletedTime, m.Deadline, m.Id)
 }
 
+// DeleteMissionMysql deletes mission in mysql
 func DeleteMissionMysql(mid int) {
 	stmt, err := dbms.DB.Prepare(MissionDelete)
 	if err != nil {
@@ -112,6 +121,7 @@ func DeleteMissionMysql(mid int) {
 	stmt.Exec(mid)
 }
 
+// CreateProjectMysql creates project in mysql
 func CreateProjectMysql(p Project) {
 	stmt, err := dbms.DB.Prepare(ProjectInsert)
 	if err != nil {
@@ -120,6 +130,7 @@ func CreateProjectMysql(p Project) {
 	stmt.Exec(p.Id, p.Pid, p.CreateTime, p.Name, p.Desc, p.BackgroundPic, p.CreatorId, p.Private)
 }
 
+// UpdateProjectMysql updates project in mysql
 func UpdateProjectMysql(p Project) {
 	stmt, err := dbms.DB.Prepare(ProjectUpdate)
 	if err != nil {
@@ -128,6 +139,7 @@ func UpdateProjectMysql(p Project) {
 	stmt.Exec(p.Name, p.Desc, p.BackgroundPic, p.Private, p.Id)
 }
 
+// DeleteProjectMysql deletes project in mysql
 func DeleteProjectMysql(pid int) {
 	stmt, err := dbms.DB.Prepare(ProjectDelete)
 	if err != nil {
@@ -136,6 +148,7 @@ func DeleteProjectMysql(pid int) {
 	stmt.Exec(pid)
 }
 
+// SyncMysql sync with redis
 func SyncMysql() {
 	syncUser()
 	syncTodo()
@@ -143,6 +156,7 @@ func SyncMysql() {
 	syncProject()
 }
 
+//sync user
 func syncUser() {
 	tmp, _ := dbms.Get("autoIncrUser")
 	total, _ := strconv.Atoi(tmp)
@@ -161,6 +175,7 @@ func syncUser() {
 	log.Info("user synced")
 }
 
+//sync to-do
 func syncTodo() {
 	tmp, _ := dbms.Get("autoIncrTodo")
 	total, _ := strconv.Atoi(tmp)
@@ -179,6 +194,7 @@ func syncTodo() {
 	log.Info("todo synced")
 }
 
+//sync mission
 func syncMission() {
 	tmp, _ := dbms.Get("autoIncrMission")
 	total, _ := strconv.Atoi(tmp)
@@ -197,6 +213,7 @@ func syncMission() {
 	log.Info("mission synced")
 }
 
+//sync project
 func syncProject() {
 	tmp, _ := dbms.Get("autoIncrProject")
 	total, _ := strconv.Atoi(tmp)
@@ -213,14 +230,4 @@ func syncProject() {
 		}
 	}
 	log.Info("project synced")
-}
-
-func Test() {
-	var name string
-	row := dbms.DB.QueryRow("select name from user where id = ?", 1)
-	err := row.Scan(&name)
-	if err != nil {
-		log.Error(err)
-	}
-	log.Println(name)
 }

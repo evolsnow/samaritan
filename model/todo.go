@@ -22,7 +22,7 @@ type Todo struct {
 	MissionId  int      `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
-//get user from to-do's owner id
+// GetOwner gets user from to-do's owner id
 func (td *Todo) GetOwner() (owner *User) {
 	var err error
 	if td.OwnerId == 0 {
@@ -38,7 +38,7 @@ func (td *Todo) GetOwner() (owner *User) {
 	return
 }
 
-//get project from to-do's project id
+// GetMission gets project from to-do's project id
 func (td *Todo) GetMission() (m *Mission) {
 	var err error
 	if td.MissionId == 0 {
@@ -54,7 +54,7 @@ func (td *Todo) GetMission() (m *Mission) {
 	return
 }
 
-//update to-do done status
+// Finish updates to-do done status
 func (td *Todo) Finish() (err error) {
 	if td.OwnerId == 0 {
 		td.OwnerId = td.GetOwner().Id
@@ -67,7 +67,7 @@ func (td *Todo) Finish() (err error) {
 	return
 }
 
-//save a new to-do
+// ave a new to-do
 func (td *Todo) Save() {
 	if td.Id == 0 {
 		//new to-do
@@ -82,7 +82,7 @@ func (td *Todo) Save() {
 	}
 }
 
-//delete a to-do
+// Remove deletes a to-do
 func (td *Todo) Remove() (err error) {
 	if err = deleteTodo(td.Id); err != nil {
 		log.Error("Error delete todo:", err)
@@ -91,7 +91,7 @@ func (td *Todo) Remove() (err error) {
 	return
 }
 
-//full read from redis
+// Load full read from redis
 func (td *Todo) Load() (err error) {
 	err = readFullTodo(td)
 	if err != nil {

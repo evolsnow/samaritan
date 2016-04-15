@@ -124,6 +124,8 @@ const (
 )
 
 //redis actions of model User
+
+//create user in redis
 func createUser(u *User) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -171,6 +173,7 @@ func createUser(u *User) {
 	//}()
 }
 
+//return model User
 func readUserWithId(id int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -184,6 +187,7 @@ func readUserWithId(id int) (*User, error) {
 	return u, err
 }
 
+//load in given User
 func readFullUser(u *User) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -196,6 +200,7 @@ func readFullUser(u *User) error {
 	return err
 }
 
+//save user avatar path
 func createUserAvatar(uid int, avatarUrl string) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -204,16 +209,19 @@ func createUserAvatar(uid int, avatarUrl string) error {
 	return err
 }
 
+//read user created projects
 func readCreatedProjects(uid int) ([]Project, error) {
 	key := fmt.Sprintf(userPjCreatedSet, uid)
 	return readProjects(key)
 }
 
+//read user joined projects
 func readJoinedProjects(uid int) ([]Project, error) {
 	key := fmt.Sprintf(userPjJoinedSet, uid)
 	return readProjects(key)
 }
 
+//read projects with the given key
 func readProjects(key string) ([]Project, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -237,6 +245,7 @@ func readProjects(key string) ([]Project, error) {
 	return ps, err
 }
 
+//read user's all completed missions' id
 func readCompletedMissionsId(uid int) ([]int, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -246,6 +255,7 @@ func readCompletedMissionsId(uid int) ([]int, error) {
 
 }
 
+//read user's accepted missions's id
 func readAcceptedMissionsId(uid int) ([]int, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -253,6 +263,7 @@ func readAcceptedMissionsId(uid int) ([]int, error) {
 	return ids, err
 }
 
+//read user'd password
 func readPassword(uid int) (pwd string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -261,6 +272,7 @@ func readPassword(uid int) (pwd string, err error) {
 	return
 }
 
+//add to user's completed mission
 func updateCompletedMission(uid, mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -269,6 +281,7 @@ func updateCompletedMission(uid, mid int) error {
 	return c.Flush()
 }
 
+//add to user's uncompleted mission
 func updateUnCompletedMission(uid, mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -277,6 +290,7 @@ func updateUnCompletedMission(uid, mid int) error {
 	return c.Flush()
 }
 
+//add to user's accepted mission
 func updateAcceptedMission(uid, mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -284,6 +298,7 @@ func updateAcceptedMission(uid, mid int) error {
 	return err
 }
 
+//update user with given value
 func updateUser(uid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -294,6 +309,7 @@ func updateUser(uid int, kvMap map[string]interface{}) error {
 }
 
 //redis actions of model to-do
+//create to-do in redis
 func createTodo(td *Todo) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -341,6 +357,7 @@ func createTodo(td *Todo) {
 	//}()
 }
 
+//return model To-do
 func readFullTodo(td *Todo) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -353,6 +370,7 @@ func readFullTodo(td *Todo) error {
 	return err
 }
 
+//load in given To-do
 func readTodoWithId(id int) (*Todo, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -366,6 +384,7 @@ func readTodoWithId(id int) (*Todo, error) {
 	return t, err
 }
 
+//get to-do's owner
 func readOwner(tid int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -376,6 +395,7 @@ func readOwner(tid int) (*User, error) {
 	return readUserWithId(uid)
 }
 
+//get to-do's belonged mission
 func readBelongedMission(tid int) (*Mission, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -386,6 +406,7 @@ func readBelongedMission(tid int) (*Mission, error) {
 	return readMissionWithId(mid)
 }
 
+//set to-do status to done
 func updateTodoStatus(uid, tid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -395,6 +416,7 @@ func updateTodoStatus(uid, tid int) error {
 	return err
 }
 
+//update to-do with given value
 func updateTodo(tid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -408,6 +430,7 @@ func updateTodo(tid int, kvMap map[string]interface{}) error {
 	return c.Flush()
 }
 
+//delete a to-do
 func deleteTodo(tid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -416,6 +439,7 @@ func deleteTodo(tid int) error {
 }
 
 //redis actions of model mission
+//create a mission in redis
 func createMission(m *Mission) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -460,6 +484,7 @@ func createMission(m *Mission) {
 	//}()
 }
 
+//create a mission comment
 func createMissionComment(cm *Comment) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -490,6 +515,7 @@ func createMissionComment(cm *Comment) {
 	//}()
 }
 
+//return model Mission
 func readMissionWithId(mid int) (*Mission, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -504,6 +530,7 @@ func readMissionWithId(mid int) (*Mission, error) {
 	return m, err
 }
 
+//return model Mission with receivers
 func readFullMission(m *Mission) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -517,6 +544,7 @@ func readFullMission(m *Mission) error {
 	return err
 }
 
+//get all mission's comments
 func readMissionComments(mid int) (cms []*Comment, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -540,6 +568,7 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
 	return
 }
 
+//get all mission's receivers id
 func readMissionReceiversId(mid int) (ids []int, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -548,6 +577,7 @@ func readMissionReceiversId(mid int) (ids []int, err error) {
 	return
 }
 
+//get all mission receivers id who has completed it
 func readMissionCompletedUsersId(mid int) (ids []int, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -556,6 +586,7 @@ func readMissionCompletedUsersId(mid int) (ids []int, err error) {
 	return
 }
 
+//get mission's pics
 func readMissionPictures(mid int) (pics []string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -564,6 +595,7 @@ func readMissionPictures(mid int) (pics []string, err error) {
 	return
 }
 
+//update mission with given value
 func updateMission(mid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -573,6 +605,7 @@ func updateMission(mid int, kvMap map[string]interface{}) error {
 	return c.Flush()
 }
 
+//add or remove mission receivers
 func updateMissionReceiver(mid, uid, action int) (err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -586,6 +619,7 @@ func updateMissionReceiver(mid, uid, action int) (err error) {
 }
 
 //redis actions of model project
+//create project in redis
 func createProject(p *Project) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -623,6 +657,7 @@ func createProject(p *Project) {
 	//}()
 }
 
+//get project's members
 func readProjectMembers(pid int) (reply []*User, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -646,6 +681,7 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 	return reply, err
 }
 
+//get project's missions
 func readProjectMissions(pid int) (reply []*Mission, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -669,18 +705,7 @@ func readProjectMissions(pid int) (reply []*Mission, err error) {
 	return reply, err
 }
 
-func readFullProject(p *Project) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	pj := "project:" + strconv.Itoa(p.Id)
-	ret, err := redis.Values(c.Do("HGETALL", pj))
-	if err != nil {
-		return err
-	}
-	err = redis.ScanStruct(ret, p)
-	return err
-}
-
+//return model Project
 func readProjectWithId(pid int) (*Project, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -694,6 +719,20 @@ func readProjectWithId(pid int) (*Project, error) {
 	return p, err
 }
 
+//load in given Project
+func readFullProject(p *Project) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	pj := "project:" + strconv.Itoa(p.Id)
+	ret, err := redis.Values(c.Do("HGETALL", pj))
+	if err != nil {
+		return err
+	}
+	err = redis.ScanStruct(ret, p)
+	return err
+}
+
+//get project's creator
 func readCreator(pid int) (*User, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -704,6 +743,7 @@ func readCreator(pid int) (*User, error) {
 	return readUserWithId(uid)
 }
 
+//get projects's members' id
 func readProjectMembersId(pid int) (ids []int, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -712,6 +752,7 @@ func readProjectMembersId(pid int) (ids []int, err error) {
 	return
 }
 
+//get projects's members' name
 func readProjectMembersName(pid int) (names []string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -729,6 +770,7 @@ func readProjectMembersName(pid int) (names []string, err error) {
 	return
 }
 
+//add or remove project member
 func updateProjectMember(pid, uid, action int) (err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -742,6 +784,7 @@ func updateProjectMember(pid, uid, action int) (err error) {
 	return
 }
 
+//update project with given value
 func updateProject(pid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -751,6 +794,7 @@ func updateProject(pid int, kvMap map[string]interface{}) error {
 	return c.Flush()
 }
 
+//delete a project
 func deleteProject(pid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -758,7 +802,8 @@ func deleteProject(pid int) error {
 	return c.Flush()
 }
 
-func updateUserProjectSet(pid, uid int) error {
+//delete project from user project set
+func deleteFromUserProjectSet(pid, uid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	c.Send("SREM", fmt.Sprintf(userPjJoinedSet, uid), pid)
@@ -767,6 +812,7 @@ func updateUserProjectSet(pid, uid int) error {
 }
 
 //chat
+//create chat in redis
 func createChat(ct *Chat) int {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -798,23 +844,17 @@ func createChat(ct *Chat) int {
 	return id
 }
 
+//get all chat members
 func readChatMembers(ct *Chat) (ids []int) {
-	//read mission members
+	//read mission members todo:mission or project
 	m := new(Mission)
 	m.Pid = ct.GroupName
 	ids = m.GetReceiversId()
 	return
 }
 
-//func readDeviceToken(uid int) (token string, err error) {
-//	c := dbms.Pool.Get()
-//	defer c.Close()
-//	key := fmt.Sprintf(deviceToken, uid)
-//	token, err = redis.String(c.Do("GET", key))
-//	return
-//}
-
-func updateOfflineMsg(uid, convId int) {
+//create offline msg when failed to push
+func createOfflineMsg(uid, convId int) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(offlineMsgList, uid)

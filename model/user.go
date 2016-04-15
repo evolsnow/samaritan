@@ -23,7 +23,7 @@ type User struct {
 	StudentNum string `json:"stuNum,omitempty" redis:"stuNum"` //1218404001...
 }
 
-//read user's password
+// GetPassword reads user's password
 func (u *User) GetPassword() (pwd string) {
 	pwd, err := readPassword(u.Id)
 	if err != nil {
@@ -33,7 +33,7 @@ func (u *User) GetPassword() (pwd string) {
 	return
 }
 
-//user created projects
+// GetCreatedProjects gets user created projects
 func (u *User) GetCreatedProjects() []Project {
 	ret, err := readCreatedProjects(u.Id)
 	if err != nil {
@@ -43,7 +43,7 @@ func (u *User) GetCreatedProjects() []Project {
 	return ret
 }
 
-//user joined projects
+// GetJoinedProjects gets user joined projects
 func (u *User) GetJoinedProjects() []Project {
 	ret, err := readJoinedProjects(u.Id)
 	if err != nil {
@@ -53,7 +53,7 @@ func (u *User) GetJoinedProjects() []Project {
 	return ret
 }
 
-//all projects
+// GetAllProjects gets all projects
 func (u *User) GetAllProjects() []Project {
 	pjs := u.GetCreatedProjects()
 	tmp := u.GetJoinedProjects()
@@ -73,7 +73,7 @@ func (u *User) GetAllProjects() []Project {
 	return pjs
 }
 
-//all completed missions id
+// GetAllCompletedMissionsId gets all completed missions id
 func (u *User) GetAllCompletedMissionsId() []int {
 	var ids []int
 	ids, err := readCompletedMissionsId(u.Id)
@@ -83,7 +83,7 @@ func (u *User) GetAllCompletedMissionsId() []int {
 	return ids
 }
 
-//all accepted missions id
+// GetAllAcceptedMissionsId gets all accepted missions id
 func (u *User) GetAllAcceptedMissionsId() []int {
 	var ids []int
 	ids, err := readAcceptedMissionsId(u.Id)
@@ -93,25 +93,26 @@ func (u *User) GetAllAcceptedMissionsId() []int {
 	return ids
 }
 
-//complete mission
+// CompleteMission adds mission to user completed mission
 func (u *User) CompleteMission(mid int) {
 	if err := updateCompletedMission(u.Id, mid); err != nil {
 		log.Error("Error update completed mission:", err)
 	}
 }
 
-//uncompleted mission
+// UnCompleteMission adds mission to user uncompleted mission
 func (u *User) UnCompleteMission(mid int) {
 	if err := updateUnCompletedMission(u.Id, mid); err != nil {
 		log.Error("Error update uncompleted mission:", err)
 	}
 }
 
+// AcceptMission add mission to user accepted mission set
 func (u *User) AcceptMission(mid int) {
 	updateAcceptedMission(u.Id, mid)
 }
 
-//generate avatar url for user
+// CreateAvatar generates avatar for user
 func (u *User) CreateAvatar() {
 	path, err := base.GenerateAvatar(u.Email)
 	if err != nil {
@@ -124,13 +125,13 @@ func (u *User) CreateAvatar() {
 	}
 }
 
-//full url of avatar img
+// FullAvatarUrl return full url of avatar img
 func (u *User) FullAvatarUrl() string {
 	prefix := "https://img.samaritan.tech/"
 	return prefix + u.Avatar
 }
 
-//create or update a new user
+// Save creates or updates a new user
 func (u *User) Save() {
 	if u.Id == 0 {
 		//new user
@@ -145,7 +146,7 @@ func (u *User) Save() {
 	}
 }
 
-//full read from redis
+// Load full read from redis
 func (u *User) Load() (err error) {
 	err = readFullUser(u)
 	if err != nil {

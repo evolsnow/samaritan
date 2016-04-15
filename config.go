@@ -12,6 +12,7 @@ type ListenServer struct {
 	DB       string `json:"db,omitempty"`
 	Password string `json:"password,omitempty"`
 }
+
 type Config struct {
 	HttpS  ListenServer `json:"http_server"`
 	RedisS ListenServer `json:"redis_server"`
@@ -20,6 +21,7 @@ type Config struct {
 	RpcSF  ListenServer `json:"rpc_server_f"`
 }
 
+// ParseConfig parse config from the given file path
 func ParseConfig(path string) (config *Config, err error) {
 	file, err := os.Open(path)
 	if err != nil {

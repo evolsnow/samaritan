@@ -2,6 +2,7 @@ package model
 
 import "reflect"
 
+//reflect, skip id and empty value
 func prepareToUpdate(s interface{}) map[string]interface{} {
 	v := reflect.ValueOf(s).Elem() // the struct variable
 	kvMap := make(map[string]interface{})
@@ -20,6 +21,7 @@ func prepareToUpdate(s interface{}) map[string]interface{} {
 	return kvMap
 }
 
+//only skip id
 func prepareToForceUpdate(s interface{}) map[string]interface{} {
 	v := reflect.ValueOf(s).Elem() // the struct variable
 	kvMap := make(map[string]interface{})
@@ -36,6 +38,7 @@ func prepareToForceUpdate(s interface{}) map[string]interface{} {
 	return kvMap
 }
 
+//test is empty or value that should be skipped for redis
 func isEmptyOrSkipValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice:

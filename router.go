@@ -45,8 +45,6 @@ func newRouter() *httprouter.Router {
 	r.POST("/invitations/project", mw.Auth(hd.NewProjectInvitation))
 	r.POST("/invitations/mission", mw.Auth(hd.NewMissionInvitation))
 
-	//todo upload device token
-
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
 	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
@@ -55,15 +53,6 @@ func newRouter() *httprouter.Router {
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
 	r.DELETE("/projects/:project", mw.Auth(hd.DeleteProject))
-
-	//test
-	r.GET("/test", hd.Test)
-	r.POST("/hi", hd.Hi)
-	r.POST("/hia/:userId", mw.Auth(hd.Hi))
-	r.GET("/set", hd.SetJwt)
-	r.GET("/pm", hd.Pm)
-	r.GET("/pm2", hd.Pm2)
-	r.GET("/ab", hd.Ab)
 
 	return r
 }

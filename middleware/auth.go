@@ -12,6 +12,13 @@ import (
 
 var lru = caches.NewLRUCache(100)
 
+const (
+	WrongTokenErr      = "token错误，请重新登录"
+	UnknownAuthTypeErr = "未知认证方式"
+	AuthFailedErr      = "鉴权失败，请登录"
+)
+
+// Auth checks if the user is allowed to visit the url
 func Auth(h httprouter.Handle) httprouter.Handle {
 	//jwt
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -32,18 +39,18 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 						lru.Add(ah[7:], strconv.Itoa(uid))
 						goto Success
 					} else {
-						msg := "token错误，请重新登录"
+						msg := WrongTokenErr
 						base.UnAuthErr(w, msg)
 						return
 					}
 				}
 			} else {
-				msg := "未知认证方式"
+				msg := UnknownAuthTypeErr
 				base.UnAuthErr(w, msg)
 				return
 			}
 		} else {
-			base.UnAuthErr(w, "鉴权失败，请登录")
+			base.UnAuthErr(w, AuthFailedErr)
 			return
 		}
 	Success:

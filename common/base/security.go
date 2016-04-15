@@ -21,6 +21,8 @@ const (
 	CommentIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 )
 
+// MakeToken makes jwt token with auth id
+// Add "Bearer " additionally
 func MakeToken(id int) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	// Set some claims
@@ -31,6 +33,8 @@ func MakeToken(id int) string {
 	return "Bearer " + tokenString
 }
 
+// ParseToken parses auth id from token
+// Compatible with token starts with "Bearer "
 func ParseToken(ah string) (uid int, err error) {
 	if strings.HasPrefix(ah, "Bearer ") {
 		ah = ah[7:]
@@ -46,7 +50,8 @@ func ParseToken(ah string) (uid int, err error) {
 	}
 }
 
-//high level secret,use 'scrypt' instead of hash+salt
+// EncryptedPassword encrypts user's password
+// High level secret,use "scrypt" instead of hash+salt
 func EncryptedPassword(pwd string) string {
 	salt := fmt.Sprintf("%s@samaritan.tech", pwd)
 	dk, _ := scrypt.Key([]byte(pwd), []byte(salt), 16384, 8, 1, 32)
@@ -59,35 +64,42 @@ func EncryptedPassword(pwd string) string {
 	return encrypted
 }
 
+// NewPrivateChatId hashed with chat salt
 func NewPrivateChatId(raw string) string {
 	return hashWithSalt(raw, PrivateChatSalt)
 }
 
+// HashedUserId hashed with user salt
 func HashedUserId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, UserIdSalt)
 }
 
+// HashedTodoId hashed with to-do salt
 func HashedTodoId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, TodoIdSalt)
 }
 
+// HashedProjectId hashed with project salt
 func HashedProjectId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, ProjectIdSalt)
 }
 
+// HashedMissionId hashed with mission salt
 func HashedMissionId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, MissionIdSalt)
 }
 
+// HashedCommentId hashed with comment salt
 func HashedCommentId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, CommentIdSalt)
 }
 
+//hashWithSalt uses md5 hash and salt
 func hashWithSalt(raw, salt string) string {
 	h := md5.New()
 	h.Write([]byte(raw))
@@ -95,31 +107,3 @@ func hashWithSalt(raw, salt string) string {
 	hashed := hex.EncodeToString(h.Sum(nil))
 	return hashed
 }
-
-//func validSign(XSign, userId string) string {
-//	//get key and last visit time from redis
-//	appKey, lastVisit := conn.GetSignKey(userId)
-//	//parse to compare
-//	parts := strings.Split(XSign, ".")
-//	current, _ := strconv.Atoi(parts[1])
-//	last, _ := strconv.Atoi(lastVisit)
-//	if len(parts) != 2 {
-//		return "Invalid Sign"
-//	}
-//	//verify sign
-//	h := md5.New()
-//	h.Write([]byte(appKey + parts[1]))
-//	hash := hex.EncodeToString(h.Sum(nil))
-//	if parts[0] == hash {
-//		if current > last {
-//			//update user sign
-//			go conn.UpdateSign(userId, parts[1])
-//			return ""
-//		} else {
-//			return "Replay Attacks"
-//		}
-//
-//	} else {
-//		return "Incorrect Sign"
-//	}
-//}

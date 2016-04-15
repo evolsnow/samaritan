@@ -34,6 +34,7 @@ type Chat struct {
 	ExtraInfo      map[string]string `json:"extraInfo" redis:"-"`
 }
 
+// Response deals with the chat message
 func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
@@ -68,6 +69,7 @@ func (ct *Chat) Response() {
 	ct.send()
 }
 
+//send with socket or apple push
 func (ct *Chat) send() {
 	ct.Timestamp = time.Now().Unix()
 	var userTokens []string
@@ -84,6 +86,7 @@ func (ct *Chat) send() {
 	//}
 }
 
+//read user's device token and push
 func applePush(tokens []string, ct *Chat) {
 	var deviceList []string
 	//read device token from db
@@ -95,15 +98,16 @@ func applePush(tokens []string, ct *Chat) {
 		}
 	}
 	log.Debug("dt:", deviceList)
-	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
+	rpc.AppPush(deviceList, ct.Msg, ct.ExtraInfo)
 }
 
+// Save saves the offline chat message
 func (ct *Chat) Save(uid int) {
 	if ct.Id == 0 {
 		//not saved
 		ct.Id = createChat(ct)
 	} else {
 		//offline msg saved
-		updateOfflineMsg(uid, ct.Id)
+		createOfflineMsg(uid, ct.Id)
 	}
 }

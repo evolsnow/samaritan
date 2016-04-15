@@ -1,6 +1,7 @@
 # **project samaritan**
 
 [![Build Status](https://api.travis-ci.org/evolsnow/samaritan.svg?branch=master)](https://travis-ci.org/evolsnow/samaritan)
+[![GoDoc](https://godoc.org/github.com/evolsnow/samaritan?status.png)](https://godoc.org/github.com/evolsnow/samaritan)
 
 **samaritan** 为APP(名字待定)的后台部分, 以Golang编写。
 

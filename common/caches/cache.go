@@ -14,13 +14,14 @@ type SimpleCache struct {
 	cache map[string]interface{}
 }
 
+// NewCache returns initialized SimpleCache
 func NewCache() *SimpleCache {
 	return &SimpleCache{
 		cache: make(map[string]interface{}),
 	}
 }
 
-// Add adds a value to the cache.
+// Set adds a value to the cache.
 func (c *SimpleCache) Set(key string, value interface{}, px time.Duration) {
 	dbms.CacheSet(key, value, px)
 }
