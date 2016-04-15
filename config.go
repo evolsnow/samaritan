@@ -6,19 +6,20 @@ import (
 	"os"
 )
 
-type ListenServer struct {
+type listenServer struct {
 	Address  string `json:"address,omitempty"`
 	Port     int    `json:"port"`
 	DB       string `json:"db,omitempty"`
 	Password string `json:"password,omitempty"`
 }
 
+// Config is a web server config
 type Config struct {
-	HttpS  ListenServer `json:"http_server"`
-	RedisS ListenServer `json:"redis_server"`
-	MysqlS ListenServer `json:"mysql_server"`
-	RpcSD  ListenServer `json:"rpc_server_d"`
-	RpcSF  ListenServer `json:"rpc_server_f"`
+	WebS   listenServer `json:"web_server"`
+	RedisS listenServer `json:"redis_server"`
+	MysqlS listenServer `json:"mysql_server"`
+	RpcSD  listenServer `json:"rpc_server_d"`
+	RpcSF  listenServer `json:"rpc_server_f"`
 }
 
 // ParseConfig parse config from the given file path

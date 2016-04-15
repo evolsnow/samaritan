@@ -32,7 +32,7 @@ import (
 	"strconv"
 )
 
-const CacheDB = "8"
+const cacheDB = "8"
 
 func main() {
 	var debug bool
@@ -49,14 +49,14 @@ func main() {
 	if err != nil {
 		log.Fatal("a vailid json config file must exist")
 	}
-	if cfg.RedisS.DB == CacheDB {
+	if cfg.RedisS.DB == cacheDB {
 		log.Fatal("redis db can not be same as cache db: '8'")
 	}
 
 	//init redis  pool
 	redisServer := net.JoinHostPort(cfg.RedisS.Address, strconv.Itoa(cfg.RedisS.Port))
 	dbms.Pool = dbms.NewPool(redisServer, cfg.RedisS.Password, cfg.RedisS.DB)
-	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, CacheDB)
+	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, cacheDB)
 
 	//init mysql database
 	dbms.DB = dbms.NewDB(cfg.MysqlS.Password, cfg.MysqlS.Address, cfg.MysqlS.Port, cfg.MysqlS.DB)
@@ -75,5 +75,5 @@ func main() {
 	)
 	r := newRouter()
 	n.UseHandler(r)
-	n.Run(net.JoinHostPort(cfg.HttpS.Address, strconv.Itoa(cfg.HttpS.Port)))
+	n.Run(net.JoinHostPort(cfg.WebS.Address, strconv.Itoa(cfg.WebS.Port)))
 }

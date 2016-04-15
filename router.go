@@ -12,16 +12,16 @@ import (
 
 var r = httprouter.New()
 
-type NotAllowed struct{}
-type NotFound struct{}
+type notAllowed struct{}
+type notFound struct{}
 
 func newRouter() *httprouter.Router {
 	//base url for all requests
 	//r.BaseURL = BaseURL
 
 	//user-defined http error handler
-	r.MethodNotAllowed = NotAllowed{}
-	r.NotFound = NotFound{}
+	r.MethodNotAllowed = notAllowed{}
+	r.NotFound = notFound{}
 
 	//http get method
 	r.GET("/samIds/:samId", hd.SamIdStatus)
@@ -58,11 +58,11 @@ func newRouter() *httprouter.Router {
 }
 
 // ServeHTTP makes the NAllowed implement the http.Handler interface.
-func (NotAllowed) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (notAllowed) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	base.MethodNAErr(w, http.StatusText(http.StatusMethodNotAllowed))
 }
 
 // ServeHTTP makes the NFound implement the http.Handler interface.
-func (NotFound) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (notFound) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	base.NotFoundErr(w, http.StatusText(http.StatusNotFound))
 }

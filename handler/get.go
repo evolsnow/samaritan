@@ -141,7 +141,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
 			CreateTime:    v.CreateTime,
-			completionNum: v.CompletionNum,
+			CompletionNum: v.CompletionNum,
 		}
 		nms[i] = nm
 	}

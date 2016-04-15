@@ -1,5 +1,5 @@
 {
-	"http_server": {
+	"web_server": {
 		"server": "127.0.0.1",
 		"port": 8080
 	},

@@ -374,7 +374,7 @@ type NestedMission struct {
 	CreatorName   string   `json:"creatorName,omitempty"`
 	CreatorId     string   `json:"creatorId,omitempty"`
 	CreateTime    int64    `json:"createTime,omitempty"`
-	completionNum int      `json:"completionNum"`
+	CompletionNum int      `json:"completionNum"`
 }
 
 type projectMissionsResp struct {
