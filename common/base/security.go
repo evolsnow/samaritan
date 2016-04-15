@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/scrypt"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -31,6 +32,9 @@ func MakeToken(id int) string {
 }
 
 func ParseToken(ah string) (uid int, err error) {
+	if strings.HasPrefix(ah, "Bearer ") {
+		ah = ah[7:]
+	}
 	token, err := jwt.Parse(ah, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JwtKey), nil
 	})

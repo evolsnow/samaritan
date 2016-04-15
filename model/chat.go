@@ -94,7 +94,6 @@ func applePush(tokens []string, ct *Chat) {
 			deviceList = append(deviceList, dt)
 		}
 	}
-	log.Debug("tokens:", tokens)
 	log.Debug("dt:", deviceList)
 	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
 }
