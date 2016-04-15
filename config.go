@@ -22,7 +22,7 @@ type Config struct {
 	RpcSF  listenServer `json:"rpc_server_f"`
 }
 
-// ParseConfig parse config from the given file path
+// ParseConfig parses config from the given file path
 func ParseConfig(path string) (config *Config, err error) {
 	file, err := os.Open(path)
 	if err != nil {
