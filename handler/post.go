@@ -33,9 +33,9 @@ const (
 )
 
 const (
-	InvitedToJoinProject = "%s 邀请你加入项目: %s"
-	InvitedToJoinMission = "%s 邀请你接受任务: %s"
-	DeliverMission       = "%s 发布了一个任务: %s"
+	InvitedToJoinProject = "%s邀请你加入项目: %s"
+	InvitedToJoinMission = "%s邀请你接受任务: %s"
+	DeliverMission       = "%s发布了一个任务: %s"
 )
 
 func NewDeviceToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -58,7 +58,8 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(req)
 	var code, info, source string
 	if req.Type == "phone" {
-		code = cache.GetSet(req.Phone+":code", "")
+		//code = cache.GetSet(req.Phone+":code", "")
+		code = cache.Get(req.Phone + ":code")
 		info, source = req.Phone, "phone"
 	} else if req.Type == "mail" {
 		//code = cache.GetSet(req.Mail+":code", "")
@@ -92,6 +93,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := new(postUsResp)
 	resp.Id = us.Pid
 	resp.Token = base.MakeToken(us.Id)
+
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
