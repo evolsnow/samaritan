@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
+	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/common/rpc"
 	"time"
 )
@@ -83,7 +84,7 @@ func (ct *Chat) send() {
 }
 
 func applePush(tokens []string, ct *Chat) {
-	deviceList := make([]string, len(tokens), len(tokens))
+	var deviceList []string
 	//read device token from db
 	for _, token := range tokens {
 		uid, _ := base.ParseToken(token)
@@ -92,6 +93,7 @@ func applePush(tokens []string, ct *Chat) {
 			deviceList = append(deviceList, dt)
 		}
 	}
+	log.Debug("dt:", deviceList)
 	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
 }
 
