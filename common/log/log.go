@@ -1,3 +1,6 @@
+/*
+Package log provides log function
+*/
 package log
 
 import (

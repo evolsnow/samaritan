@@ -1,3 +1,6 @@
+/*
+Package middleware provides middleware used in samaritan
+*/
 package middleware
 
 import (

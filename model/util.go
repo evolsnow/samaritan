@@ -1,3 +1,6 @@
+/*
+Package model provides model-level struct
+*/
 package model
 
 import "reflect"

@@ -1,3 +1,6 @@
+/*
+Package dbms provides common redis action
+*/
 package dbms
 
 import (

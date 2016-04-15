@@ -1,3 +1,6 @@
+/*
+Package base provides some base functions such as random code and valid phoneNumber check
+*/
 package base
 
 import (

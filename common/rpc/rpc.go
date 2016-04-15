@@ -1,3 +1,6 @@
+/*
+Package rpc contains some rpc actions
+*/
 package rpc
 
 import (

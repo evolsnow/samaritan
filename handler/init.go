@@ -1,3 +1,6 @@
+/*
+Package handler contains all control-level interfaces
+*/
 package handler
 
 import (
