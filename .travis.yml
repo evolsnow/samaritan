@@ -6,7 +6,8 @@ services:
   - redis-server
 
 script:
- - go build -o rpc ./gpns
+ - go get -u github.com/evolsnow/gpns
+ - go build -o rpc github.com/evolsnow/gpns
  - ./rpc &
  - go build -o testServer .
  - ./testServer -c config.json.example &

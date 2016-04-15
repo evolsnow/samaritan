@@ -11,7 +11,7 @@ const (
 	PeerToPeer = iota //private msg server <<-->> client
 	Discuss           //group chat server <<-->> client
 	//system call
-	UserJoined        // server -->> client
+	UserJoined        //server -->> client
 	UserLeft          //server -->> client
 	InvitedToProject  //server -->> client
 	KickedFromProject //server -->> client
@@ -77,9 +77,9 @@ func (ct *Chat) send() {
 		uid, _ := base.ParseToken(ft)
 		go ct.Save(uid)
 	}
-	if ct.Type == PeerToPeer || ct.Type == Discuss {
-		applePush(offlineTokens, ct)
-	}
+	//if ct.Type != UserJoined && ct.Type != UserLeft {
+	applePush(offlineTokens, ct)
+	//}
 }
 
 func applePush(tokens []string, ct *Chat) {
