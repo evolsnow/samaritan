@@ -770,9 +770,10 @@ func updateUserProjectSet(pid, uid int) error {
 func createChat(ct *Chat) int {
 	c := dbms.Pool.Get()
 	defer c.Close()
+	ct.Id, _ = redis.Int(c.Do("INCR", "autoIncrChat"))
 	//todo expire the msg
 	lua := `
-	local cid = redis.call("INCR", "autoIncrChat")
+	local cid = KEYS[2]
 	redis.call("HMSET", "chat:"..cid,
 					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					KEYS[7], KEYS[8], KEYS[9], KEYS[10],

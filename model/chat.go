@@ -63,6 +63,7 @@ func (ct *Chat) Response() {
 		for i, uPid := range ct.To {
 			ct.ReceiversId[i] = dbms.ReadUserId(uPid)
 		}
+		log.Debug("receivers:", ct.ReceiversId)
 	}
 	ct.send()
 }
@@ -93,6 +94,7 @@ func applePush(tokens []string, ct *Chat) {
 			deviceList = append(deviceList, dt)
 		}
 	}
+	log.Debug("tokens:", tokens)
 	log.Debug("dt:", deviceList)
 	rpc.IOSPush(deviceList, ct.Msg, ct.ExtraInfo)
 }
