@@ -24,6 +24,7 @@ package main
 import (
 	"flag"
 	"github.com/evolsnow/negroni"
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/evolsnow/samaritan/common/rpc"
@@ -66,6 +67,12 @@ func main() {
 	rpc.RpcClientD = rpc.NewClientD(rpcServerD)
 	rpcServerF := net.JoinHostPort(cfg.RpcSF.Address, strconv.Itoa(cfg.RpcSF.Port))
 	rpc.RpcClientF = rpc.NewClientF(rpcServerF)
+
+	//init qi niu cloud
+	base.Domain = cfg.QiNiu.Domain
+	base.Bucket = cfg.QiNiu.Bucket
+	base.AccessKey = cfg.QiNiu.AccessKey
+	base.SecretKey = cfg.QiNiu.SecretKey
 
 	//init server
 	n := negroni.New(

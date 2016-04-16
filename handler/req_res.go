@@ -329,6 +329,12 @@ type postCommentResp struct {
 	Id string `json:"id"`
 }
 
+//new qi niu upload token
+type postQiNiuUpTokenResp struct {
+	Token  string `json:"uploadToken"`
+	Expire uint32 `json:"expire"`
+}
+
 //get method
 
 //samId available status

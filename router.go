@@ -44,6 +44,7 @@ func newRouter() *httprouter.Router {
 	r.POST("/privateChats", mw.Auth(hd.NewPrivateChat))
 	r.POST("/invitations/project", mw.Auth(hd.NewProjectInvitation))
 	r.POST("/invitations/mission", mw.Auth(hd.NewMissionInvitation))
+	r.POST("/qiniu/uploadToken", mw.Auth(hd.NewUploadToken))
 
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)

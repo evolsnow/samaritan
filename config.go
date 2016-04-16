@@ -13,6 +13,13 @@ type listenServer struct {
 	Password string `json:"password,omitempty"`
 }
 
+type qiNiu struct {
+	Domain    string `json:"domain"`
+	Bucket    string `json:"bucket"`
+	AccessKey string `json:"access_key"`
+	SecretKey string `json:"secret_key"`
+}
+
 // Config is a web server config
 type Config struct {
 	WebS   listenServer `json:"web_server"`
@@ -20,6 +27,7 @@ type Config struct {
 	MysqlS listenServer `json:"mysql_server"`
 	RpcSD  listenServer `json:"rpc_server_d"`
 	RpcSF  listenServer `json:"rpc_server_f"`
+	QiNiu  qiNiu        `json:"qiniu"`
 }
 
 // ParseConfig parses config from the given file path

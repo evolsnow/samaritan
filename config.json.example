@@ -22,5 +22,11 @@
 	"rpc_server_f": {
 	    "address": "127.0.0.1",
 	    "port": 10086
+	},
+	"qiniu": {
+	    "domain": "qiniu_domain",
+	    "bucket": "bucket_name",
+	    "access_key": "access_key",
+	    "secret_key": "secret_key"
 	}
 }
