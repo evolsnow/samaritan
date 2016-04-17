@@ -22,7 +22,7 @@ func QiNiuUploadToken() string {
 		Scope:   Bucket,
 		Expires: QiNiuExpire,
 	}
-	return c.MakeUptoken(policy)
+	return AccessKey + c.MakeUptoken(policy)
 }
 
 // QiNiuDownloadUrl return download url for file key
