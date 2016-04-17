@@ -383,12 +383,3 @@ func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
-
-func NewUploadToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	resp := &postQiNiuUpTokenResp{
-		Token:  base.QiNiuUploadToken(),
-		Expire: base.QiNiuExpire,
-	}
-	log.DebugJson(resp)
-	makeResp(w, r, resp)
-}

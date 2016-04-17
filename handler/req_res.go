@@ -329,12 +329,6 @@ type postCommentResp struct {
 	Id string `json:"id"`
 }
 
-//new qi niu upload token
-type postQiNiuUpTokenResp struct {
-	Token  string `json:"uploadToken"`
-	Expire uint32 `json:"expire"`
-}
-
 //get method
 
 //samId available status
@@ -416,6 +410,12 @@ type missionDetailResp struct {
 	CompletionNum int      `json:"completionNum,omitempty"`
 	CompletedTime int64    `json:"completedTime,omitempty"`
 	ProjectId     string   `json:"projectId,omitempty"`
+}
+
+//new qi niu upload token
+type postQiNiuUpTokenResp struct {
+	Token  string `json:"uploadToken"`
+	Expire uint32 `json:"expire"`
 }
 
 //put method

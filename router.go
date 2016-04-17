@@ -30,6 +30,7 @@ func newRouter() *httprouter.Router {
 	r.GET("/projects/missions/:project", mw.Auth(hd.ProjectMissionList))
 	r.GET("/comments/:mission", mw.Auth(hd.MissionCommentList))
 	r.GET("/missions/:mission", mw.Auth(hd.MissionDetail))
+	r.GET("/qiniu/uploadTokens", mw.Auth(hd.MakeUploadToken))
 
 	//http post method
 	r.POST("/deviceTokens", mw.Auth(hd.NewDeviceToken))
@@ -44,7 +45,6 @@ func newRouter() *httprouter.Router {
 	r.POST("/privateChats", mw.Auth(hd.NewPrivateChat))
 	r.POST("/invitations/project", mw.Auth(hd.NewProjectInvitation))
 	r.POST("/invitations/mission", mw.Auth(hd.NewMissionInvitation))
-	r.POST("/qiniu/uploadToken", mw.Auth(hd.NewUploadToken))
 
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
