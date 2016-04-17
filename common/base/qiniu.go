@@ -18,8 +18,12 @@ func QiNiuUploadToken(key string) string {
 	conf.ACCESS_KEY = AccessKey
 	conf.SECRET_KEY = SecretKey
 	c := kodo.New(0, nil)
+	var scope = Bucket
+	if key != "" {
+		scope = Bucket + ":" + key
+	}
 	policy := &kodo.PutPolicy{
-		Scope:   Bucket + ":" + key,
+		Scope:   scope,
 		Expires: QiNiuExpire,
 	}
 	return c.MakeUptoken(policy)
