@@ -64,6 +64,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		MissionId:  dbms.ReadMissionId(req.MissionPId),
 		Done:       req.Done,
 		FinishTime: req.FinishTime,
+		Pictures:   req.Pictures,
 	}
 	if td.GetOwner().Id != ps.GetInt("authId") {
 		base.ForbidErr(w, BelongErr)
@@ -72,9 +73,26 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if td.Done {
 		td.Finish()
 	}
+	if len(td.Pictures) > 0 {
+		td.UpdatePics(td.Pictures)
+	}
 	td.Save()
 	makeResp(w, r, putTdResp{})
 }
+
+//
+//func UpdateTodoPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	req := new(putTdPicReq)
+//	errs := binding.Bind(r, req)
+//	if errs.Handle(w) {
+//		return
+//	}
+//	log.DebugJson(req)
+//	tid := dbms.ReadTodoId(ps.Get("todo"))
+//	t := &model.Todo{Id:tid}
+//	t.UpdatePics(req.Pictures)
+//	makeResp(w, r, putTdPicResp{})
+//}
 
 func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putMsStatusReq)
@@ -111,6 +129,19 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 	m.ForceSave()
 	makeResp(w, r, putMsStatusResp{})
+}
+
+func UpdateMissionPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putMsPicReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	mid := dbms.ReadMissionId(ps.Get("mission"))
+	m := &model.Mission{Id: mid}
+	m.UpdatePics(req.Pictures)
+	makeResp(w, r, putMsPicResp{})
 }
 
 func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

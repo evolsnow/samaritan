@@ -406,6 +406,15 @@ func readBelongedMission(tid int) (*Mission, error) {
 	return readMissionWithId(mid)
 }
 
+//read to-do pics
+func readTodoPics(tid int) (pics []string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(todoPictureList, tid)
+	pics, err = redis.Strings(c.Do("LRANGE", key, 0, -1))
+	return
+}
+
 //set to-do status to done
 func updateTodoStatus(uid, tid int) error {
 	c := dbms.Pool.Get()
@@ -414,6 +423,19 @@ func updateTodoStatus(uid, tid int) error {
 	notDone := fmt.Sprintf(userTdNotDoneSet, uid)
 	_, err := c.Do("SMOVE", notDone, done, tid)
 	return err
+}
+
+//update to-do pics
+func updateTodoPics(tid int, pics []string) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(todoPictureList, tid)
+	c.Send("DEL", key)
+	for _, v := range pics {
+		c.Send("RPUSH", key, v)
+
+	}
+	return c.Flush()
 }
 
 //update to-do with given value
@@ -587,12 +609,24 @@ func readMissionCompletedUsersId(mid int) (ids []int, err error) {
 }
 
 //get mission's pics
-func readMissionPictures(mid int) (pics []string, err error) {
+func readMissionPics(mid int) (pics []string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(missionPictureList, mid)
-	pics, err = redis.Strings(c.Do("LRANGE", key, "0", "-1"))
+	pics, err = redis.Strings(c.Do("LRANGE", key, 0, -1))
 	return
+}
+
+//update mission pics
+func updateMissionPics(mid int, pics []string) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionPictureList, mid)
+	c.Send("DEL", key)
+	for _, v := range pics {
+		c.Send("RPUSH", key, v)
+	}
+	return c.Flush()
 }
 
 //update mission with given value

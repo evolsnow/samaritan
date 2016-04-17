@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/log"
 )
 
@@ -62,7 +63,29 @@ func (td *Todo) Finish() (err error) {
 	err = updateTodoStatus(td.OwnerId, td.Id)
 	if err != nil {
 		log.Error("Error update to-do status:", err)
+	}
+	return
+}
+
+//GetPics get to-do's all pics
+func (td *Todo) GetPics() (pics []string) {
+	raw, err := readTodoPics(td.Id)
+	if err != nil {
+		log.Error("Error get to-do's pics")
 		return
+	}
+	pics = make([]string, len(raw))
+	for i, v := range pics {
+		pics[i] = base.QiNiuDownloadUrl(v)
+	}
+	return
+}
+
+// UpdatePics update to-do's pictures list
+func (td *Todo) UpdatePics(pics []string) (err error) {
+	err = updateTodoPics(td.Id, pics)
+	if err != nil {
+		log.Error("Error update to-do pics:", err)
 	}
 	return
 }

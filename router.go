@@ -38,7 +38,6 @@ func newRouter() *httprouter.Router {
 	r.POST("/verifyCode/:source", hd.NewVerifyCode)
 	r.POST("/accessToken", hd.NewAccessToken)
 	r.POST("/todos", mw.Auth(hd.NewTodo))
-	//r.POST("/todos/pictures/:todo", mw.Auth(hd.NewTodoPics))
 	r.POST("/missions", mw.Auth(hd.NewMission))
 	r.POST("/comments", mw.Auth(hd.NewComment))
 	r.POST("/projects", mw.Auth(hd.NewProject))
@@ -49,8 +48,11 @@ func newRouter() *httprouter.Router {
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
 	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
+	//r.PUT("/todos/pictures/:todo", mw.Auth(hd.UpdateTodoPics))
+	r.PUT("/missions/pictures/:mission", mw.Auth(hd.UpdateMissionPics))
 	r.PUT("/missions/status/:mission", mw.Auth((hd.UpdateMissionStatus)))
 	r.PUT("/missions/accepted/:mission", mw.Auth(hd.AcceptMission))
+
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
 	r.DELETE("/projects/:project", mw.Auth(hd.DeleteProject))

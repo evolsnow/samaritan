@@ -413,7 +413,7 @@ type missionDetailResp struct {
 }
 
 //new qi niu upload token
-type postQiNiuUpTokenResp struct {
+type QiNiuUpTokenResp struct {
 	Token  string `json:"uploadToken"`
 	Expire uint32 `json:"expire"`
 }
@@ -456,16 +456,17 @@ type putPasswordResp struct {
 
 //update to-do
 type putTdReq struct {
-	StartTime  int64  `json:"startTime"`
-	Place      string `json:"place"`
-	Repeat     bool   `json:"repeat"`
-	RepeatMode int    `json:"repeatMode"`
-	AllDay     bool   `json:"allDay"`
-	Desc       string `json:"desc"`
-	Remark     string `json:"remark"`
-	MissionPId string `json:"missionId"`
-	Done       bool   `json:"done"`
-	FinishTime int64  `json:"finishTime"`
+	StartTime  int64    `json:"startTime"`
+	Place      string   `json:"place"`
+	Repeat     bool     `json:"repeat"`
+	RepeatMode int      `json:"repeatMode"`
+	AllDay     bool     `json:"allDay"`
+	Desc       string   `json:"desc"`
+	Remark     string   `json:"remark"`
+	MissionPId string   `json:"missionId"`
+	Done       bool     `json:"done"`
+	FinishTime int64    `json:"finishTime"`
+	Pictures   []string `json:"pictures"`
 }
 
 func (pt *putTdReq) FieldMap(req *http.Request) binding.FieldMap {
@@ -480,12 +481,31 @@ func (pt *putTdReq) FieldMap(req *http.Request) binding.FieldMap {
 		&pt.MissionPId: "missionId",
 		&pt.Done:       "done",
 		&pt.FinishTime: "finishTime",
+		&pt.Pictures:   "pictures",
 	}
 }
 
 type putTdResp struct {
 	baseResp
 }
+
+//update to-do pics
+//type putTdPicReq struct {
+//	Pictures []string `json:"pictures"`
+//}
+//
+//func (ptp *putTdPicReq) FieldMap(req *http.Request) binding.FieldMap {
+//	return binding.FieldMap{
+//		&ptp.Pictures: binding.Field{
+//			Form:     "pictures",
+//			Required: true,
+//		},
+//	}
+//}
+//
+//type putTdPicResp struct {
+//	baseResp
+//}
 
 //update mission
 type putMsStatusReq struct {
@@ -503,6 +523,24 @@ func (pm *putMsStatusReq) FieldMap(req *http.Request) binding.FieldMap {
 }
 
 type putMsStatusResp struct {
+	baseResp
+}
+
+//update mission pics
+type putMsPicReq struct {
+	Pictures []string `json:"pictures"`
+}
+
+func (pmp *putMsPicReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&pmp.Pictures: binding.Field{
+			Form:     "pictures",
+			Required: true,
+		},
+	}
+}
+
+type putMsPicResp struct {
 	baseResp
 }
 

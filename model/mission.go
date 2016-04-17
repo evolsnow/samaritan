@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 )
@@ -90,12 +91,26 @@ func (m *Mission) UpdateCompleteNum() {
 }
 
 // GetPictures return mission's pics
-func (m *Mission) GetPictures() []string {
-	pics, err := readMissionPictures(m.Id)
+func (m *Mission) GetPictures() (pics []string) {
+	raw, err := readMissionPics(m.Id)
 	if err != nil {
-		log.Error("Error get mission pictures")
+		log.Error("Error get mission's pics")
+		return
 	}
-	return pics
+	pics = make([]string, len(raw))
+	for i, v := range pics {
+		pics[i] = base.QiNiuDownloadUrl(v)
+	}
+	return
+}
+
+// UpdatePics update to-do's pictures list
+func (m *Mission) UpdatePics(pics []string) (err error) {
+	err = updateMissionPics(m.Id, pics)
+	if err != nil {
+		log.Error("Error update mission pics:", err)
+	}
+	return
 }
 
 // Save a new mission
