@@ -414,6 +414,7 @@ type missionDetailResp struct {
 
 //new qi niu upload token
 type QiNiuUpTokenResp struct {
+	baseResp
 	Token  string `json:"uploadToken"`
 	Expire uint32 `json:"expire"`
 }
