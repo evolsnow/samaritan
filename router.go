@@ -30,7 +30,7 @@ func newRouter() *httprouter.Router {
 	r.GET("/projects/missions/:project", mw.Auth(hd.ProjectMissionList))
 	r.GET("/comments/:mission", mw.Auth(hd.MissionCommentList))
 	r.GET("/missions/:mission", mw.Auth(hd.MissionDetail))
-	r.GET("/qiniu/uploadTokens/:key", mw.Auth(hd.MakeUploadToken))
+	r.GET("/qiniu/uploadTokens", mw.Auth(hd.MakeUploadToken))
 
 	//http post method
 	r.POST("/deviceTokens", mw.Auth(hd.NewDeviceToken))
