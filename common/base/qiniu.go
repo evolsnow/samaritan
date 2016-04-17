@@ -14,15 +14,16 @@ var (
 var QiNiuExpire uint32 = 3600
 
 // QiNiuUploadToken return token for upload pics
-func QiNiuUploadToken() string {
+func QiNiuUploadToken(key string) string {
 	conf.ACCESS_KEY = AccessKey
 	conf.SECRET_KEY = SecretKey
 	c := kodo.New(0, nil)
 	policy := &kodo.PutPolicy{
-		Scope:   Bucket,
+		Scope:   Bucket + ":" + key,
 		Expires: QiNiuExpire,
 	}
-	return AccessKey + c.MakeUptoken(policy)
+	return c.MakeUptoken(policy)
+
 }
 
 // QiNiuDownloadUrl return download url for file key

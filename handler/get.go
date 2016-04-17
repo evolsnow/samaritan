@@ -207,7 +207,7 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 
 func MakeUploadToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := &QiNiuUpTokenResp{
-		Token:  base.QiNiuUploadToken(),
+		Token:  base.QiNiuUploadToken(ps.Get("key")),
 		Expire: base.QiNiuExpire,
 	}
 	log.DebugJson(resp)
