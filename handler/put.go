@@ -52,8 +52,13 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	log.DebugJson(req)
+	tid := dbms.ReadTodoId(ps.Get("todo"))
+	if tid == 0 {
+		base.NotFoundErr(w, TodoNotExistErr)
+		return
+	}
 	td := &model.Todo{
-		Id:         dbms.ReadTodoId(ps.Get("todo")),
+		Id:         tid,
 		StartTime:  req.StartTime,
 		Place:      req.Place,
 		Repeat:     req.Repeat,
@@ -79,20 +84,6 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	td.Save()
 	makeResp(w, r, putTdResp{})
 }
-
-//
-//func UpdateTodoPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-//	req := new(putTdPicReq)
-//	errs := binding.Bind(r, req)
-//	if errs.Handle(w) {
-//		return
-//	}
-//	log.DebugJson(req)
-//	tid := dbms.ReadTodoId(ps.Get("todo"))
-//	t := &model.Todo{Id:tid}
-//	t.UpdatePics(req.Pictures)
-//	makeResp(w, r, putTdPicResp{})
-//}
 
 func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putMsStatusReq)

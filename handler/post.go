@@ -25,7 +25,7 @@ const (
 
 	NotRegisteredErr     = "用户未注册"
 	AlreadyRegisteredErr = "用户已注册"
-	PasswordMismatchErr  = "密码不匹配"
+	PasswordMismatchErr  = "密码错误"
 
 	UserNotExistErr = "用户不存在"
 

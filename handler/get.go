@@ -16,9 +16,9 @@ const (
 
 	UnknownTypeErr = "未知类型"
 
-	ProjectNotExistErr = "项目不存在"
-	MissionNotExistErr = "任务不存在"
-
+	ProjectNotExistErr  = "项目不存在"
+	MissionNotExistErr  = "任务不存在"
+	TodoNotExistErr     = "Todo不存在"
 	NotProjectMemberErr = "不是本项目成员,无法查看项目"
 )
 
