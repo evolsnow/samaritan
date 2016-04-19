@@ -5,8 +5,8 @@ package rpc
 
 import (
 	"fmt"
+	pb "github.com/evolsnow/gpns/protos"
 	"github.com/evolsnow/samaritan/common/log"
-	pb "github.com/evolsnow/samaritan/gpns/protos"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
