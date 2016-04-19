@@ -138,6 +138,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Desc:          v.Desc,
 			Deadline:      v.Deadline,
 			Pictures:      v.GetPictures(),
+			ReceiversName: v.GetReceiversName(),
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
 			CreateTime:    v.CreateTime,
@@ -183,11 +184,13 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	}
 	m := &model.Mission{Id: mid}
 	m.Load()
-	receivers := m.GetReceiversId()
-	receiversPid := make([]string, len(receivers))
-	for i, v := range receivers {
-		receiversPid[i] = base.HashedUserId(v)
-	}
+	//receivers := m.GetReceiversId()
+	//receiversName := make([]string, len(receivers))
+	//u := new(model.User)
+	//for i, v := range receivers {
+	//	u.Id = v
+	//	receiversName[i] = u.GetName()
+	//}
 	resp := &missionDetailResp{
 		Id:            ps.Get("mission"),
 		CreateTime:    m.CreateTime,
@@ -196,7 +199,7 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		Deadline:      m.Deadline,
 		Pictures:      m.GetPictures(),
 		PublisherId:   base.HashedUserId(m.PublisherId),
-		ReceiversId:   receiversPid,
+		ReceiversName: m.GetReceiversName(),
 		CompletionNum: m.CompletionNum,
 		CompletedTime: m.CompletedTime,
 		ProjectId:     base.HashedProjectId(m.ProjectId),

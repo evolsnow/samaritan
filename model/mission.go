@@ -38,11 +38,25 @@ func (m *Mission) GetReceiversId() []int {
 	}
 	ids, err := readMissionReceiversId(m.Id)
 	if err != nil {
-		log.Error("Error get mission receivers", err)
+		log.Error("Error get mission receivers id:", err)
 		return nil
 	}
 	log.Debug("receivers id:", ids)
 	return ids
+}
+
+// GetReceiversName gets mission's receivers' name
+func (m *Mission) GetReceiversName() []string {
+	if m.Id == 0 {
+		m.Id = dbms.ReadMissionId(m.Pid)
+	}
+	names, err := readMissionReceiversName(m.Id)
+	if err != nil {
+		log.Error("Error get mission receivers name:", err)
+		return nil
+	}
+	log.Debug("receivers id:", names)
+	return names
 }
 
 // AddReceiver adds a user to mission's receiver set

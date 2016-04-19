@@ -33,6 +33,16 @@ func (u *User) GetPassword() (pwd string) {
 	return
 }
 
+// GetName reads user's real name
+func (u *User) GetName() (name string) {
+	name, err := readName(u.Id)
+	if err != nil {
+		log.Error("Error get user's name:", err)
+		return ""
+	}
+	return
+}
+
 // GetCreatedProjects gets user created projects
 func (u *User) GetCreatedProjects() []Project {
 	ret, err := readCreatedProjects(u.Id)

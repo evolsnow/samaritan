@@ -370,6 +370,7 @@ type NestedMission struct {
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc,omitempty"` //description for the mission
 	Pictures      []string `json:"pictures,omitempty"`
+	ReceiversName []string `json:"receiversName,omitempty"`
 	Deadline      int64    `json:"deadline,omitempty"`
 	CreatorName   string   `json:"creatorName,omitempty"`
 	CreatorId     string   `json:"creatorId,omitempty"`
@@ -406,7 +407,7 @@ type missionDetailResp struct {
 	Deadline      int64    `json:"deadline,omitempty"`
 	Pictures      []string `json:"pictures,omitempty"`
 	PublisherId   string   `json:"publisherId,omitempty"`
-	ReceiversId   []string `json:"receiversId,omitempty"`
+	ReceiversName []string `json:"receiversName,omitempty"`
 	CompletionNum int      `json:"completionNum,omitempty"`
 	CompletedTime int64    `json:"completedTime,omitempty"`
 	ProjectId     string   `json:"projectId,omitempty"`

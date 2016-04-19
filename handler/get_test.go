@@ -168,7 +168,7 @@ func TestMissionDetail(t *testing.T) {
 	if reply.PublisherId == "" {
 		t.Error("failed to get mission publisher")
 	}
-	if len(reply.ReceiversId) == 0 {
+	if len(reply.ReceiversName) == 0 {
 		t.Error("faield to get mission receivers")
 	}
 }

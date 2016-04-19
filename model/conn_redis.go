@@ -263,12 +263,21 @@ func readAcceptedMissionsId(uid int) ([]int, error) {
 	return ids, err
 }
 
-//read user'd password
+//read user's password
 func readPassword(uid int) (pwd string, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	user := "user:" + strconv.Itoa(uid)
 	pwd, err = redis.String(c.Do("HGET", user, UPassword))
+	return
+}
+
+//read user's name
+func readName(uid int) (name string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	user := "user:" + strconv.Itoa(uid)
+	name, err = redis.String(c.Do("HGET", user, UName))
 	return
 }
 
@@ -596,6 +605,24 @@ func readMissionReceiversId(mid int) (ids []int, err error) {
 	defer c.Close()
 	key := fmt.Sprintf(missionReceiversSet, mid)
 	ids, err = redis.Ints(c.Do("SMEMBERS", key))
+	return
+}
+
+//get all mission's receivers id
+func readMissionReceiversName(mid int) (names []string, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(missionReceiversSet, mid)
+	lua := `
+		local data = redis.call("SMEMBERS", KEYS[1])
+		local ret = {}
+  		for idx=1,#data do
+  			ret[idx] = redis.call("HGET","user:"..data[idx], KEYS[2])
+  		end
+  		return ret
+	`
+	script := redis.NewScript(2, lua)
+	names, err = redis.Strings(script.Do(c, key, UName))
 	return
 }
 
