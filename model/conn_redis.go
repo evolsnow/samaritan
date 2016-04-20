@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
@@ -88,6 +89,7 @@ const (
 	ChGroupName = "groupName"
 	ChFrom      = "from"
 	ChTimeStamp = "timestamp"
+	ChInfo      = "info"
 )
 
 //other useful index set key name
@@ -838,8 +840,8 @@ func createChat(ct *Chat) int {
 	local cid = KEYS[2]
 	redis.call("HMSET", "chat:"..cid,
 					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
-					KEYS[7], KEYS[8], KEYS[9], KEYS[10],
-					KEYS[11], KEYS[12], KEYS[13], KEYS[14], KEYS[15], KEYS[16])
+					KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
+					KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18])
 	return cid
 	`
 	ka := []interface{}{
@@ -848,6 +850,7 @@ func createChat(ct *Chat) int {
 		ChType, ct.Type,
 		ChTarget, ct.Target,
 		ChMsg, ct.Msg,
+		ChInfo, ct.SerializedInfo,
 		ChTimeStamp, ct.Timestamp,
 		ChGroupName, ct.GroupName,
 		ChFrom, ct.From,
@@ -875,4 +878,20 @@ func createOfflineMsg(uid, convId int) {
 	defer c.Close()
 	key := fmt.Sprintf(offlineMsgList, uid)
 	c.Do("RPUSH", key, convId)
+}
+
+//return model Chat
+func readChatWithId(cid int) (*Chat, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	chat := "chat:" + strconv.Itoa(cid)
+	ret, err := redis.Values(c.Do("HGETALL", chat))
+	if err != nil {
+		return nil, err
+	}
+	ch := new(Chat)
+	err = redis.ScanStruct(ret, ch)
+	json.Unmarshal([]byte(ch.SerializedInfo), ch.ExtraInfo)
+	//m.ReceiversId, _ = readMissionReceiversId(m.Id)
+	return ch, err
 }

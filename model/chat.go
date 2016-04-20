@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
@@ -32,6 +33,7 @@ type Chat struct {
 	ReceiversId    []int             `json:"-" redis:"-"` //server side use
 	Timestamp      int64             `json:"timestamp,omitempty" redis:"timestamp"`
 	ExtraInfo      map[string]string `json:"extraInfo" redis:"-"`
+	SerializedInfo string            `json:"-" redis:"info"` //serialize from extra info
 }
 
 // Response deals with the chat message
@@ -103,11 +105,21 @@ func applePush(tokens []string, ct *Chat) {
 
 // Save saves the offline chat message
 func (ct *Chat) Save(uid int) {
-	if ct.Id == 0 {
-		//not saved
-		ct.Id = createChat(ct)
-	} else {
-		//offline msg saved
-		createOfflineMsg(uid, ct.Id)
+	data, _ := json.Marshal(ct.ExtraInfo)
+	ct.SerializedInfo = string(data)
+	//save chat
+	ct.Id = createChat(ct)
+	//update user offline msg
+	createOfflineMsg(uid, ct.Id)
+
+}
+
+// Load from redis
+func (ct *Chat) Load() (err error) {
+	cPtr, err := readChatWithId(ct.Id)
+	if err != nil {
+		log.Error(err)
 	}
+	*ct = *cPtr
+	return
 }
