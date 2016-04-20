@@ -23,6 +23,19 @@ type Todo struct {
 	MissionId  int      `json:"missionId,omitempty" redis:"missionId"` //belong to which mission
 }
 
+// InitedTodo returns a full loaded to-do object by id
+func InitedTodo(id int) (td *Todo) {
+	td = &Todo{Id: id}
+	td.load()
+	td.Pictures = td.GetPics()
+	return
+}
+
+// Sync reloads to-do from db
+func (td *Todo) Sync() {
+	*td = *InitedTodo(td.Id)
+}
+
 // GetOwner gets user from to-do's owner id
 func (td *Todo) GetOwner() (owner *User) {
 	var err error
@@ -115,10 +128,11 @@ func (td *Todo) Remove() (err error) {
 }
 
 // Load full read from redis
-func (td *Todo) Load() (err error) {
-	err = readFullTodo(td)
+func (td *Todo) load() (err error) {
+	tPtr, err := readTodoWithId(td.Id)
 	if err != nil {
 		log.Debug(err)
 	}
+	*td = *tPtr
 	return
 }

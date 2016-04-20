@@ -31,6 +31,22 @@ type Comment struct {
 	CriticName string `json:"uName,omitempty" redis:"criticName"`
 }
 
+// InitedMission returns a full loaded mission object by id
+func InitedMission(id int) (m *Mission) {
+	m = &Mission{Id: id}
+	m.load()
+	m.Pictures = m.GetPictures()
+	m.ReceiversId = m.GetReceiversId()
+	m.Comments = m.GetComments()
+	m.UpdateCompleteNum()
+	return
+}
+
+// Sync reloads mission from db
+func (m *Mission) Sync() {
+	*m = *InitedMission(m.Id)
+}
+
 // GetReceiversId gets mission's receivers' id slice
 func (m *Mission) GetReceiversId() []int {
 	if m.Id == 0 {
@@ -71,7 +87,7 @@ func (m *Mission) AddReceiver(uid int) (err error) {
 }
 
 // GetComments gets mission's comments
-func (m *Mission) GetComments() (comments []*Comment) {
+func (m *Mission) GetComments() (comments []Comment) {
 	comments, err := readMissionComments(m.Id)
 	if err != nil {
 		log.Error("Error get mission comments:", err)
@@ -157,6 +173,15 @@ func (m *Mission) ForceSave() {
 	}
 }
 
+// Remove deletes a mission
+func (m *Mission) Remove() (err error) {
+	if err = deleteMission(m.Id); err != nil {
+		log.Error("Error delete mission:", err)
+	}
+	//go DeleteTodoMysql(td.Id)
+	return
+}
+
 // Save a comment
 func (cm *Comment) Save() {
 	log.Debug("create comment:", cm)
@@ -164,10 +189,11 @@ func (cm *Comment) Save() {
 }
 
 // Load full read from redis
-func (m *Mission) Load() (err error) {
-	err = readFullMission(m)
+func (m *Mission) load() (err error) {
+	mPtr, err := readMissionWithId(m.Id)
 	if err != nil {
-		log.Debug(err)
+		log.Error(err)
 	}
+	*m = *mPtr
 	return
 }

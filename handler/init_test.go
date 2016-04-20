@@ -69,6 +69,15 @@ func beforeTest() {
 	cache.Set("put_test_mission_pid", m.Pid, time.Minute*5)
 	cache.Set("post_test_mission_pid", m.Pid, time.Minute*5)
 
+	m2 := &model.Mission{
+		Name:        "test mission",
+		Desc:        "test mission desc",
+		PublisherId: u.Id,
+		Deadline:    147258369,
+	}
+	m2.Save()
+	cache.Set("delete_test_mission_pid", m2.Pid, time.Minute*5)
+
 	p := &model.Project{
 		CreatorId: u.Id,
 		Name:      "pj name",

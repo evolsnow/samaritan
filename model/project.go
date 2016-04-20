@@ -16,6 +16,19 @@ type Project struct {
 	MembersId     []int  `json:"membersId,omitempty" redis:"-"` //user list who in this project
 }
 
+// InitedProject returns a full loaded project object by id
+func InitedProject(id int) (p *Project) {
+	p = &Project{Id: id}
+	p.load()
+	p.MembersId = p.GetMembersId()
+	return
+}
+
+// Sync reloads project from db
+func (p *Project) Sync() {
+	*p = *InitedProject(p.Id)
+}
+
 // GetCreator gets project's creator
 func (p *Project) GetCreator() (creator *User) {
 	creator, err := readCreator(p.Id)
@@ -122,10 +135,11 @@ func (p *Project) Remove() (err error) {
 }
 
 // Load full read from redis
-func (p *Project) Load() (err error) {
-	err = readFullProject(p)
+func (p *Project) load() (err error) {
+	pPtr, err := readProjectWithId(p.Id)
 	if err != nil {
 		log.Debug(err)
 	}
+	*p = *pPtr
 	return
 }

@@ -17,10 +17,8 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	tid := dbms.ReadTodoId(ps.Get("todo"))
 	uid := ps.GetInt("authId")
 	log.Debug("authId:", uid)
-	td := &model.Todo{
-		Id: tid,
-	}
-	if td.GetOwner().Id != uid {
+	td := model.InitedTodo(tid)
+	if td.OwnerId != uid {
 		base.ForbidErr(w, BelongErr)
 		return
 	}
@@ -28,14 +26,25 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeBaseResp(w, r)
 }
 
+func DeleteMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	mid := dbms.ReadMissionId(ps.Get("mission"))
+	uid := ps.GetInt("authId")
+	log.Debug("authId:", uid)
+	m := model.InitedMission(mid)
+	m.Sync()
+	if m.PublisherId != uid {
+		base.ForbidErr(w, BelongErr)
+		return
+	}
+	m.Remove()
+	makeBaseResp(w, r)
+}
+
 func DeleteProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
 	uid := ps.GetInt("authId")
-	p := &model.Project{
-		Id:        pid,
-		CreatorId: uid,
-	}
-	if p.GetCreator().Id != uid {
+	p := model.InitedProject(pid)
+	if p.CreatorId != uid {
 		base.ForbidErr(w, BelongErr)
 		return
 	}

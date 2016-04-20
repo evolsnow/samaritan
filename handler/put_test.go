@@ -43,12 +43,10 @@ func TestUpdatePassword(t *testing.T) {
 		t.Error("update failed", reply.Msg)
 	}
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
-	u := &model.User{
-		Id: uid,
-	}
+	u := model.InitedUser(uid)
 	//wait redis
 	//time.Sleep(time.Second)
-	if u.GetPassword() != base.EncryptedPassword(req.Password) {
+	if u.Password != base.EncryptedPassword(req.Password) {
 		//t.Error(u.GetPassword())
 		//t.Error(base.EncryptedPassword(req.Password))
 		t.Error("pwd not change")
@@ -94,8 +92,7 @@ func TestUpdateTodo(t *testing.T) {
 	if reply.Code != 0 {
 		t.Error("update todo failed")
 	}
-	td := model.Todo{Id: dbms.ReadTodoId(tPid)}
-	td.Load()
+	td := model.InitedTodo(dbms.ReadTodoId(tPid))
 	if td.Place != req.Place {
 		t.Error("todo place not changed")
 	}
@@ -114,8 +111,7 @@ func TestUpdateMissionStatus(t *testing.T) {
 	if reply.Code != 0 {
 		t.Error("update mission status failed")
 	}
-	m := &model.Mission{Id: dbms.ReadMissionId(mPid)}
-	m.Load()
+	m := model.InitedMission(dbms.ReadMissionId(mPid))
 	if m.CompletionNum != 50 {
 		t.Error("update mission completion failed:", m.CompletionNum)
 	}
@@ -125,7 +121,7 @@ func TestUpdateMissionStatus(t *testing.T) {
 	}
 	reply = new(putMsStatusResp)
 	put("http://127.0.0.1:8080/missions/status/"+mPid, auth, req, reply)
-	m.Load()
+	m.Sync()
 	if m.CompletionNum != 0 {
 		t.Error("update mission uncompletion failed:", m.CompletionNum)
 	}
@@ -133,15 +129,17 @@ func TestUpdateMissionStatus(t *testing.T) {
 
 func TestAcceptMission(t *testing.T) {
 	mPid := cache.Get("put_test_mission_pid")
-	m := &model.Mission{Id: dbms.ReadMissionId(mPid)}
-	accepted := len(m.GetReceiversId())
+	m := model.InitedMission(dbms.ReadMissionId(mPid))
+	accepted := len(m.ReceiversId)
+	t.Log(m.ReceiversId)
 	req := new(putAcceptMsReq)
 	reply := new(putAcceptMsResp)
 	put("http://127.0.0.1:8080/missions/accepted/"+mPid, base.MakeToken(123), req, reply)
 	if reply.Code != 0 {
 		t.Error("failed to accept mission")
 	}
-	if len(m.GetReceiversId())-accepted != 1 {
-		t.Error("update accept set failed:", m.GetReceiversId())
+	m.Sync()
+	if len(m.ReceiversId)-accepted != 1 {
+		t.Error("update accept set failed:", m.ReceiversId)
 	}
 }

@@ -99,22 +99,20 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
-	m := &model.Mission{Id: mid}
-	receivers := m.GetReceiversId()
-	if !base.InIntSlice(uid, receivers) {
+	m := model.InitedMission(mid)
+	if !base.InIntSlice(uid, m.ReceiversId) {
 		base.ForbidErr(w, NotMissionMemberErr)
 		return
 	}
-	m.Load()
 	if req.Done && !base.InIntSlice(uid, u.GetAllCompletedMissionsId()) {
-		m.CompletionNum += 100 / len(receivers)
+		m.CompletionNum += 100 / len(m.ReceiversId)
 		u.CompleteMission(m.Id)
 		if m.CompletionNum == 100 {
 			m.CompletedTime = time.Now().Unix()
 		}
 	}
 	if !req.Done && base.InIntSlice(uid, u.GetAllCompletedMissionsId()) {
-		m.CompletionNum -= 100 / len(receivers)
+		m.CompletionNum -= 100 / len(m.ReceiversId)
 		u.UnCompleteMission(m.Id)
 		m.CompletedTime = 0
 	}

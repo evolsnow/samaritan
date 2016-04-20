@@ -187,19 +187,6 @@ func readUserWithId(id int) (*User, error) {
 	return u, err
 }
 
-//load in given User
-func readFullUser(u *User) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	user := "user:" + strconv.Itoa(u.Id)
-	ret, err := redis.Values(c.Do("HGETALL", user))
-	if err != nil {
-		return err
-	}
-	err = redis.ScanStruct(ret, u)
-	return err
-}
-
 //save user avatar path
 func createUserAvatar(uid int, avatarUrl string) error {
 	c := dbms.Pool.Get()
@@ -367,19 +354,6 @@ func createTodo(td *Todo) {
 }
 
 //return model To-do
-func readFullTodo(td *Todo) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	todo := "todo:" + strconv.Itoa(td.Id)
-	ret, err := redis.Values(c.Do("HGETALL", todo))
-	if err != nil {
-		return err
-	}
-	err = redis.ScanStruct(ret, td)
-	return err
-}
-
-//load in given To-do
 func readTodoWithId(id int) (*Todo, error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
@@ -557,26 +531,12 @@ func readMissionWithId(mid int) (*Mission, error) {
 	}
 	m := new(Mission)
 	err = redis.ScanStruct(ret, m)
-	m.ReceiversId, _ = readMissionReceiversId(m.Id)
+	//m.ReceiversId, _ = readMissionReceiversId(m.Id)
 	return m, err
 }
 
-//return model Mission with receivers
-func readFullMission(m *Mission) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	mission := "mission:" + strconv.Itoa(m.Id)
-	ret, err := redis.Values(c.Do("HGETALL", mission))
-	if err != nil {
-		return err
-	}
-	err = redis.ScanStruct(ret, m)
-	m.ReceiversId, _ = readMissionReceiversId(m.Id)
-	return err
-}
-
 //get all mission's comments
-func readMissionComments(mid int) (cms []*Comment, err error) {
+func readMissionComments(mid int) (cms []Comment, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(missionCommentsList, mid)
@@ -590,11 +550,11 @@ func readMissionComments(mid int) (cms []*Comment, err error) {
 	`
 	script := redis.NewScript(1, lua)
 	results, err := redis.Values(script.Do(c, key))
-	cms = make([]*Comment, len(results))
+	cms = make([]Comment, len(results))
 	for i, v := range results {
 		cmt := new(Comment)
 		err = redis.ScanStruct(v.([]interface{}), cmt)
-		cms[i] = cmt
+		cms[i] = *cmt
 	}
 	return
 }
@@ -677,6 +637,14 @@ func updateMissionReceiver(mid, uid, action int) (err error) {
 		_, err = c.Do("SREM", memSet, uid)
 	}
 	return
+}
+
+//delete a mission
+func deleteMission(mid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := c.Do("DEL", "mission:"+strconv.Itoa(mid))
+	return err
 }
 
 //redis actions of model project
@@ -778,19 +746,6 @@ func readProjectWithId(pid int) (*Project, error) {
 	p := new(Project)
 	err = redis.ScanStruct(ret, p)
 	return p, err
-}
-
-//load in given Project
-func readFullProject(p *Project) error {
-	c := dbms.Pool.Get()
-	defer c.Close()
-	pj := "project:" + strconv.Itoa(p.Id)
-	ret, err := redis.Values(c.Do("HGETALL", pj))
-	if err != nil {
-		return err
-	}
-	err = redis.ScanStruct(ret, p)
-	return err
 }
 
 //get project's creator

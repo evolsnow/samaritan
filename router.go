@@ -55,6 +55,7 @@ func newRouter() *httprouter.Router {
 
 	//http delete method
 	r.DELETE("/todos/:todo", mw.Auth(hd.DeleteTodo))
+	r.DELETE("/missions/:mission", mw.Auth(hd.DeleteMission))
 	r.DELETE("/projects/:project", mw.Auth(hd.DeleteProject))
 
 	return r

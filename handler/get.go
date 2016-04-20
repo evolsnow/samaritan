@@ -99,8 +99,7 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		base.NotFoundErr(w, UserNotExistErr)
 		return
 	}
-	u := &model.User{Id: uid}
-	u.Load()
+	u := model.InitedUser(uid)
 	resp := userSearchResp{
 		Name:   u.Name,
 		Id:     u.Pid,
@@ -117,13 +116,12 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 	resp := new(projectMissionsResp)
-	p := &model.Project{Id: pid}
+	p := model.InitedProject(pid)
 	ms := p.GetMissions()
 	uid := ps.GetInt("authId")
-	u := &model.User{Id: uid}
-	u.Load()
+	u := model.InitedUser(uid)
 	userAcceptedMissions := u.GetAllAcceptedMissionsId()
-	if !base.InIntSlice(uid, p.GetMembersId()) {
+	if !base.InIntSlice(uid, p.MembersId) {
 		base.ForbidErr(w, NotProjectMemberErr)
 		return
 	}
@@ -132,12 +130,13 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		if !base.InIntSlice(v.Id, userAcceptedMissions) {
 			continue
 		}
+		v.Sync()
 		nm := NestedMission{
 			Id:            v.Pid,
 			Name:          v.Name,
 			Desc:          v.Desc,
 			Deadline:      v.Deadline,
-			Pictures:      v.GetPictures(),
+			Pictures:      v.Pictures,
 			ReceiversName: v.GetReceiversName(),
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
@@ -158,8 +157,8 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 	resp := new(missionCommentResp)
-	m := &model.Mission{Id: mid}
-	cms := m.GetComments()
+	m := model.InitedMission(mid)
+	cms := m.Comments
 
 	ncs := make([]NestedComment, len(cms))
 	for i, v := range cms {
@@ -182,8 +181,7 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
-	m := &model.Mission{Id: mid}
-	m.Load()
+	m := model.InitedMission(mid)
 	//receivers := m.GetReceiversId()
 	//receiversName := make([]string, len(receivers))
 	//u := new(model.User)
@@ -197,7 +195,7 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		Name:          m.Name,
 		Desc:          m.Desc,
 		Deadline:      m.Deadline,
-		Pictures:      m.GetPictures(),
+		Pictures:      m.Pictures,
 		PublisherId:   base.HashedUserId(m.PublisherId),
 		ReceiversName: m.GetReceiversName(),
 		CompletionNum: m.CompletionNum,

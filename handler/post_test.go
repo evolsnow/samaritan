@@ -107,8 +107,7 @@ func TestNewTodo(t *testing.T) {
 		t.FailNow()
 	}
 	tid := dbms.ReadTodoId(reply.Id)
-	td := &model.Todo{Id: tid}
-	td.Load()
+	td := model.InitedTodo(tid)
 	if td.Desc != req.Desc || td.Place != req.Place {
 		t.Error("save todo error")
 	}
@@ -131,8 +130,7 @@ func TestNewProject(t *testing.T) {
 		t.FailNow()
 	}
 	pid := dbms.ReadProjectId(reply.Id)
-	pj := &model.Project{Id: pid}
-	pj.Load()
+	pj := model.InitedProject(pid)
 	if pj.Desc != req.Desc || pj.Private != req.Private {
 		t.Error("save project error")
 	}

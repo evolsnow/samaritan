@@ -49,6 +49,17 @@ func TestDeleteTodo(t *testing.T) {
 	}
 }
 
+func TestDeleteMission(t *testing.T) {
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	mid := cache.Get("delete_test_mission_pid")
+	reply := new(delMissionResp)
+	del("http://127.0.0.1:8080/missions/"+mid, auth, reply)
+	if reply.Code != 0 {
+		t.Error("delete mission failed:", reply.Msg)
+	}
+}
+
 func TestDeleteProject(t *testing.T) {
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
 	auth := base.MakeToken(uid)

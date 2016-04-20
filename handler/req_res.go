@@ -567,6 +567,11 @@ type delTodoResp struct {
 	baseResp
 }
 
+//delete mission
+type delMissionResp struct {
+	baseResp
+}
+
 //delete project
 type delProjectResp struct {
 	baseResp

@@ -23,6 +23,18 @@ type User struct {
 	StudentNum string `json:"stuNum,omitempty" redis:"stuNum"` //1218404001...
 }
 
+// InitedUser returns a full loaded user object by id
+func InitedUser(id int) (u *User) {
+	u = &User{Id: id}
+	u.load()
+	return
+}
+
+// Sync reloads user from db
+func (u *User) Sync() {
+	*u = *InitedUser(u.Id)
+}
+
 // GetPassword reads user's password
 func (u *User) GetPassword() (pwd string) {
 	pwd, err := readPassword(u.Id)
@@ -157,10 +169,11 @@ func (u *User) Save() {
 }
 
 // Load full read from redis
-func (u *User) Load() (err error) {
-	err = readFullUser(u)
+func (u *User) load() (err error) {
+	uPtr, err := readUserWithId(u.Id)
 	if err != nil {
 		log.Debug(err)
 	}
+	*u = *uPtr
 	return
 }

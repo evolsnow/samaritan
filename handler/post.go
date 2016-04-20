@@ -268,8 +268,7 @@ func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 	}
 	log.DebugJson(req)
 	uid := ps.GetInt("authId")
-	user := &model.User{Id: uid}
-	user.Load()
+	user := model.InitedUser(uid)
 	go func() {
 		msg := fmt.Sprintf(InvitedToJoinProject, user.Name, req.ProjectName)
 		payload := make(map[string]string)
@@ -296,8 +295,7 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	log.DebugJson(req)
 	uid := ps.GetInt("authId")
-	user := &model.User{Id: uid}
-	user.Load()
+	user := model.InitedUser(uid)
 	m := &model.Mission{
 		PublisherId: uid,
 		Name:        req.Name,
@@ -334,8 +332,7 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 	}
 	log.DebugJson(req)
 	uid := ps.GetInt("authId")
-	user := &model.User{Id: uid}
-	user.Load()
+	user := model.InitedUser(uid)
 	go func() {
 		msg := fmt.Sprintf(InvitedToJoinMission, user.Name, req.MissionName)
 		payload := make(map[string]string)
@@ -362,11 +359,10 @@ func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	log.DebugJson(req)
 	uid := ps.GetInt("authId")
-	user := &model.User{Id: uid}
-	user.Load()
+	user := model.InitedUser(uid)
+
 	mid := dbms.ReadMissionId(req.MissionPid)
-	m := &model.Mission{Id: mid}
-	m.Load()
+	m := model.InitedMission(mid)
 	if uid != m.PublisherId || !base.InIntSlice(uid, m.ReceiversId) {
 		log.Debug(uid, m.PublisherId, m.ReceiversId)
 		base.ForbidErr(w, UnableToCommentErr)
