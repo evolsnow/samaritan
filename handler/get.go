@@ -111,10 +111,6 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
-	if pid == 0 {
-		base.NotFoundErr(w, ProjectNotExistErr)
-		return
-	}
 	resp := new(projectMissionsResp)
 	p := model.InitedProject(pid)
 	if p == nil {
@@ -124,6 +120,10 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	ms := p.GetMissions()
 	uid := ps.GetInt("authId")
 	u := model.InitedUser(uid)
+	if u == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
 	userAcceptedMissions := u.GetAllAcceptedMissionsId()
 	if !base.InIntSlice(uid, p.MembersId) {
 		base.ForbidErr(w, NotProjectMemberErr)
@@ -156,18 +156,13 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mid := dbms.ReadProjectId(ps.Get("mission"))
-	if mid == 0 {
-		base.NotFoundErr(w, MissionNotExistErr)
-		return
-	}
-	resp := new(missionCommentResp)
 	m := model.InitedMission(mid)
 	if m == nil {
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
 	cms := m.Comments
-
+	resp := new(missionCommentResp)
 	ncs := make([]NestedComment, len(cms))
 	for i, v := range cms {
 		nc := NestedComment{
@@ -190,13 +185,6 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
-	//receivers := m.GetReceiversId()
-	//receiversName := make([]string, len(receivers))
-	//u := new(model.User)
-	//for i, v := range receivers {
-	//	u.Id = v
-	//	receiversName[i] = u.GetName()
-	//}
 	resp := &missionDetailResp{
 		Id:            ps.Get("mission"),
 		CreateTime:    m.CreateTime,

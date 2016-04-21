@@ -130,9 +130,9 @@ func TestProjectMissionList(t *testing.T) {
 	if reply.Code != 0 || len(reply.Nm) < 1 {
 		t.Error("failed to get missions")
 	}
-	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, base.MakeToken(123), reply)
+	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, base.MakeToken(dbms.ReadUserIdWithIndex("snow@gmail.com", "mail")), reply)
 	if reply.Code == 0 || reply.Msg != NotProjectMemberErr {
-		t.Error("not member")
+		t.Error("not member:", reply.Msg)
 	}
 }
 

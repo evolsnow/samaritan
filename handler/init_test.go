@@ -35,7 +35,9 @@ func beforeTest() {
 		Email:    "gsc1215225@gmail.com",
 	}
 	u.Save()
-
+	go u.CreateAvatar()
+	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
+	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
 	u2 := &model.User{
 		SamId:    "snow",
 		Alias:    "snow",
@@ -45,10 +47,9 @@ func beforeTest() {
 		Email:    "snow@gmail.com",
 	}
 	u2.Save()
-	go u.CreateAvatar()
-	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
-	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
+	dbms.CreateSearchIndex(u2.Id, "snow@gmail.com", "mail")
 
+	cache.Set("get_test_user_pid", u2.Pid, time.Minute*5)
 	t1 := &model.Todo{
 		OwnerId:   u.Id,
 		StartTime: time.Now().Unix(),
@@ -56,7 +57,6 @@ func beforeTest() {
 	}
 	t1.Save()
 	//dbms.CreateTodoIndex(t.Id, t.Pid)
-	cache.Set("delete_test_todo_pid", t1.Pid, time.Minute*5)
 
 	t2 := &model.Todo{
 		OwnerId:   u.Id,
@@ -66,6 +66,14 @@ func beforeTest() {
 	t2.Save()
 	//dbms.CreateTodoIndex(t2.Id, t2.Pid)
 	cache.Set("put_test_todo_pid", t2.Pid, time.Minute*5)
+
+	t3 := &model.Todo{
+		OwnerId:   u.Id,
+		StartTime: time.Now().Unix(),
+		Desc:      "todo 3 desc here",
+	}
+	t3.Save()
+	cache.Set("delete_test_todo_pid", t3.Pid, time.Minute*5)
 
 	m := &model.Mission{
 		Name:        "test mission",
