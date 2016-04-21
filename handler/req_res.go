@@ -420,6 +420,15 @@ type QiNiuUpTokenResp struct {
 	Expire uint32 `json:"expire"`
 }
 
+type NestedMsg struct {
+	Msg       string            `json:"msg"`
+	ExtraInfo map[string]string `json:"extraInfo"`
+}
+
+type getOfflineMsgResp struct {
+	Msgs []NestedMsg `json:"messages"`
+}
+
 //put method
 
 //change password

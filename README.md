@@ -3,7 +3,7 @@
 [![Build Status](https://api.travis-ci.org/evolsnow/samaritan.svg?branch=master)](https://travis-ci.org/evolsnow/samaritan)
 [![GoDoc](https://godoc.org/github.com/evolsnow/samaritan?status.png)](https://godoc.org/github.com/evolsnow/samaritan)
 
-**samaritan** 为APP(名字待定)的后台部分, 以Golang编写。
+**samaritan** 为APP(Godo)的后台部分, 以Golang编写。
 
 ### 项目介绍
 与另外两位同学的2016年毕业论文题为《基于iOS端的个人日程管理与团队管理工具的研究与实现》，
@@ -27,7 +27,7 @@ samaritan为其实现部分。此处仅简单介绍后台部分的一些架构�
 
 - 安全考虑： 1.严格的jwt鉴权; 2.id混淆，避免URI猜测; 3.scrypt强加密密码
 
-- 静态资源： 头像，图片等交由nginx处理 ，后期考虑七牛云等。
+- 静态资源： 头像，图片等交由七牛云。
 
 - RPC: 采用基于ProtoBuf的gRPC。消息推送(websocket/apns), 邮件发送等功能直接通过rpc实现, 形成微服务。非必须, 兴趣而已。
 

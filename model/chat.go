@@ -74,15 +74,14 @@ func (ct *Chat) Response() {
 //send with socket or apple push
 func (ct *Chat) send() {
 	ct.Timestamp = time.Now().Unix()
+	ct.Save()
 	var userTokens []string
 	for _, uid := range ct.ReceiversId {
 		userTokens = append(userTokens, base.MakeToken(uid))
+		go ct.AddToOffline(uid)
 	}
 	offlineTokens := rpc.SocketPush(userTokens, ct.Msg, ct.ExtraInfo) //use webSocket push
-	for _, ft := range offlineTokens {
-		uid, _ := base.ParseToken(ft)
-		go ct.Save(uid)
-	}
+
 	//if ct.Type != UserJoined && ct.Type != UserLeft {
 	applePush(offlineTokens, ct)
 	//}
@@ -104,14 +103,16 @@ func applePush(tokens []string, ct *Chat) {
 }
 
 // Save saves the offline chat message
-func (ct *Chat) Save(uid int) {
+func (ct *Chat) Save() {
 	data, _ := json.Marshal(ct.ExtraInfo)
 	ct.SerializedInfo = string(data)
 	//save chat
 	ct.Id = createChat(ct)
+}
+
+func (ct *Chat) AddToOffline(uid int) {
 	//update user offline msg
 	createOfflineMsg(uid, ct.Id)
-
 }
 
 // Load from redis

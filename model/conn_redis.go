@@ -275,6 +275,36 @@ func readName(uid int) (name string, err error) {
 	return
 }
 
+//read offline msg
+func readOfflineMsg(uid int) (reply []*Chat, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	key := fmt.Sprintf(offlineMsgList, uid)
+	lua := `
+	local data = redis.call("LRANGE", KEYS[1], "0", "-1")
+	local ret = {}
+  	for idx=1,#data do
+  	  	local info = redis.call("HGETALL","chat:"..data[idx])
+		if (info == false) then
+			redis.call("LREM", KEYS[1], 1, data[idx])
+		else
+			ret[idx] = info
+		end
+  	end
+  	return ret
+   	`
+	script := redis.NewScript(1, lua)
+	chs, err := redis.Values(script.Do(c, key))
+	reply = make([]*Chat, len(chs))
+	for i, v := range chs {
+		ch := new(Chat)
+		err = redis.ScanStruct(v.([]interface{}), ch)
+		err = json.Unmarshal([]byte(ch.SerializedInfo), &ch.ExtraInfo)
+		reply[i] = ch
+	}
+	return reply, err
+}
+
 //add to user's completed mission
 func updateCompletedMission(uid, mid int) error {
 	c := dbms.Pool.Get()

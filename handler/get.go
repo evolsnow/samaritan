@@ -210,3 +210,25 @@ func MakeUploadToken(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
+
+func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	uid := ps.GetInt("authId")
+	u := model.InitedUser(uid)
+	if u == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
+	resp := new(getOfflineMsgResp)
+	msgs := u.GetAllOfflineMsg()
+	nms := make([]NestedMsg, len(msgs))
+	for i, v := range msgs {
+		nc := NestedMsg{
+			Msg:       v.Msg,
+			ExtraInfo: v.ExtraInfo,
+		}
+		nms[i] = nc
+	}
+	resp.Msgs = nms
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}

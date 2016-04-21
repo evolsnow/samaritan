@@ -118,6 +118,14 @@ func (u *User) GetAllAcceptedMissionsId() []int {
 	return ids
 }
 
+func (u *User) GetAllOfflineMsg() []*Chat {
+	chs, err := readOfflineMsg(u.Id)
+	if err != nil {
+		log.Error("Error get user offline msgs:", err)
+	}
+	return chs
+}
+
 // CompleteMission adds mission to user completed mission
 func (u *User) CompleteMission(mid int) {
 	if err := updateCompletedMission(u.Id, mid); err != nil {
