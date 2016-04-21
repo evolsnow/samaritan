@@ -426,6 +426,7 @@ type NestedMsg struct {
 }
 
 type getOfflineMsgResp struct {
+	baseResp
 	Msgs []NestedMsg `json:"messages"`
 }
 

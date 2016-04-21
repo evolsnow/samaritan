@@ -172,3 +172,13 @@ func TestMissionDetail(t *testing.T) {
 		t.Error("faield to get mission receivers")
 	}
 }
+
+func TestOfflineMsgs(t *testing.T) {
+	reply := new(getOfflineMsgResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	get("http://127.0.0.1:8080/offlineMessages", auth, reply)
+	if reply.Code != 0 {
+		t.Error("failed to get messages")
+	}
+}
