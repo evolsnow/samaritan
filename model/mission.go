@@ -128,7 +128,7 @@ func (m *Mission) GetPictures() (pics []string) {
 		return
 	}
 	pics = make([]string, len(raw))
-	for i, v := range pics {
+	for i, v := range raw {
 		pics[i] = base.QiNiuDownloadUrl(v)
 	}
 	return

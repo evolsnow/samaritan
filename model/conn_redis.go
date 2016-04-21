@@ -218,7 +218,12 @@ func readProjects(key string) ([]Project, error) {
 		local data = redis.call("SMEMBERS", KEYS[1])
 		local ret = {}
   		for idx=1,#data do
-  			ret[idx] = redis.call("HGETALL","project:"..data[idx])
+  			local info = redis.call("HGETALL","project:"..data[idx])
+			if (info == false) then
+				redis.call("SREM", KEYS[1], data[idx])
+			else
+				ret[idx] = info
+  			end
   		end
   		return ret
 	`
@@ -441,8 +446,12 @@ func updateTodo(tid int, kvMap map[string]interface{}) error {
 func deleteTodo(tid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	_, err := c.Do("DEL", "todo:"+strconv.Itoa(tid))
-	return err
+	c.Send("DEL", "todo:"+strconv.Itoa(tid))
+	c.Send("DEL", fmt.Sprintf(todoPictureList), tid)
+	//c.Send("LREM", fmt.Sprintf(userTdList, tid), 1, tid)
+	//c.Send("SREM", fmt.Sprintf(userTdNotDoneSet, tid), tid)
+	//c.Send("SREM", fmt.Sprintf(userTdDoneSet, tid), tid)
+	return c.Flush()
 }
 
 //redis actions of model mission
@@ -546,7 +555,12 @@ func readMissionComments(mid int) (cms []Comment, err error) {
 		local data = redis.call("LRANGE", KEYS[1], 0, -1)
 		local ret = {}
   		for idx=1,#data do
-  			ret[idx] = redis.call("HGETALL","comment:"..data[idx])
+			local info = redis.call("HGETALL","comment:"..data[idx])
+			if (info == false) then
+				redis.call("LREM", KEYS[1], 1, data[idx])
+			else
+				ret[idx] = info
+			end
   		end
   		return ret
 	`
@@ -579,7 +593,12 @@ func readMissionReceiversName(mid int) (names []string, err error) {
 		local data = redis.call("SMEMBERS", KEYS[1])
 		local ret = {}
   		for idx=1,#data do
-  			ret[idx] = redis.call("HGET","user:"..data[idx], KEYS[2])
+  			local info = redis.call("HGET","user:"..data[idx], KEYS[2])
+			if (info == false) then
+				redis.call("SREM", KEYS[1], data[idx])
+			else
+				ret[idx] = info
+			end
   		end
   		return ret
 	`
@@ -645,8 +664,16 @@ func updateMissionReceiver(mid, uid, action int) (err error) {
 func deleteMission(mid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	_, err := c.Do("DEL", "mission:"+strconv.Itoa(mid))
-	return err
+	c.Send("DEL", "mission:"+strconv.Itoa(mid))
+	//c.Send("SREM",fmt.Sprintf(userMsAcceptedSet,mid),mid)
+	//c.Send("SREM",fmt.Sprintf(userMsPublishedSet,mid),mid)
+	//c.Send("SREM",fmt.Sprintf(userMsCompletedSet,mid),mid)
+
+	//c.Send("DEL",fmt.Sprintf(missionReceiversSet,mid))
+	//c.Send("DEL",fmt.Sprintf(missionCommentsList,mid))
+	//c.Send("DEL",fmt.Sprintf(missionCompletedUserSet,mid))
+	c.Send("DEL", fmt.Sprintf(missionPictureList, mid))
+	return c.Flush()
 }
 
 //redis actions of model project
@@ -697,7 +724,12 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 	local data = redis.call("SMEMBERS", KEYS[1])
 	local ret = {}
   	for idx=1,#data do
-  		ret[idx] = redis.call("HGETALL","user:"..data[idx])
+  	  	local info = redis.call("HGETALL","user:"..data[idx])
+		if (info == false) then
+			redis.call("SREM", KEYS[1], data[idx])
+		else
+			ret[idx] = info
+		end
   	end
   	return ret
    	`
@@ -721,7 +753,12 @@ func readProjectMissions(pid int) (reply []*Mission, err error) {
 	local data = redis.call("SMEMBERS", KEYS[1])
 	local ret = {}
   	for idx=1,#data do
-  		ret[idx] = redis.call("HGETALL","mission:"..data[idx])
+  	  	local info = redis.call("HGETALL","mission:"..data[idx])
+		if (info == false) then
+			redis.call("SREM", KEYS[1], data[idx])
+		else
+			ret[idx] = info
+		end
   	end
   	return ret
    	`
@@ -779,7 +816,12 @@ func readProjectMembersName(pid int) (names []string, err error) {
 	local data = redis.call("SMEMBERS", KEYS[1])
 	local ret = {}
   	for idx=1,#data do
-  		ret[idx] = redis.call("HGET","user:"..data[idx], KEYS[2])
+  	  	local info = redis.call("HGET", "user:"..data[idx], KEYS[2])
+		if (info == false) then
+			redis.call("SREM", KEYS[1], data[idx])
+		else
+			ret[idx] = info
+		end
   	end
   	return ret
    	`
@@ -817,6 +859,8 @@ func deleteProject(pid int) error {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	c.Send("DEL", "project:"+strconv.Itoa(pid))
+	c.Send("DEL", fmt.Sprintf(projectMembersSet, pid))
+	c.Send("DEL", fmt.Sprintf(projectMissionsSet, pid))
 	return c.Flush()
 }
 

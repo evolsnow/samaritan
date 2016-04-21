@@ -35,6 +35,16 @@ func beforeTest() {
 		Email:    "gsc1215225@gmail.com",
 	}
 	u.Save()
+
+	u2 := &model.User{
+		SamId:    "snow",
+		Alias:    "snow",
+		Name:     "王二",
+		Phone:    "13212341234",
+		Password: "oldpwd",
+		Email:    "snow@gmail.com",
+	}
+	u2.Save()
 	go u.CreateAvatar()
 	dbms.CreateSearchIndex(u.Id, "gsc1215225@gmail.com", "mail")
 	cache.Set("gsc1215225@gmail.com:code", "123456", time.Minute*5)
@@ -65,7 +75,7 @@ func beforeTest() {
 	}
 	m.Save()
 	m.AddReceiver(u.Id)
-	m.AddReceiver(10)
+	m.AddReceiver(u2.Id)
 	cache.Set("put_test_mission_pid", m.Pid, time.Minute*5)
 	cache.Set("post_test_mission_pid", m.Pid, time.Minute*5)
 

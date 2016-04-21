@@ -28,6 +28,8 @@ func QiNiuUploadToken() string {
 
 // QiNiuDownloadUrl return download url for file key
 func QiNiuDownloadUrl(key string) string {
+	conf.ACCESS_KEY = AccessKey
+	conf.SECRET_KEY = SecretKey
 	baseUrl := kodo.MakeBaseUrl(Domain, key)
 	policy := kodo.GetPolicy{}
 	c := kodo.New(0, nil)

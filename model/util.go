@@ -36,7 +36,9 @@ func prepareToForceUpdate(s interface{}) map[string]interface{} {
 			continue
 		}
 		value := v.FieldByName(name)
-		kvMap[fieldInfo.Tag.Get("redis")] = value
+		if tag := fieldInfo.Tag.Get("redis"); tag != "-" {
+			kvMap[tag] = value
+		}
 	}
 	return kvMap
 }
