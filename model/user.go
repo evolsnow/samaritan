@@ -27,6 +27,9 @@ type User struct {
 func InitedUser(id int) (u *User) {
 	u = &User{Id: id}
 	u.load()
+	if u.Pid == "" {
+		return nil
+	}
 	return
 }
 

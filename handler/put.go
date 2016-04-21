@@ -95,11 +95,11 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	uid := ps.GetInt("authId")
 	u := &model.User{Id: uid}
 	mid := dbms.ReadMissionId(ps.Get("mission"))
-	if mid == 0 {
+	m := model.InitedMission(mid)
+	if m == nil {
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
-	m := model.InitedMission(mid)
 	if !base.InIntSlice(uid, m.ReceiversId) {
 		base.ForbidErr(w, NotMissionMemberErr)
 		return

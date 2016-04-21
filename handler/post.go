@@ -363,6 +363,10 @@ func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	mid := dbms.ReadMissionId(req.MissionPid)
 	m := model.InitedMission(mid)
+	if m == nil {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
 	if uid != m.PublisherId || !base.InIntSlice(uid, m.ReceiversId) {
 		log.Debug(uid, m.PublisherId, m.ReceiversId)
 		base.ForbidErr(w, UnableToCommentErr)

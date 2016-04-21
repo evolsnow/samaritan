@@ -20,6 +20,9 @@ type Project struct {
 func InitedProject(id int) (p *Project) {
 	p = &Project{Id: id}
 	p.load()
+	if p.Pid == "" {
+		return nil
+	}
 	p.MembersId = p.GetMembersId()
 	return
 }

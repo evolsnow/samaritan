@@ -27,6 +27,9 @@ type Todo struct {
 func InitedTodo(id int) (td *Todo) {
 	td = &Todo{Id: id}
 	td.load()
+	if td.Pid == "" {
+		return nil
+	}
 	td.Pictures = td.GetPics()
 	return
 }

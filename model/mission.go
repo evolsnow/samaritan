@@ -35,6 +35,9 @@ type Comment struct {
 func InitedMission(id int) (m *Mission) {
 	m = &Mission{Id: id}
 	m.load()
+	if m.Pid == "" { //deleted
+		return nil
+	}
 	m.Pictures = m.GetPictures()
 	m.ReceiversId = m.GetReceiversId()
 	m.Comments = m.GetComments()

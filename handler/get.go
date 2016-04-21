@@ -117,6 +117,10 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 	resp := new(projectMissionsResp)
 	p := model.InitedProject(pid)
+	if p == nil {
+		base.NotFoundErr(w, ProjectNotExistErr)
+		return
+	}
 	ms := p.GetMissions()
 	uid := ps.GetInt("authId")
 	u := model.InitedUser(uid)
@@ -158,6 +162,10 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 	resp := new(missionCommentResp)
 	m := model.InitedMission(mid)
+	if m == nil {
+		base.NotFoundErr(w, MissionNotExistErr)
+		return
+	}
 	cms := m.Comments
 
 	ncs := make([]NestedComment, len(cms))
@@ -177,11 +185,11 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mid := dbms.ReadProjectId(ps.Get("mission"))
-	if mid == 0 {
+	m := model.InitedMission(mid)
+	if m == nil {
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
-	m := model.InitedMission(mid)
 	//receivers := m.GetReceiversId()
 	//receiversName := make([]string, len(receivers))
 	//u := new(model.User)
