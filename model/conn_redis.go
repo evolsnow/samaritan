@@ -299,7 +299,7 @@ func readOfflineMsg(uid int) (reply []*Chat, err error) {
 	for i, v := range chs {
 		ch := new(Chat)
 		err = redis.ScanStruct(v.([]interface{}), ch)
-		err = json.Unmarshal([]byte(ch.SerializedInfo), &ch.ExtraInfo)
+		json.Unmarshal([]byte(ch.SerializedInfo), &ch.ExtraInfo)
 		reply[i] = ch
 	}
 	return reply, err

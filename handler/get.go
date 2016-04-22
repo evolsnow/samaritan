@@ -131,9 +131,9 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 	nms := make([]NestedMission, len(ms))
 	for i, v := range ms {
-		if !base.InIntSlice(v.Id, userAcceptedMissions) {
-			continue
-		}
+		//if !base.InIntSlice(v.Id, userAcceptedMissions) {
+		//	continue
+		//}
 		v.Sync()
 		nm := NestedMission{
 			Id:            v.Pid,
@@ -141,6 +141,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Desc:          v.Desc,
 			Deadline:      v.Deadline,
 			Pictures:      v.Pictures,
+			Accepted:      base.InIntSlice(v.Id, userAcceptedMissions),
 			ReceiversName: v.GetReceiversName(),
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
@@ -185,12 +186,20 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		base.NotFoundErr(w, MissionNotExistErr)
 		return
 	}
+	uid := ps.GetInt("authId")
+	u := model.InitedUser(uid)
+	if u == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
+	userAcceptedMissions := u.GetAllAcceptedMissionsId()
 	resp := &missionDetailResp{
 		Id:            ps.Get("mission"),
 		CreateTime:    m.CreateTime,
 		Name:          m.Name,
 		Desc:          m.Desc,
 		Deadline:      m.Deadline,
+		Accepted:      base.InIntSlice(m.Id, userAcceptedMissions),
 		Pictures:      m.Pictures,
 		PublisherId:   base.HashedUserId(m.PublisherId),
 		ReceiversName: m.GetReceiversName(),
