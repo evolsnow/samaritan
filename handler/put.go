@@ -152,3 +152,23 @@ func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	u.AcceptMission(m.Id)
 	makeResp(w, r, putAcceptMsResp{})
 }
+
+func JoinProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putJoinPjReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	pid := dbms.ReadMissionId(ps.Get("project"))
+	if pid == 0 {
+		base.NotFoundErr(w, ProjectNotExistErr)
+		return
+	}
+	uid := ps.GetInt("authId")
+	u := &model.User{Id: uid}
+	p := &model.Project{Id: pid}
+	p.AddMember(uid)
+	u.JoinProject(p.Id)
+	makeResp(w, r, putAcceptMsResp{})
+}

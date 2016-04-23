@@ -572,6 +572,20 @@ type putAcceptMsResp struct {
 	baseResp
 }
 
+//join project
+type putJoinPjReq struct {
+}
+
+func (pm *putJoinPjReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+	//&pm.Done: "done",
+	}
+}
+
+type putJoinPjResp struct {
+	baseResp
+}
+
 //delete method
 
 //delete to-do

@@ -145,6 +145,11 @@ func (u *User) AcceptMission(mid int) {
 	updateAcceptedMission(u.Id, mid)
 }
 
+// JoinProject add project to user joined project set
+func (u *User) JoinProject(pid int) {
+	updateJoinedProject(u.Id, pid)
+}
+
 // CreateAvatar generates avatar for user
 func (u *User) CreateAvatar() {
 	path, err := base.GenerateAvatar(u.Email)

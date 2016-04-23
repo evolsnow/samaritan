@@ -12,7 +12,6 @@ import (
 func init() {
 	dbms.Pool = dbms.NewPool("127.0.0.1:6379", "", "1")
 	dbms.CachePool = dbms.NewPool("127.0.0.1:6379", "", "8")
-	dbms.DB = dbms.NewDB(",F^[zMo=3,}ITYz", "139.129.131.112", 12306, "samaritan")
 	c := dbms.Pool.Get()
 	c.Do("FLUSHDB")
 	c.Close()
@@ -110,5 +109,6 @@ func beforeTest() {
 		Desc:      "pj2 desc",
 	}
 	p2.Save()
+	cache.Set("put_test_project_pid", p2.Pid, time.Minute*5)
 	cache.Set("post_test_project_pid", p2.Pid, time.Minute*5)
 }

@@ -131,7 +131,6 @@ func TestAcceptMission(t *testing.T) {
 	mPid := cache.Get("put_test_mission_pid")
 	m := model.InitedMission(dbms.ReadMissionId(mPid))
 	accepted := len(m.ReceiversId)
-	t.Log(m.ReceiversId)
 	req := new(putAcceptMsReq)
 	reply := new(putAcceptMsResp)
 	put("http://127.0.0.1:8080/missions/accepted/"+mPid, base.MakeToken(123), req, reply)
@@ -141,5 +140,21 @@ func TestAcceptMission(t *testing.T) {
 	m.Sync()
 	if len(m.ReceiversId)-accepted != 1 {
 		t.Error("update accept set failed:", m.ReceiversId)
+	}
+}
+
+func TestJoinProject(t *testing.T) {
+	pPid := cache.Get("put_test_project_pid")
+	p := model.InitedProject(dbms.ReadProjectId(pPid))
+	joined := len(p.MembersId)
+	req := new(putJoinPjReq)
+	reply := new(putJoinPjResp)
+	put("http://127.0.0.1:8080/projects/joined/"+pPid, base.MakeToken(123), req, reply)
+	if reply.Code != 0 {
+		t.Error("failed to accept mission")
+	}
+	p.Sync()
+	if len(p.MembersId)-joined != 1 {
+		t.Error("update join set failed:", p.MembersId)
 	}
 }

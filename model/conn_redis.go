@@ -331,6 +331,14 @@ func updateAcceptedMission(uid, mid int) error {
 	return err
 }
 
+//add to user's joined project
+func updateJoinedProject(uid, pid int) error {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	_, err := c.Do("SADD", fmt.Sprintf(userPjJoinedSet, uid), pid)
+	return err
+}
+
 //update user with given value
 func updateUser(uid int, kvMap map[string]interface{}) error {
 	c := dbms.Pool.Get()
