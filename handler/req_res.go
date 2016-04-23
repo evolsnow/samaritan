@@ -219,8 +219,12 @@ func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
 
 type postAccessTokenResp struct {
 	baseResp
-	Id    string `json:"id"`
-	Token string `json:"token"`
+	Id     string `json:"id"`
+	Token  string `json:"token"`
+	Avatar string `json:"avatar"`
+	Mail   string `json:"mail"`
+	Name   string `json:"name"`
+	Alias  string `json:"alias,omitempty"`
 }
 
 //project invitation
@@ -465,6 +469,25 @@ func (pp *putPasswordReq) FieldMap(req *http.Request) binding.FieldMap {
 }
 
 type putPasswordResp struct {
+	baseResp
+}
+
+//change user info
+type putUserInfoReq struct {
+	Alias  string `json:"alias,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Avatar string `json:"avatar,omitempty"`
+}
+
+func (pui *putUserInfoReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		pui.Alias:  "alias",
+		pui.Name:   "name",
+		pui.Avatar: "avatar",
+	}
+}
+
+type putUserInfoResp struct {
 	baseResp
 }
 

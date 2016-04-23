@@ -13,6 +13,7 @@ import (
 
 const (
 	NotMissionMemberErr = "您还未接受此任务"
+	NotLoginErr         = "您还未登录"
 )
 
 func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -45,6 +46,30 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, putPasswordResp{})
 }
 
+func UpdateUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putUserInfoReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	user := model.InitedUser(ps.GetInt("authId"))
+	if user == nil {
+		base.ForbidErr(w, NotLoginErr)
+		return
+	}
+	if req.Avatar != "" {
+		user.Avatar = req.Avatar
+	}
+	if req.Alias != "" {
+		user.Alias = req.Alias
+	}
+	if req.Name != "" {
+		user.Name = req.Name
+	}
+	user.Save()
+	makeResp(w, r, putUserInfoResp{})
+}
 func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putTdReq)
 	errs := binding.Bind(r, req)

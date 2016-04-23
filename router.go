@@ -48,6 +48,7 @@ func newRouter() *httprouter.Router {
 
 	//http put method
 	r.PUT("/users/password/:identity", hd.UpdatePassword)
+	r.PUT("/users/personalInfo", mw.Auth(hd.UpdateUserInfo))
 	r.PUT("/todos/:todo", mw.Auth(hd.UpdateTodo))
 	//r.PUT("/todos/pictures/:todo", mw.Auth(hd.UpdateTodoPics))
 	r.PUT("/missions/pictures/:mission", mw.Auth(hd.UpdateMissionPics))

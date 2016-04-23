@@ -67,6 +67,24 @@ func TestUpdatePassword(t *testing.T) {
 	}
 }
 
+func TestUpdateUserInfo(t *testing.T) {
+	req := &putUserInfoReq{
+		Alias: "new alias",
+		Name:  "",
+	}
+	reply := new(putUserInfoResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	put("http://127.0.0.1:8080/users/personalInfo", auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("update user failed")
+	}
+	user := model.InitedUser(uid)
+	if user.Alias != req.Alias {
+		t.Error("update user alias failed")
+	}
+}
+
 func TestUpdateTodo(t *testing.T) {
 	req := &putTdReq{
 		Place:  "new place",

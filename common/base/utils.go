@@ -41,7 +41,10 @@ func GenerateAvatar(phone string) (string, error) {
 			return "", err
 		}
 		path := fmt.Sprintf("%s%s.jpg", avatarPath, phone)
-		go ioutil.WriteFile(path, data, 0644)
+		err = ioutil.WriteFile(path, data, 0644)
+		if err != nil {
+			return "", err
+		}
 		return path, nil
 	}
 	return "", err

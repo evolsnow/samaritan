@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/log"
+	"strings"
 )
 
 type User struct {
@@ -30,6 +31,7 @@ func InitedUser(id int) (u *User) {
 	if u.Pid == "" {
 		return nil
 	}
+	u.Avatar = u.FullAvatarUrl()
 	return
 }
 
@@ -38,15 +40,15 @@ func (u *User) Sync() {
 	*u = *InitedUser(u.Id)
 }
 
-// GetPassword reads user's password
-func (u *User) GetPassword() (pwd string) {
-	pwd, err := readPassword(u.Id)
-	if err != nil {
-		log.Error("Error get user's password:", err)
-		return ""
-	}
-	return
-}
+//// GetPassword reads user's password
+//func (u *User) GetPassword() (pwd string) {
+//	pwd, err := readPassword(u.Id)
+//	if err != nil {
+//		log.Error("Error get user's password:", err)
+//		return ""
+//	}
+//	return
+//}
 
 // GetName reads user's real name
 func (u *User) GetName() (name string) {
@@ -166,7 +168,11 @@ func (u *User) CreateAvatar() {
 // FullAvatarUrl return full url of avatar img
 func (u *User) FullAvatarUrl() string {
 	prefix := "https://img.samaritan.tech/"
-	return prefix + u.Avatar
+	if strings.Contains(u.Avatar, "/avatar") {
+		//default or qi niu
+		return prefix + u.Avatar
+	}
+	return base.QiNiuDownloadUrl(u.Avatar)
 }
 
 // Save creates or updates a new user

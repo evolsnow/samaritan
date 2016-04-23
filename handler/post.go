@@ -247,15 +247,19 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		base.NotFoundErr(w, NotRegisteredErr)
 		return
 	}
-	us := new(model.User)
-	us.Id = uid
-	if base.EncryptedPassword(req.Password) != us.GetPassword() {
+	user := model.InitedUser(uid)
+	if base.EncryptedPassword(req.Password) != user.Password {
 		base.ForbidErr(w, PasswordMismatchErr)
 		return
 	}
-	resp := new(postAccessTokenResp)
-	resp.Id = base.HashedUserId(us.Id)
-	resp.Token = base.MakeToken(us.Id)
+	resp := &postAccessTokenResp{
+		Id:     base.HashedUserId(user.Id),
+		Token:  base.MakeToken(user.Id),
+		Avatar: user.Avatar,
+		Name:   user.Name,
+		Alias:  user.Alias,
+		Mail:   user.Email,
+	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
