@@ -74,7 +74,7 @@ func SocketPush(tokenList []string, msg string, extraInfo map[string]string) []s
 // AppPush calls rpc server to push message to client with apple push notification system
 func AppPush(tokenList []string, msg string, extraInfo map[string]string) {
 	log.Debug("calling rpc.IOSPush")
-	RpcClientF.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, ExtraInfo: extraInfo, DeviceToken: tokenList})
+	RpcClientD.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, ExtraInfo: extraInfo, DeviceToken: tokenList})
 }
 
 //receive chat from rpc server
