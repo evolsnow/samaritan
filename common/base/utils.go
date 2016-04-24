@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	avatarPath = "static/avatar/"
+	avatarPath = "avatar/"
 )
 
 //generate avatar url
