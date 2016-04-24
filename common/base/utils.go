@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	avatarPath = "avatar/"
+	AvatarPath = "static/avatar/"
 )
 
 //generate avatar url
@@ -40,7 +40,7 @@ func GenerateAvatar(phone string) (string, error) {
 			//use default avatar
 			return "", err
 		}
-		path := fmt.Sprintf("%s%s.jpg", avatarPath, phone)
+		path := fmt.Sprintf("%s%s.jpg", AvatarPath, phone)
 		err = ioutil.WriteFile(path, data, 0644)
 		if err != nil {
 			return "", err

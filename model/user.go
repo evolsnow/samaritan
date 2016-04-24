@@ -168,7 +168,7 @@ func (u *User) CreateAvatar() {
 // FullAvatarUrl return full url of avatar img
 func (u *User) FullAvatarUrl() string {
 	prefix := "https://img.samaritan.tech/"
-	if strings.Contains(u.Avatar, "/avatar") {
+	if strings.Contains(u.Avatar, base.AvatarPath) {
 		//default or qi niu
 		return prefix + u.Avatar
 	}
