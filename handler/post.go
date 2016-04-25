@@ -77,7 +77,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		base.ForbidErr(w, CodeMismatchErr)
 		return
 	}
-	us := &model.User{
+	user := &model.User{
 		Phone:      req.Phone,
 		Email:      req.Mail,
 		Password:   base.EncryptedPassword(req.Password),
@@ -85,15 +85,15 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		StudentNum: req.StuNum,
 	}
 	//assign id to user
-	us.Save()
-	go us.CreateAvatar()
+	user.Save()
+	go user.CreateAvatar()
 	//create user login/search index
-	go dbms.CreateSearchIndex(us.Id, info, source)
+	go dbms.CreateSearchIndex(user.Id, info, source)
 	//return jwt token and public user id
-	resp := new(postUsResp)
-	resp.Id = us.Pid
-	resp.Token = base.MakeToken(us.Id)
-
+	resp := &postUsResp{
+		Id:    user.Pid,
+		Token: base.MakeToken(user.Id),
+	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
@@ -253,13 +253,8 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		return
 	}
 	resp := &postAccessTokenResp{
-		Id:     base.HashedUserId(user.Id),
-		Token:  base.MakeToken(user.Id),
-		Avatar: user.Avatar,
-		Name:   user.Name,
-		Alias:  user.Alias,
-		Mail:   user.Email,
-		StuNum: user.StudentNum,
+		Id:    base.HashedUserId(user.Id),
+		Token: base.MakeToken(user.Id),
 	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)

@@ -74,9 +74,6 @@ func TestNewAccessToken(t *testing.T) {
 	if reply.Id == "" || reply.Token == "" {
 		t.Error("login failed")
 	}
-	if reply.Avatar == "" {
-		t.Error("failed to get avatar url")
-	}
 	req.Password = "abc"
 	reply = new(postAccessTokenResp)
 	post("http://127.0.0.1:8080/accessToken", "", req, reply)

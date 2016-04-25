@@ -241,3 +241,22 @@ func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
 }
+
+func UserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	uid := ps.GetInt("authId")
+	user := model.InitedUser(uid)
+	if user == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
+	resp := &personalInfoResp{
+		Id:     user.Pid,
+		Avatar: user.Avatar,
+		Name:   user.Name,
+		Alias:  user.Alias,
+		Mail:   user.Email,
+		StuNum: user.StudentNum,
+	}
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}

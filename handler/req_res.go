@@ -219,13 +219,8 @@ func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
 
 type postAccessTokenResp struct {
 	baseResp
-	Id     string `json:"id"`
-	Token  string `json:"token"`
-	Avatar string `json:"avatar"`
-	Mail   string `json:"mail"`
-	Name   string `json:"name"`
-	Alias  string `json:"alias,omitempty"`
-	StuNum string `json:"stuNum,omitempty"`
+	Id    string `json:"id"`
+	Token string `json:"token"`
 }
 
 //project invitation
@@ -435,6 +430,16 @@ type NestedMsg struct {
 type getOfflineMsgResp struct {
 	baseResp
 	Msgs []NestedMsg `json:"messages"`
+}
+
+type personalInfoResp struct {
+	baseResp
+	Id     string `json:"id"`
+	Avatar string `json:"avatar"`
+	Mail   string `json:"mail"`
+	Name   string `json:"name"`
+	Alias  string `json:"alias,omitempty"`
+	StuNum string `json:"stuNum,omitempty"`
 }
 
 //put method

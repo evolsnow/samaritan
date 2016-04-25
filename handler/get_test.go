@@ -91,12 +91,12 @@ func TestUserProjectList(t *testing.T) {
 
 func TestUserSearch(t *testing.T) {
 	reply := new(userSearchResp)
-	get("http://127.0.0.1:8080/users/mail@fake.com", "", reply)
+	get("http://127.0.0.1:8080/users/pubInfo/mail@fake.com", "", reply)
 	if reply.Msg != UserNotExistErr {
 		t.Error("user not exist")
 	}
 	reply = new(userSearchResp)
-	get("http://127.0.0.1:8080/users/gsc1215225@gmail.com", "", reply)
+	get("http://127.0.0.1:8080/users/pubInfo/gsc1215225@gmail.com", "", reply)
 	if reply.Code != 0 || reply.Id == "" {
 		t.Error("failed to serach user")
 	}
@@ -180,5 +180,18 @@ func TestOfflineMsgs(t *testing.T) {
 	get("http://127.0.0.1:8080/offlineMessages", auth, reply)
 	if reply.Code != 0 {
 		t.Error("failed to get messages")
+	}
+}
+
+func TestUserInfo(t *testing.T) {
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	reply := new(personalInfoResp)
+	get("http://127.0.0.1:8080/users/personalInfo", auth, reply)
+	if reply.Code != 0 {
+		t.Error("failed to get user personal info")
+	}
+	if reply.Id == "" {
+		t.Error("failed to get user id info")
 	}
 }
