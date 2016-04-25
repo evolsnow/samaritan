@@ -181,6 +181,9 @@ func TestOfflineMsgs(t *testing.T) {
 	if reply.Code != 0 {
 		t.Error("failed to get messages")
 	}
+	if len(reply.Msgs) > 0 && reply.Msgs[0].Id == "" {
+		t.Error("got wrong chat id")
+	}
 }
 
 func TestUserInfo(t *testing.T) {

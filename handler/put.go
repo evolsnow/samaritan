@@ -197,3 +197,24 @@ func JoinProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	u.JoinProject(p.Id)
 	makeResp(w, r, putAcceptMsResp{})
 }
+
+func UpdateChatStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	req := new(putCtStatusReq)
+	errs := binding.Bind(r, req)
+	if errs.Handle(w) {
+		return
+	}
+	log.DebugJson(req)
+	uid := ps.GetInt("authId")
+	u := &model.User{Id: uid}
+	cid := dbms.ReadChatId(ps.Get("chat"))
+	c := model.InitedChat(cid)
+	if c == nil {
+		base.NotFoundErr(w, ChatNotExistErr)
+		return
+	}
+	if base.InIntSlice(c.Id, u.GetAllMsgsId()) {
+		u.DealtChat(cid, req.Dealt)
+	}
+	makeResp(w, r, putCtStatusResp{})
+}

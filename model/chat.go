@@ -13,16 +13,19 @@ const (
 	PeerToPeer = iota //private msg server <<-->> client
 	Discuss           //group chat server <<-->> client
 	//system call
-	UserJoined        //server -->> client
-	UserLeft          //server -->> client
+	UserJoined //server -->> client
+	UserLeft   //server -->> client
+
 	InvitedToProject  //server -->> client
 	KickedFromProject //server -->> client
-	InvitedToMission  //server -->> client
+
+	DeliveredMission //server -->> client
+	InvitedToMission //server -->> client
 )
 
 type Chat struct {
 	Id             int               `json:"-" redis:"id"`
-	ConversationId string            `json:"convId,omitempty" redis:"convId"`
+	Pid            string            `json:"id,omitempty" redis:"pid"`
 	Type           int               `json:"type" redis:"type"`
 	Msg            string            `json:"msg,omitempty" redis:"msg"`
 	Target         string            `json:"target,omitempty" redis:"target"`       //joined or left user
@@ -34,6 +37,17 @@ type Chat struct {
 	Timestamp      int64             `json:"timestamp,omitempty" redis:"timestamp"`
 	ExtraInfo      map[string]string `json:"extraInfo" redis:"-"`
 	SerializedInfo string            `json:"-" redis:"info"` //serialize from extra info
+	Dealt          bool              `json:"dealt,omitempty" redis:"dealt"`
+}
+
+// InitedChat returns a full loaded chat object by id
+func InitedChat(id int) (c *Chat) {
+	c = &Chat{Id: id}
+	c.load()
+	if c.Pid == "" { //deleted
+		return nil
+	}
+	return
 }
 
 // Response deals with the chat message
@@ -115,8 +129,8 @@ func (ct *Chat) AddToOffline(uid int) {
 	createOfflineMsg(uid, ct.Id)
 }
 
-// Load from redis
-func (ct *Chat) Load() (err error) {
+//load from redis
+func (ct *Chat) load() (err error) {
 	cPtr, err := readChatWithId(ct.Id)
 	if err != nil {
 		log.Error(err)

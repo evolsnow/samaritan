@@ -176,3 +176,17 @@ func TestJoinProject(t *testing.T) {
 		t.Error("update join set failed:", p.MembersId)
 	}
 }
+
+func TestUpdateChatStatus(t *testing.T) {
+	req := &putCtStatusReq{
+		Dealt: true,
+	}
+	reply := new(putCtStatusResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	//completed
+	put("http://127.0.0.1:8080/chats/status/"+base.HashedChatId(1), auth, req, reply)
+	if reply.Code != 0 {
+		t.Error("update chat failed")
+	}
+}

@@ -310,7 +310,7 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		payload["invitor"] = user.Pid
 		payload["missionId"] = m.Pid
 		push := &model.Chat{
-			Type:      model.InvitedToMission,
+			Type:      model.DeliveredMission,
 			To:        req.ReceiversId,
 			Msg:       msg,
 			ExtraInfo: payload,

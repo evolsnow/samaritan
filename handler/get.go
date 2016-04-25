@@ -19,6 +19,7 @@ const (
 	ProjectNotExistErr  = "项目不存在"
 	MissionNotExistErr  = "任务不存在"
 	TodoNotExistErr     = "Todo不存在"
+	ChatNotExistErr     = "消息不存在"
 	NotProjectMemberErr = "不是本项目成员,无法查看项目"
 )
 
@@ -232,7 +233,10 @@ func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	nms := make([]NestedMsg, len(msgs))
 	for i, v := range msgs {
 		nc := NestedMsg{
+			Id:        v.Pid,
 			Msg:       v.Msg,
+			Dealt:     v.Dealt,
+			Type:      v.Type,
 			ExtraInfo: v.ExtraInfo,
 		}
 		nms[i] = nc

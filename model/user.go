@@ -120,10 +120,29 @@ func (u *User) GetAllAcceptedMissionsId() []int {
 	return ids
 }
 
+// GetAllMsgsId gets all msgs id
+func (u *User) GetAllMsgsId() []int {
+	var ids []int
+	ids, err := readUserMsgsId(u.Id)
+	if err != nil {
+		log.Error("Error get offline msgs id:", err)
+	}
+	return ids
+}
+
 func (u *User) GetAllOfflineMsg() []*Chat {
 	chs, err := readOfflineMsg(u.Id)
 	if err != nil {
 		log.Error("Error get user offline msgs:", err)
+	}
+	ids, err := readDealtChatsId(u.Id)
+	if err != nil {
+		log.Error("Error get user dealt ids:", err)
+	}
+	for _, c := range chs {
+		if base.InIntSlice(c.Id, ids) {
+			c.Dealt = true
+		}
 	}
 	return chs
 }
@@ -173,6 +192,11 @@ func (u *User) FullAvatarUrl() string {
 		return prefix + u.Avatar
 	}
 	return base.QiNiuDownloadUrl(u.Avatar)
+}
+
+// DealtChat dealt a chat
+func (u *User) DealtChat(cid int, dealt bool) {
+	updateDealtChat(u.Id, cid, dealt)
 }
 
 // Save creates or updates a new user

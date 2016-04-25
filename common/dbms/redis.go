@@ -22,6 +22,7 @@ const (
 	TodoIndex    = "index:todo"
 	MissionIndex = "index:mission"
 	ProjectIndex = "index:project"
+	ChatIndex    = "index:chat"
 	DeviceIndex  = "index:device"
 )
 
@@ -144,6 +145,13 @@ func CreateProjectIndex(pid int, pPid string) {
 	c.Do("HSET", ProjectIndex, pPid, pid)
 }
 
+// CreateChatIndex creates 'chat public id==>> chat real id' index
+func CreateChatIndex(cid int, cPid string) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("HSET", ChatIndex, cPid, cid)
+}
+
 // CreateDeviceIndex creates 'user real id==>> user device token' index
 func CreateDeviceIndex(uid int, dt string) {
 	c := Pool.Get()
@@ -180,6 +188,14 @@ func ReadProjectId(pPid string) (pid int) {
 	c := Pool.Get()
 	defer c.Close()
 	pid, _ = redis.Int(c.Do("HGET", ProjectIndex, pPid))
+	return
+}
+
+// ReadProjectId gets project real id with public id
+func ReadChatId(cPid string) (cid int) {
+	c := Pool.Get()
+	defer c.Close()
+	cid, _ = redis.Int(c.Do("HGET", ChatIndex, cPid))
 	return
 }
 

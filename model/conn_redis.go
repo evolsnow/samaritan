@@ -82,7 +82,7 @@ const (
 
 const (
 	ChId        = "id"
-	ChConvId    = "convId"
+	ChPid       = "pid"
 	ChType      = "type"
 	ChTarget    = "target"
 	ChMsg       = "msg"
@@ -90,6 +90,7 @@ const (
 	ChFrom      = "from"
 	ChTimeStamp = "timestamp"
 	ChInfo      = "info"
+	ChDealt     = "dealt"
 )
 
 //other useful index set key name
@@ -104,6 +105,7 @@ const (
 	userMsAcceptedSet  = "user:%d:missions:accept" //user's all missions redis-type:Set
 	userMsPublishedSet = "user:%d:missions:publish"
 	userMsCompletedSet = "user:%d:missions:complete"
+	userCsDealtSet     = "user:%d:chats:complete"
 
 	userPjColorList = "user:%d:project:%d:color" //user defined project color redis-type:List
 
@@ -257,6 +259,14 @@ func readAcceptedMissionsId(uid int) ([]int, error) {
 	return ids, err
 }
 
+//read user's dealt chat's id
+func readDealtChatsId(uid int) ([]int, error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	ids, err := redis.Ints(c.Do("SMEMBERS", fmt.Sprintf(userCsDealtSet, uid)))
+	return ids, err
+}
+
 //read user's password
 func readPassword(uid int) (pwd string, err error) {
 	c := dbms.Pool.Get()
@@ -337,6 +347,18 @@ func updateJoinedProject(uid, pid int) error {
 	defer c.Close()
 	_, err := c.Do("SADD", fmt.Sprintf(userPjJoinedSet, uid), pid)
 	return err
+}
+
+//add to user's completed mission
+func updateDealtChat(uid, cid int, dealt bool) (err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	if dealt {
+		_, err = c.Do("SADD", fmt.Sprintf(userCsDealtSet, uid), cid)
+	} else {
+		_, err = c.Do("SREM", fmt.Sprintf(userCsDealtSet, uid), cid)
+	}
+	return
 }
 
 //update user with given value
@@ -917,18 +939,21 @@ func createChat(ct *Chat) int {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	ct.Id, _ = redis.Int(c.Do("INCR", "autoIncrChat"))
+	ct.Pid = base.HashedChatId(ct.Id)
+	go dbms.CreateChatIndex(ct.Id, ct.Pid)
 	//todo expire the msg
 	lua := `
 	local cid = KEYS[2]
 	redis.call("HMSET", "chat:"..cid,
 					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
-					KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18])
+					KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18],
+					KEYS[19], KEYS[20])
 	return cid
 	`
 	ka := []interface{}{
 		ChId, ct.Id,
-		ChConvId, ct.ConversationId,
+		ChPid, ct.Pid,
 		ChType, ct.Type,
 		ChTarget, ct.Target,
 		ChMsg, ct.Msg,
@@ -936,6 +961,7 @@ func createChat(ct *Chat) int {
 		ChTimeStamp, ct.Timestamp,
 		ChGroupName, ct.GroupName,
 		ChFrom, ct.From,
+		ChDealt, ct.Dealt,
 	}
 	script := redis.NewScript(len(ka), lua)
 	id, err := redis.Int(script.Do(c, ka...))
@@ -960,6 +986,13 @@ func createOfflineMsg(uid, convId int) {
 	defer c.Close()
 	key := fmt.Sprintf(offlineMsgList, uid)
 	c.Do("RPUSH", key, convId)
+}
+
+func readUserMsgsId(uid int) (ids []int, err error) {
+	c := dbms.Pool.Get()
+	defer c.Close()
+	ids, err = redis.Ints(c.Do("LRANGE", fmt.Sprintf(offlineMsgList, uid), "0", "-1"))
+	return
 }
 
 //return model Chat

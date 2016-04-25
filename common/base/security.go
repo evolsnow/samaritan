@@ -19,6 +19,7 @@ const (
 	ProjectIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 	MissionIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
 	CommentIdSalt   = "d27023a4f4939d8059b5eed20e86e6be"
+	ChatIdSalt      = "d27023a4f4939d8059b5eed20e86e6be"
 )
 
 // MakeToken makes jwt token with auth id
@@ -97,6 +98,12 @@ func HashedMissionId(id int) string {
 func HashedCommentId(id int) string {
 	raw := strconv.Itoa(id)
 	return hashWithSalt(raw, CommentIdSalt)
+}
+
+// HashedChatId hashed with comment salt
+func HashedChatId(id int) string {
+	raw := strconv.Itoa(id)
+	return hashWithSalt(raw, ChatIdSalt)
 }
 
 //hashWithSalt uses md5 hash and salt

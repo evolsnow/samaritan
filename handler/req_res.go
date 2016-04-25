@@ -423,7 +423,10 @@ type QiNiuUpTokenResp struct {
 }
 
 type NestedMsg struct {
+	Id        string            `json:"id"`
 	Msg       string            `json:"msg"`
+	Type      int               `json:"type"`
+	Dealt     bool              `json:"dealt"`
 	ExtraInfo map[string]string `json:"extraInfo"`
 }
 
@@ -612,6 +615,25 @@ func (pm *putJoinPjReq) FieldMap(req *http.Request) binding.FieldMap {
 }
 
 type putJoinPjResp struct {
+	baseResp
+}
+
+//update chat
+type putCtStatusReq struct {
+	Dealt bool `json:"dealt"`
+}
+
+func (pc *putCtStatusReq) FieldMap(req *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		//&pm.Done: binding.Field{
+		//	Form:     "done",
+		//	Required: true,
+		//},
+		&pc.Dealt: "dealt",
+	}
+}
+
+type putCtStatusResp struct {
 	baseResp
 }
 
