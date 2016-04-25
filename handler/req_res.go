@@ -219,12 +219,13 @@ func (pat *postAccessTokenReq) FieldMap(req *http.Request) binding.FieldMap {
 
 type postAccessTokenResp struct {
 	baseResp
-	Id     string `json:"id"`
-	Token  string `json:"token"`
-	Avatar string `json:"avatar"`
-	Mail   string `json:"mail"`
-	Name   string `json:"name"`
-	Alias  string `json:"alias,omitempty"`
+	Id         string `json:"id"`
+	Token      string `json:"token"`
+	Avatar     string `json:"avatar"`
+	Mail       string `json:"mail"`
+	Name       string `json:"name"`
+	Alias      string `json:"alias,omitempty"`
+	StudentNum string `json:"studentNum,omitempty"`
 }
 
 //project invitation

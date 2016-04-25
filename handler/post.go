@@ -253,12 +253,13 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 		return
 	}
 	resp := &postAccessTokenResp{
-		Id:     base.HashedUserId(user.Id),
-		Token:  base.MakeToken(user.Id),
-		Avatar: user.Avatar,
-		Name:   user.Name,
-		Alias:  user.Alias,
-		Mail:   user.Email,
+		Id:         base.HashedUserId(user.Id),
+		Token:      base.MakeToken(user.Id),
+		Avatar:     user.Avatar,
+		Name:       user.Name,
+		Alias:      user.Alias,
+		Mail:       user.Email,
+		StudentNum: user.StudentNum,
 	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
