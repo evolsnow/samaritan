@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	BelongErr = "请检查所登录的账户"
+	BelongErr        = "请检查所登录的账户"
+	MissionRemainErr = "项目包含任务，暂无法删除"
 )
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -46,6 +47,10 @@ func DeleteProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	p := model.InitedProject(pid)
 	if p.CreatorId != uid {
 		base.ForbidErr(w, BelongErr)
+		return
+	}
+	if len(p.GetMissions()) > 0 {
+		base.ForbidErr(w, MissionRemainErr)
 		return
 	}
 	p.Remove()
