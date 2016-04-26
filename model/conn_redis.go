@@ -119,8 +119,8 @@ const (
 	missionPictureList      = "mission:%d:pictures"       //mission's pictures redis-type:List
 
 	//project
-	projectMembersSet  = "project:%d:members" //project's members redis-type:Set
-	projectMissionsSet = "project:%d:missions"
+	projectMembersSet   = "project:%d:members" //project's members redis-type:Set
+	projectMissionsList = "project:%d:missions"
 	//chat
 	deviceToken    = "deviceToken:%d"     //ios device token
 	offlineMsgList = "user:%d:offlineMsg" //redis type:list
@@ -554,7 +554,7 @@ func createMission(m *Mission) {
 	c.Send("SADD", fmt.Sprintf(userMsPublishedSet, m.PublisherId), m.Id)
 	c.Send("SADD", fmt.Sprintf(userMsAcceptedSet, m.PublisherId), m.Id)
 	if m.ProjectId != 0 {
-		c.Send("SADD", fmt.Sprintf(projectMissionsSet, m.ProjectId), m.Id)
+		c.Send("LPUSH", fmt.Sprintf(projectMissionsList, m.ProjectId), m.Id)
 	}
 	c.Flush()
 	//}()
@@ -808,9 +808,9 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 func readProjectMissions(pid int) (reply []*Mission, err error) {
 	c := dbms.Pool.Get()
 	defer c.Close()
-	msSet := fmt.Sprintf(projectMissionsSet, pid)
+	msList := fmt.Sprintf(projectMissionsList, pid)
 	lua := `
-	local data = redis.call("SMEMBERS", KEYS[1])
+	local data = redis.call("LRANGE", KEYS[1], "0", "-1")
 	local ret = {}
   	for idx=1,#data do
   	  	local info = redis.call("HGETALL","mission:"..data[idx])
@@ -823,7 +823,7 @@ func readProjectMissions(pid int) (reply []*Mission, err error) {
   	return ret
    	`
 	script := redis.NewScript(1, lua)
-	ms, err := redis.Values(script.Do(c, msSet))
+	ms, err := redis.Values(script.Do(c, msList))
 	reply = make([]*Mission, len(ms))
 	for i, v := range ms {
 		m := new(Mission)
@@ -920,7 +920,7 @@ func deleteProject(pid int) error {
 	defer c.Close()
 	c.Send("DEL", "project:"+strconv.Itoa(pid))
 	c.Send("DEL", fmt.Sprintf(projectMembersSet, pid))
-	c.Send("DEL", fmt.Sprintf(projectMissionsSet, pid))
+	c.Send("DEL", fmt.Sprintf(projectMissionsList, pid))
 	return c.Flush()
 }
 
