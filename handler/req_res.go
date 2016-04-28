@@ -258,6 +258,7 @@ type postMissionInvitationReq struct {
 	Invitee     string `json:"invitee"`
 	MissionId   string `json:"missionId"`
 	MissionName string `json:"missionName"`
+	ProjectId   string `json:"projectId,omitempty"`
 	Remark      string `json:"remark"`
 }
 
