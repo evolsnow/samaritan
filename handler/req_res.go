@@ -426,6 +426,7 @@ type NestedMsg struct {
 	Id        string            `json:"id"`
 	Msg       string            `json:"msg"`
 	Type      int               `json:"type"`
+	Time      int64             `json:"time"`
 	Dealt     bool              `json:"dealt"`
 	ExtraInfo map[string]string `json:"extraInfo"`
 }

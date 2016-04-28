@@ -44,7 +44,8 @@ type Chat struct {
 func InitedChat(id int) (c *Chat) {
 	c = &Chat{Id: id}
 	c.load()
-	if c.Pid == "" { //deleted
+	if c.Pid == "" {
+		//deleted
 		return nil
 	}
 	return
@@ -94,7 +95,7 @@ func (ct *Chat) send() {
 		userTokens = append(userTokens, base.MakeToken(uid))
 		go ct.AddToOffline(uid)
 	}
-	offlineTokens := rpc.SocketPush(userTokens, ct.Msg, ct.ExtraInfo) //use webSocket push
+	offlineTokens := rpc.SocketPush(userTokens, ct.Msg, ct.ExtraInfo, ct.Timestamp) //use webSocket push
 
 	//if ct.Type != UserJoined && ct.Type != UserLeft {
 	applePush(offlineTokens, ct)
@@ -113,7 +114,7 @@ func applePush(tokens []string, ct *Chat) {
 		}
 	}
 	log.Debug("dt:", deviceList)
-	rpc.AppPush(deviceList, ct.Msg, ct.ExtraInfo)
+	rpc.AppPush(deviceList, ct.Msg, ct.ExtraInfo, ct.Timestamp)
 }
 
 // Save saves the offline chat message

@@ -273,6 +273,8 @@ func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		msg := fmt.Sprintf(InvitedToJoinProject, user.Name, req.ProjectName)
 		payload := make(map[string]string)
 		payload["invitor"] = user.Pid
+		payload["invitorName"] = user.Name
+		payload["invitorAvatar"] = user.Avatar
 		payload["projectId"] = req.ProjectId
 		payload["remark"] = req.Remark
 		push := &model.Chat{
@@ -308,6 +310,8 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		msg := fmt.Sprintf(DeliverMission, user.Name, m.Name)
 		payload := make(map[string]string)
 		payload["invitor"] = user.Pid
+		payload["invitorName"] = user.Name
+		payload["invitorAvatar"] = user.Avatar
 		payload["missionId"] = m.Pid
 		push := &model.Chat{
 			Type:      model.DeliveredMission,
@@ -337,6 +341,8 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		msg := fmt.Sprintf(InvitedToJoinMission, user.Name, req.MissionName)
 		payload := make(map[string]string)
 		payload["invitor"] = user.Pid
+		payload["invitorName"] = user.Name
+		payload["invitorAvatar"] = user.Avatar
 		payload["missionId"] = req.MissionId
 		payload["remark"] = req.Remark
 		push := &model.Chat{

@@ -62,9 +62,9 @@ func SendSMS(to, text string) (err error) {
 }
 
 // SocketPush calls rpc server to push message to client with webSocket
-func SocketPush(tokenList []string, msg string, extraInfo map[string]string) []string {
+func SocketPush(tokenList []string, msg string, extraInfo map[string]string, time int64) []string {
 	log.Debug("calling rpc.SocketPush")
-	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, ExtraInfo: extraInfo, UserToken: tokenList})
+	spr, err := RpcClientD.SocketPush(context.Background(), &pb.SocketPushRequest{Message: msg, ExtraInfo: extraInfo, Time: time, UserToken: tokenList})
 	if err != nil {
 		log.Error("socket push err:", err)
 	}
@@ -72,9 +72,9 @@ func SocketPush(tokenList []string, msg string, extraInfo map[string]string) []s
 }
 
 // AppPush calls rpc server to push message to client with apple push notification system
-func AppPush(tokenList []string, msg string, extraInfo map[string]string) {
+func AppPush(tokenList []string, msg string, extraInfo map[string]string, time int64) {
 	log.Debug("calling rpc.IOSPush")
-	RpcClientD.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, ExtraInfo: extraInfo, DeviceToken: tokenList})
+	RpcClientD.ApplePush(context.Background(), &pb.ApplePushRequest{Message: msg, ExtraInfo: extraInfo, Time: time, DeviceToken: tokenList})
 }
 
 //receive chat from rpc server

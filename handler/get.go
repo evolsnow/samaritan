@@ -234,6 +234,7 @@ func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	for i, v := range msgs {
 		nc := NestedMsg{
 			Id:        v.Pid,
+			Time:      v.Timestamp,
 			Msg:       v.Msg,
 			Dealt:     v.Dealt,
 			Type:      v.Type,
