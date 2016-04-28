@@ -275,7 +275,8 @@ func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		payload["invitor"] = user.Pid
 		payload["invitorName"] = user.Name
 		payload["invitorAvatar"] = user.Avatar
-		payload["projectId"] = req.ProjectId
+		payload["targetId"] = req.ProjectId
+		payload["targetName"] = req.ProjectName
 		payload["remark"] = req.Remark
 		push := &model.Chat{
 			Type:      model.InvitedToProject,
@@ -312,7 +313,8 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		payload["invitor"] = user.Pid
 		payload["invitorName"] = user.Name
 		payload["invitorAvatar"] = user.Avatar
-		payload["missionId"] = m.Pid
+		payload["targetId"] = m.Pid
+		payload["targetName"] = m.Name
 		push := &model.Chat{
 			Type:      model.DeliveredMission,
 			To:        req.ReceiversId,
@@ -343,7 +345,8 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		payload["invitor"] = user.Pid
 		payload["invitorName"] = user.Name
 		payload["invitorAvatar"] = user.Avatar
-		payload["missionId"] = req.MissionId
+		payload["targetId"] = req.MissionId
+		payload["targetName"] = req.MissionName
 		payload["remark"] = req.Remark
 		push := &model.Chat{
 			Type:      model.InvitedToMission,
