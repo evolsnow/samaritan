@@ -77,14 +77,14 @@ func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 			createdOrJoined = "joined"
 		}
 		np := NestedProject{
-			Id:          p.Pid,
-			Name:        p.Name,
-			Desc:        p.Desc,
-			CreatorId:   base.HashedUserId(p.CreatorId),
-			CreatorName: p.GetCreator().Name,
-			Private:     p.Private,
-			Type:        createdOrJoined,
-			Members:     p.GetMembersName(),
+			Id:           p.Pid,
+			Name:         p.Name,
+			Desc:         p.Desc,
+			CreatorId:    base.HashedUserId(p.CreatorId),
+			CreatorName:  p.GetCreator().Name,
+			Private:      p.Private,
+			Type:         createdOrJoined,
+			MembersCount: len(p.GetMembersName()),
 		}
 		nps[i] = np
 	}
@@ -123,13 +123,13 @@ func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		base.NotFoundErr(w, UserNotExistErr)
 		return
 	}
-	allMembers := p.GetMembers()
-	mems := make([]userModel, len(allMembers))
-	for i, mem := range allMembers {
-		mems[i] = userModel{
+	mems := p.GetMembers()
+	allMembers := make([]userModel, len(mems))
+	for i, mem := range mems {
+		allMembers[i] = userModel{
 			Id:     base.HashedUserId(mem.Id),
 			Name:   mem.Name,
-			Avatar: mem.Avatar,
+			Avatar: mem.FullAvatarUrl(),
 		}
 	}
 	resp := &projectDetailResp{
@@ -140,7 +140,7 @@ func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		CreatorId:   base.HashedUserId(p.CreatorId),
 		CreatorName: p.GetCreator().Name,
 		Private:     p.Private,
-		Members:     mems,
+		Members:     allMembers,
 	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)

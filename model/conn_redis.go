@@ -796,10 +796,10 @@ func readProjectMembers(pid int) (reply []*User, err error) {
 	script := redis.NewScript(1, lua)
 	users, err := redis.Values(script.Do(c, rcvSet))
 	reply = make([]*User, len(users))
-	for _, v := range users {
+	for i, v := range users {
 		rcv := new(User)
 		err = redis.ScanStruct(v.([]interface{}), rcv)
-		reply = append(reply, rcv)
+		reply[i] = rcv
 	}
 	return reply, err
 }

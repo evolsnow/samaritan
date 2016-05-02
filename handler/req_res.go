@@ -341,14 +341,14 @@ type samIdStatusResp struct {
 //user projects
 
 type NestedProject struct {
-	Id          string   `json:"id"` //public id
-	Name        string   `json:"name"`
-	Desc        string   `json:"desc,omitempty"` //description for the project
-	CreatorId   string   `json:"creatorId"`      //who created the project
-	CreatorName string   `json:"creatorName"`    //who created the project
-	Private     bool     `json:"private"`
-	Type        string   `json:"type"` //joined or created
-	Members     []string `json:"members"`
+	Id           string `json:"id"` //public id
+	Name         string `json:"name"`
+	Desc         string `json:"desc,omitempty"` //description for the project
+	CreatorId    string `json:"creatorId"`      //who created the project
+	CreatorName  string `json:"creatorName"`    //who created the project
+	Private      bool   `json:"private"`
+	Type         string `json:"type"` //joined or created
+	MembersCount int    `json:"membersCount"`
 }
 
 type userProjectsResp struct {

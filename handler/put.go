@@ -102,7 +102,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	if td.Done {
 		td.Finish()
-		UpdateMissionStatus(w,r,ps)
+		UpdateMissionStatus(w, r, ps)
 	}
 	if len(td.Pictures) > 0 {
 		td.UpdatePics(td.Pictures)
