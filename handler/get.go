@@ -110,6 +110,42 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	pid := dbms.ReadProjectId(ps.Get("project"))
+	p := model.InitedProject(pid)
+	if p == nil {
+		base.NotFoundErr(w, ProjectNotExistErr)
+		return
+	}
+	uid := ps.GetInt("authId")
+	u := model.InitedUser(uid)
+	if u == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
+	allMembers := p.GetMembers()
+	mems := make([]userModel, len(allMembers))
+	for i, mem := range allMembers {
+		mems[i] = userModel{
+			Id:     base.HashedUserId(mem.Id),
+			Name:   mem.Name,
+			Avatar: mem.Avatar,
+		}
+	}
+	resp := &projectDetailResp{
+		Id:          ps.Get("project"),
+		CreateTime:  p.CreateTime,
+		Name:        p.Name,
+		Desc:        p.Desc,
+		CreatorId:   base.HashedUserId(p.CreatorId),
+		CreatorName: p.GetCreator().Name,
+		Private:     p.Private,
+		Members:     mems,
+	}
+	log.DebugJson(resp)
+	makeResp(w, r, resp)
+}
+
 func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
 	resp := new(projectMissionsResp)
@@ -146,6 +182,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			ReceiversName: v.GetReceiversName(),
 			CreatorName:   u.Name,
 			CreatorId:     u.Pid,
+			CreatorAvatar: u.Avatar,
 			CreateTime:    v.CreateTime,
 			CompletionNum: v.CompletionNum,
 		}
@@ -181,7 +218,7 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	mid := dbms.ReadProjectId(ps.Get("mission"))
+	mid := dbms.ReadMissionId(ps.Get("mission"))
 	m := model.InitedMission(mid)
 	if m == nil {
 		base.NotFoundErr(w, MissionNotExistErr)

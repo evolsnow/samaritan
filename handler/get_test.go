@@ -122,7 +122,7 @@ func TestProjectMissionList(t *testing.T) {
 	}
 	m.Save()
 	auth := base.MakeToken(uid)
-	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, "", reply)
+	get("http://127.0.0.1:8080/projectMissions/"+p.Pid, "", reply)
 	if reply.Code == 0 {
 		t.Error("should be unauthorized")
 	}

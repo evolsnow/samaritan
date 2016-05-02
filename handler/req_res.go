@@ -364,6 +364,25 @@ type userSearchResp struct {
 	Avatar string `json:"avatar"`
 }
 
+//project detail
+type userModel struct {
+	Id     string `json:"id"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
+}
+
+type projectDetailResp struct {
+	baseResp
+	Id          string      `json:"id"`
+	CreateTime  int64       `json:"createTime,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	Desc        string      `json:"desc,omitempty"`
+	CreatorId   string      `json:"creatorId,omitempty"`
+	CreatorName string      `json:"creatorName,omitempty"`
+	Private     bool        `json:"private,omitempty"`
+	Members     []userModel `json:"members,omitempty"`
+}
+
 //project missions
 
 type NestedMission struct {
@@ -376,6 +395,7 @@ type NestedMission struct {
 	Accepted      bool     `json:"accepted,omitempty"`
 	CreatorName   string   `json:"creatorName,omitempty"`
 	CreatorId     string   `json:"creatorId,omitempty"`
+	CreatorAvatar string   `json:"creatorAvatar,omitempty"`
 	CreateTime    int64    `json:"createTime,omitempty"`
 	CompletionNum int      `json:"completionNum"`
 }
