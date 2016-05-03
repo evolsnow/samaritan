@@ -198,3 +198,21 @@ func TestUserInfo(t *testing.T) {
 		t.Error("failed to get user id info")
 	}
 }
+
+func TestProjectDetail(t *testing.T) {
+	pPid := cache.Get("put_test_project_pid")
+	reply := new(projectDetailResp)
+	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
+	auth := base.MakeToken(uid)
+	get("http://127.0.0.1:8080/projects/"+pPid, auth, reply)
+	if reply.Code != 0 {
+		t.Error("failed to get mission")
+		t.FailNow()
+	}
+	if reply.CreatorId == "" {
+		t.Error("failed to get project creator")
+	}
+	if len(reply.Members) == 0 {
+		t.Error("faield to get project members")
+	}
+}
