@@ -126,11 +126,11 @@ func TestProjectMissionList(t *testing.T) {
 	if reply.Code == 0 {
 		t.Error("should be unauthorized")
 	}
-	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, auth, reply)
+	get("http://127.0.0.1:8080/projectMissions/"+p.Pid, auth, reply)
 	if reply.Code != 0 || len(reply.Nm) < 1 {
-		t.Error("failed to get missions")
+		t.Error("failed to get missions:", reply.Msg)
 	}
-	get("http://127.0.0.1:8080/projects/missions/"+p.Pid, base.MakeToken(dbms.ReadUserIdWithIndex("snow@gmail.com", "mail")), reply)
+	get("http://127.0.0.1:8080/projectMissions/"+p.Pid, base.MakeToken(dbms.ReadUserIdWithIndex("snow@gmail.com", "mail")), reply)
 	if reply.Code == 0 || reply.Msg != NotProjectMemberErr {
 		t.Error("not member:", reply.Msg)
 	}

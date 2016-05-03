@@ -104,7 +104,7 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := userSearchResp{
 		Name:   u.Name,
 		Id:     u.Pid,
-		Avatar: u.FullAvatarUrl(),
+		Avatar: u.Avatar,
 	}
 	log.DebugJson(resp)
 	makeResp(w, r, resp)
@@ -123,9 +123,9 @@ func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		base.NotFoundErr(w, UserNotExistErr)
 		return
 	}
-	mems := p.GetMembers()
-	allMembers := make([]userModel, len(mems))
-	for i, mem := range mems {
+	members := p.GetMembers()
+	allMembers := make([]userModel, len(members))
+	for i, mem := range members {
 		allMembers[i] = userModel{
 			Id:     base.HashedUserId(mem.Id),
 			Name:   mem.Name,
