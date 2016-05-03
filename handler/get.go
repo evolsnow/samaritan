@@ -154,6 +154,11 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		base.NotFoundErr(w, ProjectNotExistErr)
 		return
 	}
+	owner := model.InitedUser(p.CreatorId)
+	if owner == nil {
+		base.NotFoundErr(w, UserNotExistErr)
+		return
+	}
 	ms := p.GetMissions()
 	uid := ps.GetInt("authId")
 	u := model.InitedUser(uid)
@@ -180,9 +185,9 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Pictures:      v.Pictures,
 			Accepted:      base.InIntSlice(v.Id, userAcceptedMissions),
 			ReceiversName: v.GetReceiversName(),
-			CreatorName:   u.Name,
-			CreatorId:     u.Pid,
-			CreatorAvatar: u.Avatar,
+			CreatorName:   owner.Name,
+			CreatorId:     owner.Pid,
+			CreatorAvatar: owner.Avatar,
 			CreateTime:    v.CreateTime,
 			CompletionNum: v.CompletionNum,
 		}
