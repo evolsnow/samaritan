@@ -186,7 +186,7 @@ func JoinProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	log.DebugJson(req)
-	pid := dbms.ReadMissionId(ps.Get("project"))
+	pid := dbms.ReadProjectId(ps.Get("project"))
 	if pid == 0 {
 		base.NotFoundErr(w, ProjectNotExistErr)
 		return
