@@ -14,6 +14,7 @@ const (
 	MissionRemainErr = "项目包含任务，暂无法删除"
 )
 
+// DeleteToDo deletes a to-do object
 func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	tid := dbms.ReadTodoId(ps.Get("todo"))
 	uid := ps.GetInt("authId")
@@ -27,6 +28,7 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeBaseResp(w, r)
 }
 
+// DeleteMission deletes mission object
 func DeleteMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mid := dbms.ReadMissionId(ps.Get("mission"))
 	uid := ps.GetInt("authId")
@@ -41,6 +43,7 @@ func DeleteMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	makeBaseResp(w, r)
 }
 
+// DeleteProject deletes a project object
 func DeleteProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
 	uid := ps.GetInt("authId")

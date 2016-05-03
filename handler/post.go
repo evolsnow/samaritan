@@ -38,6 +38,7 @@ const (
 	DeliverMission       = "%s发布了一个任务: %s"
 )
 
+// NewDeviceToken saves user's device token for apple push when user login
 func NewDeviceToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postDtReq)
 	errs := binding.Bind(r, req)
@@ -49,6 +50,7 @@ func NewDeviceToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, postDtResp{})
 }
 
+// NewUser means register action
 func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postUsReq)
 	errs := binding.Bind(r, req)
@@ -98,6 +100,7 @@ func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// NewTodo creates a to-do object in db
 func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postTdReq)
 	errs := binding.Bind(r, req)
@@ -122,18 +125,7 @@ func NewTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
-//func NewTodoPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-//	req := new(postPicReq)
-//	errs := binding.Bind(r, req)
-//	if errs.Handle(w) {
-//		return
-//	}
-//	log.DebugJson(req)
-//	uid := ps.GetInt("authId")
-//	tid := dbms.ReadTodoId(ps.Get("todo"))
-//
-//}
-
+// NewProject creates a project object
 func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postPjReq)
 	errs := binding.Bind(r, req)
@@ -154,6 +146,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// NewPrivateChat returns chat id for private chat
 func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postPrivateChatReq)
 	errs := binding.Bind(r, req)
@@ -175,6 +168,7 @@ func NewPrivateChat(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, resp)
 }
 
+// NewVerifyCode send mail code for different use
 func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postVerifyCodeReq)
 	errs := binding.Bind(r, req)
@@ -227,6 +221,7 @@ func NewVerifyCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	makeResp(w, r, postVerifyCodeResp{})
 }
 
+// NewAccessToken means login action
 func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postAccessTokenReq)
 	errs := binding.Bind(r, req)
@@ -260,6 +255,7 @@ func NewAccessToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, resp)
 }
 
+// NewProjectInvitation sends invitation to multi users
 func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postProjectInvitationReq)
 	errs := binding.Bind(r, req)
@@ -290,6 +286,7 @@ func NewProjectInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 	makeResp(w, r, postProjectInvitationResp{})
 }
 
+// NewMission creates a mission object
 func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postMissionReq)
 	errs := binding.Bind(r, req)
@@ -331,6 +328,7 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// NewMissionInvitation sends mission invitation to multi users
 func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postMissionInvitationReq)
 	errs := binding.Bind(r, req)
@@ -362,6 +360,7 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 	makeResp(w, r, postMissionInvitationResp{})
 }
 
+// NewComment creates a mission comment object
 func NewComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(postCommentReq)
 	errs := binding.Bind(r, req)

@@ -23,6 +23,7 @@ const (
 	NotProjectMemberErr = "不是本项目成员,无法查看项目"
 )
 
+// SamIdStatus tests whether a sam id is available
 func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	samId := ps.Get("samId")
 	resp := new(samIdStatusResp)
@@ -51,6 +52,7 @@ func SamIdStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// UserProjectList return projects a user joined/created
 func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	uid := ps.GetInt("authId")
 	pjType := r.URL.Query().Get("type")
@@ -93,6 +95,7 @@ func UserProjectList(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	makeResp(w, r, resp)
 }
 
+// SearchUser searches the user by mail
 func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userMail := ps.Get("user")
 	uid := dbms.ReadUserIdWithIndex(userMail, "mail")
@@ -110,6 +113,7 @@ func SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// ProjectDetail returns a project detail information
 func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
 	p := model.InitedProject(pid)
@@ -146,6 +150,7 @@ func ProjectDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	makeResp(w, r, resp)
 }
 
+// ProjectMissionList returns a project's all missions
 func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	pid := dbms.ReadProjectId(ps.Get("project"))
 	resp := new(projectMissionsResp)
@@ -198,6 +203,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	makeResp(w, r, resp)
 }
 
+// MissionCommentList returns a mission's all comments
 func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mid := dbms.ReadProjectId(ps.Get("mission"))
 	m := model.InitedMission(mid)
@@ -222,6 +228,7 @@ func MissionCommentList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	makeResp(w, r, resp)
 }
 
+// MissionDetail returns a mission's detail information
 func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	mid := dbms.ReadMissionId(ps.Get("mission"))
 	m := model.InitedMission(mid)
@@ -254,6 +261,7 @@ func MissionDetail(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	makeResp(w, r, resp)
 }
 
+// MakeUploadToken returns a qi niu upload token
 func MakeUploadToken(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	resp := &QiNiuUpTokenResp{
 		Token:  base.QiNiuUploadToken(),
@@ -263,6 +271,7 @@ func MakeUploadToken(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	makeResp(w, r, resp)
 }
 
+// OfflineMsgs returns user's all msgs
 func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	uid := ps.GetInt("authId")
 	u := model.InitedUser(uid)
@@ -289,6 +298,7 @@ func OfflineMsgs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, resp)
 }
 
+// UserInfo returns user's detail information
 func UserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	uid := ps.GetInt("authId")
 	user := model.InitedUser(uid)

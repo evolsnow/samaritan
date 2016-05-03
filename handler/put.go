@@ -16,6 +16,7 @@ const (
 	NotLoginErr         = "您还未登录"
 )
 
+// UpdatePassword updates user's password
 func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putPasswordReq)
 	errs := binding.Bind(r, req)
@@ -46,6 +47,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	makeResp(w, r, putPasswordResp{})
 }
 
+// UpdateUserInfo updates other common info
 func UpdateUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putUserInfoReq)
 	errs := binding.Bind(r, req)
@@ -70,6 +72,8 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	user.Save()
 	makeResp(w, r, putUserInfoResp{})
 }
+
+// UpdateTodo updates to-do's info
 func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putTdReq)
 	errs := binding.Bind(r, req)
@@ -111,6 +115,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, putTdResp{})
 }
 
+// UpdateMissionStatus sets mission status to done or not
 func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putMsStatusReq)
 	errs := binding.Bind(r, req)
@@ -146,6 +151,7 @@ func UpdateMissionStatus(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	makeResp(w, r, putMsStatusResp{})
 }
 
+// UpdateMissionPics updates mission's pictures
 func UpdateMissionPics(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putMsPicReq)
 	errs := binding.Bind(r, req)
@@ -159,6 +165,7 @@ func UpdateMissionPics(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	makeResp(w, r, putMsPicResp{})
 }
 
+//AcceptMission updates user's accepted mission
 func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putAcceptMsReq)
 	errs := binding.Bind(r, req)
@@ -179,6 +186,7 @@ func AcceptMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	makeResp(w, r, putAcceptMsResp{})
 }
 
+// JoinProject updates user's joined project list
 func JoinProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putJoinPjReq)
 	errs := binding.Bind(r, req)
@@ -199,6 +207,7 @@ func JoinProject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	makeResp(w, r, putAcceptMsResp{})
 }
 
+// UpdateChatStatus set chat status to dealt or not
 func UpdateChatStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req := new(putCtStatusReq)
 	errs := binding.Bind(r, req)
