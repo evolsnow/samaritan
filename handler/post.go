@@ -350,7 +350,7 @@ func NewMissionInvitation(w http.ResponseWriter, r *http.Request, ps httprouter.
 		payload["remark"] = req.Remark
 		push := &model.Chat{
 			Type:      model.InvitedToMission,
-			To:        []string{req.Invitee},
+			To:        req.Invitee,
 			Msg:       msg,
 			ExtraInfo: payload,
 		}

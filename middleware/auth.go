@@ -4,6 +4,7 @@ import (
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/common/base"
 	"github.com/evolsnow/samaritan/common/caches"
+	"github.com/evolsnow/samaritan/common/dbms"
 	"github.com/evolsnow/samaritan/common/log"
 	"net/http"
 	"strconv"
@@ -54,6 +55,11 @@ func Auth(h httprouter.Handle) httprouter.Handle {
 			return
 		}
 	Success:
+		go analyse(ps.GetInt("authId"))
 		h(w, r, ps)
 	}
+}
+
+func analyse(uid int) {
+	dbms.VisitRecord(uid)
 }

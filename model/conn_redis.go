@@ -985,7 +985,7 @@ func createOfflineMsg(uid, convId int) {
 	c := dbms.Pool.Get()
 	defer c.Close()
 	key := fmt.Sprintf(offlineMsgList, uid)
-	c.Do("RPUSH", key, convId)
+	c.Do("LPUSH", key, convId)
 }
 
 func readUserMsgsId(uid int) (ids []int, err error) {

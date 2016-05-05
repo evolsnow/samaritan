@@ -192,7 +192,7 @@ func TestNewMission(t *testing.T) {
 func TestNewMissionInvitation(t *testing.T) {
 	uid := dbms.ReadUserIdWithIndex("gsc1215225@gmail.com", "mail")
 	req := &postMissionInvitationReq{
-		Invitee:     base.HashedUserId(uid),
+		Invitee:     []string{base.HashedUserId(uid)},
 		MissionId:   "e2a7af07009a48fce8b0c2646f5089d3",
 		MissionName: "ms name",
 		Remark:      "remark",

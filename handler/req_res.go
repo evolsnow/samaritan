@@ -255,11 +255,11 @@ type postProjectInvitationResp struct {
 
 //mission invitation
 type postMissionInvitationReq struct {
-	Invitee     string `json:"invitee"`
-	MissionId   string `json:"missionId"`
-	MissionName string `json:"missionName"`
-	ProjectId   string `json:"projectId,omitempty"`
-	Remark      string `json:"remark"`
+	Invitee     []string `json:"invitee"`
+	MissionId   string   `json:"missionId"`
+	MissionName string   `json:"missionName"`
+	ProjectId   string   `json:"projectId,omitempty"`
+	Remark      string   `json:"remark"`
 }
 
 func (pi *postMissionInvitationReq) FieldMap(req *http.Request) binding.FieldMap {

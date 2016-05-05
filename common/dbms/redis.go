@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	samIdSet = "allSamId"
+	samIdSet    = "allSamId"
+	visitRecord = "visitRecord"
 
 	SearchPhoneIndex = "index:search:phone"
 	SearchMailIndex  = "index:search:mail"
@@ -205,4 +206,11 @@ func ReadDeviceToken(uid int) (dt string) {
 	defer c.Close()
 	dt, _ = redis.String(c.Do("HGET", DeviceIndex, uid))
 	return
+}
+
+// VisitRecord records user visit times
+func VisitRecord(uid int) {
+	c := Pool.Get()
+	defer c.Close()
+	c.Do("ZINCRBY", visitRecord, 1, uid)
 }
