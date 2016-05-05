@@ -24,11 +24,11 @@ const (
 )
 
 type Chat struct {
-	Id             int               `json:"-" redis:"id"`
-	Pid            string            `json:"id,omitempty" redis:"pid"`
-	Type           int               `json:"type" redis:"type"`
-	Msg            string            `json:"msg,omitempty" redis:"msg"`
-	Target         string            `json:"target,omitempty" redis:"target"`       //joined or left user
+	Id   int    `json:"-" redis:"id"`
+	Pid  string `json:"id,omitempty" redis:"pid"`
+	Type int    `json:"type" redis:"type"`
+	Msg  string `json:"msg,omitempty" redis:"msg"`
+	//Target         string            `json:"target,omitempty" redis:"target"`       //joined or left user
 	GroupName      string            `json:"groupName,omitempty" redis:"groupName"` //as mission's name
 	From           string            `json:"from,omitempty" redis:"from"`
 	SenderId       int               `json:"-" redis:"-"` //server side use
@@ -56,7 +56,7 @@ func (ct *Chat) Response() {
 	switch ct.Type {
 	//notify the special user
 	case InvitedToProject, KickedFromProject:
-		uid := dbms.ReadUserId(ct.Target)
+		uid := dbms.ReadUserId(ct.To[0])
 		ct.ReceiversId = append(ct.ReceiversId, uid)
 
 	//notify one user
@@ -76,7 +76,7 @@ func (ct *Chat) Response() {
 				ct.ReceiversId = append(ct.ReceiversId, uid)
 			}
 		}
-	case InvitedToMission:
+	case DeliveredMission, InvitedToMission:
 		ct.ReceiversId = make([]int, len(ct.To))
 		for i, uPid := range ct.To {
 			ct.ReceiversId[i] = dbms.ReadUserId(uPid)

@@ -81,10 +81,10 @@ const (
 )
 
 const (
-	ChId        = "id"
-	ChPid       = "pid"
-	ChType      = "type"
-	ChTarget    = "target"
+	ChId   = "id"
+	ChPid  = "pid"
+	ChType = "type"
+	//ChTarget    = "target"
 	ChMsg       = "msg"
 	ChGroupName = "groupName"
 	ChFrom      = "from"
@@ -947,15 +947,14 @@ func createChat(ct *Chat) int {
 	redis.call("HMSET", "chat:"..cid,
 					KEYS[1], cid, KEYS[3], KEYS[4], KEYS[5], KEYS[6],
 					KEYS[7], KEYS[8], KEYS[9], KEYS[10], KEYS[11], KEYS[12],
-					KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18],
-					KEYS[19], KEYS[20])
+					KEYS[13], KEYS[14], KEYS[15], KEYS[16], KEYS[17], KEYS[18])
 	return cid
 	`
 	ka := []interface{}{
 		ChId, ct.Id,
 		ChPid, ct.Pid,
 		ChType, ct.Type,
-		ChTarget, ct.Target,
+		//ChTarget, ct.Target,
 		ChMsg, ct.Msg,
 		ChInfo, ct.SerializedInfo,
 		ChTimeStamp, ct.Timestamp,
