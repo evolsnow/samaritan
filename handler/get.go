@@ -182,6 +182,7 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		//	continue
 		//}
 		v.Sync()
+		publisher := model.InitedUser(v.PublisherId)
 		nm := NestedMission{
 			Id:            v.Pid,
 			Name:          v.Name,
@@ -190,9 +191,9 @@ func ProjectMissionList(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			Pictures:      v.Pictures,
 			Accepted:      base.InIntSlice(v.Id, userAcceptedMissions),
 			ReceiversName: v.GetReceiversName(),
-			CreatorName:   owner.Name,
-			CreatorId:     owner.Pid,
-			CreatorAvatar: owner.Avatar,
+			CreatorName:   publisher.Name,
+			CreatorId:     publisher.Pid,
+			CreatorAvatar: publisher.Avatar,
 			CreateTime:    v.CreateTime,
 			CompletionNum: v.CompletionNum,
 		}

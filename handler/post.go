@@ -29,6 +29,7 @@ const (
 
 	UserNotExistErr = "用户不存在"
 
+	UnableToPubMsErr   = "该私有项目只有创建者可以发布任务"
 	UnableToCommentErr = "不是该任务发布者或者接收者,无权评论"
 )
 
@@ -296,12 +297,16 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.DebugJson(req)
 	uid := ps.GetInt("authId")
 	user := model.InitedUser(uid)
+	project := model.InitedProject(dbms.ReadProjectId(req.ProjectId))
+	if project.Private && user.Id != project.CreatorId {
+		base.ForbidErr(w, UnableToPubMsErr)
+	}
 	m := &model.Mission{
 		PublisherId: uid,
 		Name:        req.Name,
 		Desc:        req.Desc,
 		Deadline:    req.Deadline,
-		ProjectId:   dbms.ReadProjectId(req.ProjectId),
+		ProjectId:   project.Id,
 	}
 	m.Save()
 	go func() {
