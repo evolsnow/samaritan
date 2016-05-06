@@ -300,6 +300,7 @@ func NewMission(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	project := model.InitedProject(dbms.ReadProjectId(req.ProjectId))
 	if project.Private && user.Id != project.CreatorId {
 		base.ForbidErr(w, UnableToPubMsErr)
+		return
 	}
 	m := &model.Mission{
 		PublisherId: uid,
