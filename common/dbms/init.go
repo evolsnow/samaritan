@@ -43,9 +43,9 @@ func NewPool(server, password string, db string) *redis.Pool {
 var DB *sql.DB
 
 // NewDB return a mysql connection
-func NewDB(password, host string, port int, database string) *sql.DB {
+func NewDB(user, password, host string, port int, database string) *sql.DB {
 	server := net.JoinHostPort(host, strconv.Itoa(port))
-	db, _ := sql.Open("mysql", fmt.Sprintf("remote:%s@tcp(%s)/%s?autocommit=true", password, server, database))
+	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?autocommit=true", user, password, server, database))
 	if err := db.Ping(); err != nil {
 		log.Error("failed to connect mysql:", err)
 		return nil

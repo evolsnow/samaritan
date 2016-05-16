@@ -60,7 +60,7 @@ func main() {
 	dbms.CachePool = dbms.NewPool(redisServer, cfg.RedisS.Password, cacheDB)
 
 	//init mysql database
-	dbms.DB = dbms.NewDB(cfg.MysqlS.Password, cfg.MysqlS.Address, cfg.MysqlS.Port, cfg.MysqlS.DB)
+	dbms.DB = dbms.NewDB(cfg.MysqlS.User, cfg.MysqlS.Password, cfg.MysqlS.Address, cfg.MysqlS.Port, cfg.MysqlS.DB)
 
 	//init rpc client, domestic+foreign
 	rpcServerD := net.JoinHostPort(cfg.RpcSD.Address, strconv.Itoa(cfg.RpcSD.Port))

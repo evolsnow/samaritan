@@ -10,6 +10,7 @@ type listenServer struct {
 	Address  string `json:"address,omitempty"`
 	Port     int    `json:"port"`
 	DB       string `json:"db,omitempty"`
+	User     string `json:"user,omitempty"`
 	Password string `json:"password,omitempty"`
 }
 
